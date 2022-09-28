@@ -1,0 +1,646 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN ">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>杨红蓝 | 实现Demo之大转盘三连中</title>
+    <meta name="author" content="Yanghonglan">
+    <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
+    <meta name="keywords" content=" ">
+    <link rel="icon" href="/images/avatar.jpg">
+    <link rel="stylesheet" href="/css/antd.min.css">
+    
+    <link rel="stylesheet" href="/css/full-theme.css">
+    
+    <script src="/js/vue.js"></script>
+    <script src="/js/antd.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+
+    <div id="loading"
+        style="height: 100vh; width: 100%; position: fixed;display: flex;z-index: 200; justify-content: space-between;">
+        <div id="loadleft" style="width: 50%;background-color: #ffffff;transition: width 0.6s ease-out;"></div>
+        <div id="loadright" style="width: 50%;background-color: #ffffff;transition: width 0.6s ease-out;"></div>
+        <div
+            style="position: fixed; height: 100vh; width: 100%;display: flex;justify-content: center;align-items: center;">
+            <div id="loadcontent"
+                style="width:400px;height:400px;padding:50px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:solid 10px#a3ddfb; text-align:center;opacity:1;transition:opacity 0.3s ease-out;">
+                <div>
+                    <h2>LOADING...</h2>
+                    <p>加载过慢请开启缓存(浏览器默认开启)</p>
+                    <div>
+                        <img src="/images/dancingkitty.gif" alt="loading">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="layout">
+        <transition name="into">
+            <div v-show="show_page" style="display: none;">
+                <div id="menu_show">
+                    
+    <nav id="menu">
+        <div class="desktop-menu">
+            <span class="title">
+                杨红蓝's Blog
+            </span>
+            
+                <a href="/">
+                    <span>
+                        <a-icon type="home" theme="filled" />
+                    </span>
+                    <span>
+                        主页
+                    </span>
+                </a>
+                
+                <a href="/archives">
+                    <span>
+                        <a-icon type="read" theme="filled" />
+                    </span>
+                    <span>
+                        文章
+                    </span>
+                </a>
+                
+                <a href="/categories">
+                    <span>
+                        <a-icon type="book" theme="filled" />
+                    </span>
+                    <span>
+                        分类
+                    </span>
+                </a>
+                
+        </div>
+
+        <div :class="'phone-menu ' + menu_show" id="phone-menu">
+            <div :class="'title'" @click="menu_show=!menu_show">
+                <span style="margin-right: 10px;">
+                    <a-icon type="appstore" theme="filled" />
+                </span>
+                <span>
+                    杨红蓝
+                </span>
+            </div>
+            <div class="items" v-show="menu_show">
+                
+                    <a href="/">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="home"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                主页
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="/archives">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="read"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                文章
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="/categories">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="book"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                分类
+                            </div>
+                        </div>
+                    </a>
+                    
+            </div>
+            <div class="curtain" v-show="menu_show"></div>
+        </div>
+
+    </nav>
+                </div>
+
+                <div id="main">
+                     
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="article">
+    <div>
+        <h1>实现Demo之大转盘三连中 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/27
+        </span>
+
+        
+        <span class="category">
+            <a href="/categories/HTML">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" />
+                </span>
+                HTML
+            </a>
+        </span>
+        
+
+        
+    </div>
+
+    <div class="content" v-pre>
+        <h3 id="点击抽奖大转盘三连中"><a href="#点击抽奖大转盘三连中" class="headerlink" title="点击抽奖大转盘三连中"></a>点击抽奖大转盘三连中</h3><p><strong>ps:</strong> <em>实现一个抽奖大转盘抽奖三连中，通过canvas来绘制奖品的转盘，其他的背景通过html标签实现，简易Demo如下</em></p>
+<h4 id="html-amp-css-Code"><a href="#html-amp-css-Code" class="headerlink" title="html&amp;css Code"></a>html&amp;css Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Demo之大转盘三连中&lt;/title&gt;
+    &lt;style&gt;
+        * &#123;
+            margin: 0;
+            padding: 0;
+        &#125;
+
+        html,
+        body &#123;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        &#125;
+
+        .container &#123;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        &#125;
+
+        .canvas-wrapper &#123;
+            position: relative;
+        &#125;
+
+        .button &#123;
+            background: transparent;
+            outline: none;
+            border: none;
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 56vh;
+            border-radius: 50%;
+            margin: 0 auto;
+            width: 100px;
+            height: 100px;
+        &#125;
+
+        #canvas &#123;
+            display: block;
+        &#125;
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;div class=&quot;canvas-wrapper&quot;&gt;
+            &lt;!-- 抽奖按钮 --&gt;
+            &lt;button class=&quot;button&quot;&gt;&lt;/button&gt;
+            &lt;!-- canvas根据奖品数据绘制奖品圆盘 --&gt;
+            &lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
+        &lt;/div&gt;
+        &lt;div&gt;信息&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    // 获取像素比 高清cavas
+    function getPixelRatio(context) &#123;
+
+        var backingStore = context.backingStorePixelRatio ||
+
+            context.webkitBackingStorePixelRatio ||
+
+            context.mozBackingStorePixelRatio ||
+
+            context.msBackingStorePixelRatio ||
+
+            context.oBackingStorePixelRatio ||
+
+            context.backingStorePixelRatio || 1;
+
+        return (window.devicePixelRatio || 1) / backingStore;
+
+    &#125;;
+
+    // 公共类
+    function Wheel() &#123;
+        let cav = document.getElementById(&#39;canvas&#39;);
+        this.pointerRange = [];
+        this.pointerIndex = 0;
+        this.turned = []; //已经转中的下标数组
+        this.turnTargetRotate = []; //要转的目的数组
+        this.turnedCount = 0; // 转盘次数
+        this.startTurn = false; // 开始抽
+        this.delay = 20;
+        this.speed = 1; //转速
+        this.ctx = cav.getContext(&#39;2d&#39;);
+        this.ratio = getPixelRatio(this.ctx);
+        this.w = window.innerWidth;
+        this.h = window.innerHeight;
+        cav.style.width = this.w + &#39;px&#39;;
+        cav.style.height = this.h + &#39;px&#39;;
+        cav.width = this.w * this.ratio;
+        cav.height = this.h * this.ratio;
+    &#125;
+    Wheel.prototype.updatePointerIndex = function (rotate) &#123;
+        let rotateV = rotate % 360;
+        let index = this.pointerRange.findIndex(d =&gt; rotateV &lt; d);
+        this.pointerIndex = index == -1 ? 0 : index;
+    &#125;
+
+    // 转盘类
+    function AwardRound(&#123;
+        cx,
+        cy,
+        cr = 100,
+        data = []
+    &#125;) &#123;
+        let angleStore = 0;
+        let sum = 0;
+        this.cx = cx * wheel.ratio;
+        this.cy = cy * wheel.ratio;
+        this.cr = cr * wheel.ratio;
+        this.count = data.length;
+        this.data = data.map((d, i) =&gt; &#123;
+            sum += d.angle;
+            let prevData = data[i - 1];
+            angleStore += d.angle + (i - 1 &gt; 0 ? prevData.angle : 0);
+            let startAngle = - 90 - (d.angle / 2);
+            d.beginAngle = startAngle / 180 * Math.PI;
+            d.endAngle = (startAngle + d.angle) / 180 * Math.PI;
+            if (i == 0) &#123;
+                d.rotateAngle = 0;
+
+            &#125; else &#123;
+                d.rotateAngle = angleStore;
+            &#125;
+            wheel.pointerRange.push(sum - (data[0].angle / 2));
+            if (d.isTurn) &#123;
+                let prevItem = wheel.pointerRange[i - 1];
+                wheel.turnTargetRotate.push(&#123;
+                    rotate: ((wheel.pointerRange[i] - prevItem) / 2 + prevItem) + 3 * 360,
+                    index: i
+                &#125;)
+            &#125;
+
+            return d;
+        &#125;);
+    &#125;
+    // 此处逻辑就是绘制转盘的方法
+    AwardRound.prototype.render = function () &#123;
+        let iconW = 36 * wheel.ratio;
+        this.data.forEach((d, i) =&gt; &#123;
+
+            wheel.ctx.save();
+            wheel.ctx.translate(this.cx, this.cy);
+            wheel.ctx.rotate((d.rotateAngle) * Math.PI / 360);
+            wheel.ctx.beginPath();
+
+            // 画底盘
+            wheel.ctx.fillStyle = d.background || &#39;#fdf1e7&#39;;
+            wheel.ctx.arc(0, 0, this.cr, d.beginAngle, d.endAngle);
+            wheel.ctx.lineTo(0, 0);
+            wheel.ctx.fill()
+            // 名字
+            wheel.ctx.fillStyle = d.color || &#39;#000&#39;;
+            wheel.ctx.font = `$&#123;d.fontSize ? d.fontSize * wheel.ratio : 16&#125;px 微软雅黑`;
+            wheel.ctx.textAlign = &#39;center&#39;;
+            wheel.ctx.fillText(d.name || &#39;&#39;, 0, - this.cr + 20 * wheel.ratio);
+
+            // 图片
+            if (d.icon) &#123;
+                wheel.ctx.drawImage(d.icon, -iconW / 2, -this.cr + 40 * wheel.ratio, iconW, iconW);
+            &#125;
+            // 浮层
+            wheel.ctx.fillStyle = &#39;#000&#39;;
+            wheel.ctx.globalAlpha = i == wheel.pointerIndex || wheel.turned.includes(i) ? 0 : 0.5;
+            wheel.ctx.arc(0, 0, this.cr, d.beginAngle, d.endAngle);
+            wheel.ctx.lineTo(0, 0);
+            wheel.ctx.fill();
+
+            wheel.ctx.restore();
+        &#125;)
+
+    &#125;
+
+    // 按钮类
+    function Button(&#123;
+        cx,
+        cy
+    &#125;) &#123;
+        this.cx = cx * wheel.ratio;
+        this.cy = cy * wheel.ratio;
+        this.rotate = 0;
+    &#125;
+    Button.prototype.render = function () &#123;
+        let tmpW = 25 * wheel.ratio;
+        wheel.ctx.save()
+        wheel.ctx.translate(this.cx, this.cy);
+        wheel.ctx.rotate(this.rotate * Math.PI / 180);
+        wheel.ctx.beginPath()
+        wheel.ctx.fillStyle = &#39;#FF910B&#39;;
+        wheel.ctx.arc(0, 0, 50 * wheel.ratio, 0, Math.PI * 2);
+        wheel.ctx.fill();
+        wheel.ctx.moveTo(0, 0);
+        wheel.ctx.lineTo(tmpW, 0);
+        wheel.ctx.lineTo(0, -80 * wheel.ratio);
+        wheel.ctx.lineTo(-tmpW, 0);
+        wheel.ctx.fill();
+        wheel.ctx.restore();
+    &#125;
+    Button.prototype.update = function () &#123;
+        this.rotate += wheel.speed;
+        if (wheel.startTurn) &#123; // 开始转了
+            if (this.rotate &gt;= wheel.turnTargetRotate[wheel.turnedCount].rotate) &#123; // 达到阈值
+                wheel.delay--; //延时器
+                if (wheel.delay &gt; 0) &#123;
+                    // 休息一下
+                    this.rotate = wheel.turnTargetRotate[wheel.turnedCount].rotate; // 保持抽到位置
+                    wheel.speed = 0; //停止转动
+                &#125; else &#123;
+                    // 转下一次
+                    wheel.turnedCount++; // 中次+1
+                    wheel.turned.push(wheel.turnTargetRotate[wheel.turnedCount - 1].index);
+                    wheel.speed = 20;
+                    wheel.delay = 20;
+                    if (wheel.turnedCount &lt; 3) &#123;
+                        this.rotate = 0;
+                    &#125;
+                &#125;
+            &#125;
+        &#125;
+        wheel.updatePointerIndex(this.rotate);
+    &#125;
+
+    // 背景类
+    function Background() &#123;
+        let img = new Image()
+        img.src = &#39;./bg.png&#39;;
+        this.bgImg = img;
+    &#125;
+    Background.prototype.render = function () &#123;
+        let iconW = (wheel.w - 10) * wheel.ratio;
+        let iconH = iconW * (846 / 720);
+        wheel.ctx.drawImage(this.bgImg, 5 * wheel.ratio, wheel.h * wheel.ratio - iconH, iconW, iconH)
+    &#125;
+
+
+    var awardData = [
+        &#123;
+            icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065297220_maYiZc27.jpg&#39;,
+            name: &#39;感谢参与&#39;,
+            background: &#39;#fdf1e7&#39;,
+            color: &#39;#C24603&#39;,
+            fontSize: &#39;13&#39;,
+            angle: 45,
+        &#125;,
+        &#123;
+            icon: &#39;&#39;,
+            name: &#39;AirJordan1&#39;,
+            background: &#39;#FFB876&#39;,
+            color: &#39;#C24603&#39;,
+            fontSize: &#39;11&#39;,
+            angle: 25
+        &#125;,
+        &#123;
+            icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065313260_JDMZ2GTW.jpg&#39;,
+            name: &#39;iPhone手机&#39;,
+            background: &#39;#BD1600&#39;,
+            color: &#39;#FEE28A&#39;,
+            fontSize: &#39;11&#39;,
+            angle: 25,
+            isTurn: true,
+        &#125;,
+        &#123;
+            icon: &#39;&#39;,
+            name: &#39;蓝牙音箱&#39;,
+            background: &#39;#FFDAB2&#39;,
+            color: &#39;#C24603&#39;,
+            fontSize: &#39;11&#39;,
+            angle: 25
+        &#125;,
+
+        &#123;
+            icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065297220_maYiZc27.jpg&#39;,
+            name: &#39;感谢参与&#39;,
+            background: &#39;#fdf1e7&#39;,
+            color: &#39;#C24603&#39;,
+            fontSize: &#39;13&#39;,
+            angle: 45,
+        &#125;,
+        &#123;
+            icon: &#39;&#39;,
+            name: &#39;AirJordan1&#39;,
+            background: &#39;#FFB876&#39;,
+            color: &#39;#C24603&#39;,
+            fontSize: &#39;11&#39;,
+            angle: 25
+        &#125;,
+        &#123;
+            icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065313260_JDMZ2GTW.jpg&#39;,
+            name: &#39;iPhone手机&#39;,
+            background: &#39;#BD1600&#39;,
+            color: &#39;#FEE28A&#39;,
+            fontSize: &#39;11&#39;,
+            angle: 25,
+            isTurn: true,
+        &#125;,
+        &#123;
+            icon: &#39;&#39;,
+            name: &#39;蓝牙音箱&#39;,
+            background: &#39;#FFDAB2&#39;,
+            color: &#39;#C24603&#39;,
+            fontSize: &#39;11&#39;,
+            angle: 25
+        &#125;,
+
+        &#123;
+            icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065297220_maYiZc27.jpg&#39;,
+            name: &#39;感谢参与&#39;,
+            background: &#39;#fdf1e7&#39;,
+            color: &#39;#C24603&#39;,
+            fontSize: &#39;13&#39;,
+            angle: 45,
+        &#125;,
+        &#123;
+            icon: &#39;&#39;,
+            name: &#39;AirJordan1&#39;,
+            background: &#39;#FFB876&#39;,
+            color: &#39;#C24603&#39;,
+            fontSize: &#39;11&#39;,
+            angle: 25
+        &#125;,
+        &#123;
+            icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065313260_JDMZ2GTW.jpg&#39;,
+            name: &#39;iPhone手机&#39;,
+            background: &#39;#BD1600&#39;,
+            color: &#39;#FEE28A&#39;,
+            fontSize: &#39;11&#39;,
+            angle: 25,
+            isTurn: true,
+        &#125;,
+        &#123;
+            icon: &#39;&#39;,
+            name: &#39;蓝牙音箱&#39;,
+            background: &#39;#FFDAB2&#39;,
+            color: &#39;#C24603&#39;,
+            fontSize: &#39;11&#39;,
+            angle: 25
+        &#125;,
+    ];
+    awardData = awardData.map(d =&gt; &#123;
+        if (d.icon) &#123;
+            let img = new Image();
+            img.src = d.icon;
+            d.icon = img
+        &#125;
+        return d
+    &#125;)
+
+    // 这个需要先执行， 而且得绑定到全局window上
+    var wheel = new Wheel(); 
+
+    window.onload = function () &#123;
+        let iconH = (wheel.w - 10) * (846 / 720);
+        let cx = wheel.w / 2;
+        let cr = cx - 30;
+        let cy = wheel.h - iconH + cr + 25;
+        var btnDom = document.querySelector(&#39;.button&#39;)
+        var background = new Background();
+        var awardRound = new AwardRound(&#123;
+            cx: cx,
+            cy: cy,
+            cr: cr,
+            data: awardData
+        &#125;);
+        var button = new Button(&#123;
+            cx,
+            cy,
+        &#125;);
+        const clickDown = function () &#123;
+            if (wheel.startTurn) &#123;
+                btnDom.removeEventListener(&#39;click&#39;, clickDown);
+                return;
+            &#125;
+            button.rotate = 0;
+            wheel.startTurn = true;
+            wheel.speed = 20;
+        &#125;
+        btnDom.addEventListener(&#39;click&#39;, clickDown)
+
+        function doAnimate() &#123;
+            // 清除画布
+            wheel.ctx.clearRect(0, 0, 10000, 10000)
+            // 渲染转盘背景
+            background.render();
+            // 渲染转盘
+            awardRound.render();
+            // 渲染按钮
+            button.update();
+            button.render();
+            if (wheel.turnedCount &lt; 3) &#123;
+                requestAnimationFrame(() =&gt; &#123;
+                    doAnimate();
+                &#125;)
+            &#125;
+        &#125;
+        doAnimate();
+
+    &#125;
+</code></pre>
+
+    </div>
+
+    
+</div>
+                     
+<footer id="footer">
+    <div class="footer-wrap">
+        <div>
+            © 杨红蓝
+            <span class="footer-icon">
+                <a-icon type="flag" theme="filled" /></span>
+            @Yanghonglan
+        </div>
+        
+    </div>
+
+</footer>
+
+<script src="/js/highlight.min.js"></script>
+<script src="/js/particle.js"></script>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+    <script>
+    new Vue({
+        el: "#layout",
+        data: {
+            show_page: false,
+            onload_menu: false,
+            menu_show: false,
+            card_top: 100
+        },
+        created: function () {
+            var that = this
+            window.onload = function () {
+                that.show_page = true
+                document.getElementById("loadcontent").style.opacity = 0
+                setTimeout(function () {
+                    document.getElementById("loadleft").style.width = 0
+                    document.getElementById("loadright").style.width = 0
+                }, 300)
+                setTimeout(function () {
+                    document.getElementById("loading").style = "display:none"
+                }, 600)
+            }
+        },
+        mounted: function () {
+            var that = this
+            window.addEventListener('scroll', function (e) {
+                that.menu_show = false
+            })
+        },
+        methods: {
+            home_click: function () {
+                window.scrollTo({
+                    top: window.innerHeight - 80,
+                    behavior: "smooth",
+                });
+            }
+        }
+    })
+</script>
+
+</body>
+
+</html>

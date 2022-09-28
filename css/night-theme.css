@@ -780,7 +780,9 @@ footer .footer-wrap {
   border-top: 1px solid #aaa;
   width: 900px;
   margin: auto;
-  color: #5c6b72;
+  color: #333;
+  font-weight: bold;
+  overflow: hidden;
 }
 footer .footer-wrap div {
   margin: 15px;
@@ -857,6 +859,16 @@ footer .footer-icon {
 .categories-tags #archives {
   top: 60px;
 }
+.articlebg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url("https://thumbnail1.baidupcs.com/thumbnail/ca660ce26g3d001bc040f246d3bc058e?fid=3419225308-250528-395870620402480&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-k808PJ2wtg0EGA8m4vt02NEzecw%3d&expires=8h&chkbd=0&chkv=0&dp-logid=513851345508704923&dp-callid=0&time=1664352000&size=c2048_u1152&quality=90&vuk=3419225308&ft=image&autopolicy=1");
+}
 .article {
   margin: auto;
   position: relative;
@@ -864,6 +876,7 @@ footer .footer-icon {
   color: #24292e;
   padding: 20px;
   font-size: 15px;
+  background: rgba(255,255,255,0.8);
 }
 .article h1 {
   font-weight: bolder;

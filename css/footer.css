@@ -10,7 +10,9 @@ footer .footer-wrap {
   border-top: 1px solid footer-line;
   width: 900px;
   margin: auto;
-  color: label-font;
+  color: #333;
+  font-weight: bold;
+  overflow: hidden;
 }
 footer .footer-wrap div {
   margin: 15px;

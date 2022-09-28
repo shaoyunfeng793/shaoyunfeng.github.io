@@ -30,8 +30,9 @@
 }
 #home-posts .post:after {
   content: '- 点击阅读全文 -';
+  font-weight: bold;
   text-align: center;
-  color: #92cafa;
+  color: #5daef2;
   display: block;
   position: absolute;
   bottom: 50px;

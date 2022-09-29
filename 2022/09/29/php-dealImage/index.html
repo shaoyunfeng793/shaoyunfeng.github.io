@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | PHP处理图片</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,59 +135,123 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>PHP处理图片 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/29
+        </span>
+
         
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/axios">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 axios
             </a>
         </span>
         
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#03a9f4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
+
         
     </div>
-    <div id="archives">
+
+    <div class="content" v-pre>
+        <h3 id="使用GD库实现图片处理工具函数"><a href="#使用GD库实现图片处理工具函数" class="headerlink" title="使用GD库实现图片处理工具函数"></a>使用GD库实现图片处理工具函数</h3><p><strong>ps:</strong> <em>使用php完成对图片的裁切或者调整图片大小(缩放)</em></p>
+<h4 id="php-Code"><a href="#php-Code" class="headerlink" title="php Code"></a>php Code</h4><pre><code class="php">&lt;?php
+    /* img_deal(String $file,String $save,Array $options)参数
+        $file 用户上传文件的路径
+        $save 保存的路径
+    
+        $options参数:
+        - type 裁切(clip)或者是缩放(scale) 默认裁切
+    
+        - scale参数 (至少写一个参数)
+        - scale_w 缩放后的宽度 (如果只设置其中一值则按原图比例缩放)
+        - scale_h 缩放后的高度
+    
+        - clip参数 (全都得写)
+        - clip_w 裁切后的宽度
+        - clip_h 裁切后的高度
+        - clip_x 裁切起点x坐标(以图片左上顶点为原点,向下y正方向,向右x正方向)
+        - clip_y 裁切起点y坐标
+    */
+    function img_deal($file,$save,$options)&#123;
+    
+        //上传的原图片
+        $img_src = imagecreatefromjpeg($file);
+        //原图片的宽高
+        $src_w = imagesx($img_src);
+        $src_h = imagesy($img_src);
         
+        switch ($options[&#39;type&#39;]) &#123;
+            case &#39;scale&#39;:
+                if(is_numeric($options[&#39;scale_w&#39;]) &amp;&amp; is_numeric($options[&#39;scale_h&#39;]))&#123;
+                    $dist_w = $options[&#39;scale_w&#39;];
+                    $dist_h = $options[&#39;scale_h&#39;];
+                &#125;elseif(is_numeric($options[&#39;scale_w&#39;]))&#123;
+                    $dist_w = $options[&#39;scale_w&#39;];
+                    $dist_h = $src_h*$dist_w/$src_w;
+                &#125;elseif(is_numeric($options[&#39;scale_h&#39;]))&#123;
+                    $dist_h = $options[&#39;scale_h&#39;];
+                    $dist_w = $src_w*$dist_h/$src_h;
+                &#125;else&#123;
+                    echo &#39;Image deal is Failed&lt;br&gt;&#39;;
+                    return false;
+                &#125;
+                //设置目标图片大小
+                $img_dist = imagecreatetruecolor($dist_w,$dist_h);
+                //图片进行处理
+                imagecopyresampled($img_dist, $img_src, 0, 0, 0, 0, $dist_w, $dist_h, $src_w, $src_h);
+    
+                break;
+            
+            default:
+                //设置目标图片大小
+                $img_dist = imagecreatetruecolor($options[&#39;clip_w&#39;],$options[&#39;clip_h&#39;]);
+                $keys = array_keys($options);
+                $str = implode($keys, &#39;,&#39;);
+                preg_match_all(&#39;/clip_/&#39;, $str, $matches);
+                if(count($matches[0]) !== 4)&#123;
+                    echo &#39;Image deal is Failed&lt;br&gt;&#39;;
+                    return false;
+                &#125;
+    
+                //图片进行处理
+                imagecopyresampled($img_dist, $img_src, 0, 0, $options[&#39;clip_x&#39;], $options[&#39;clip_y&#39;], $options[&#39;clip_w&#39;], $options[&#39;clip_h&#39;], $options[&#39;clip_w&#39;], $options[&#39;clip_h&#39;]);
+                
+                break;
+                
+        &#125;
+        //将图片保存
+        $status = imagejpeg($img_dist,$save);
+        if($status)&#123;
+            echo &#39;Image deal is Success&lt;br&gt;&#39;;
+        &#125;else&#123;
+            echo &#39;Image deal is Failed&lt;br&gt;&#39;;
+        &#125;
+        //释放内存空间
+        imagedestroy($img_dist);
+        imagedestroy($img_src);
+    
+        //返回保存状态结果
+        return $status;
+    
+    &#125;
+ 
+?&gt;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

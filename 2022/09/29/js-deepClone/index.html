@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | 实现对象深拷贝函数</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,59 +135,109 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>实现对象深拷贝函数 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/29
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/Js">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 Js
             </a>
         </span>
         
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
+
         
     </div>
-    <div id="archives">
+
+    <div class="content" v-pre>
+        <h3 id="实现对象深拷贝函数"><a href="#实现对象深拷贝函数" class="headerlink" title="实现对象深拷贝函数"></a>实现对象深拷贝函数</h3><p><strong>ps:</strong> <em><code>深拷贝</code>需要根据不同的类型值进行不同的拷贝特性,Reg对象的一些属性拷贝，</em></p>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    // 判断是否是某类型
+    const isType = (obj, type) =&gt; &#123;
+        if (typeof obj !== &#39;object&#39;) return false;
+        const typeString = Object.prototype.toString.call(obj);
+        let flag;
+        switch (type) &#123;
+            case &#39;Array&#39;:
+            flag = typeString === &#39;[object Array]&#39;;
+            break;
+            case &#39;Date&#39;:
+            flag = typeString === &#39;[object Date]&#39;;
+            break;
+            case &#39;RegExp&#39;:
+            flag = typeString === &#39;[object RegExp]&#39;;
+            break;
+            default:
+            flag = false;
+        &#125;
+        return flag;
+        &#125;;
+        // 获取到正则修饰符
+        const getRegExp = re =&gt; &#123;
+        var flags = &#39;&#39;;
+        if (re.global) flags += &#39;g&#39;;
+        if (re.ignoreCase) flags += &#39;i&#39;;
+        if (re.multiline) flags += &#39;m&#39;;
+        return flags;
+        &#125;;
+        // 深度克隆
+        const deepClone = parent =&gt; &#123;
+        // 旧对象 ：新对象 map
+        let _map = new WeakMap();
         
+        const _clone = parent =&gt; &#123;
+            if (parent === null) return null;
+            if (typeof parent !== &#39;object&#39;) return parent;
+            if (_map.get(parent)) return _map.get(parent);
+            
+            let newParent;
+            if (isType(parent, &#39;Array&#39;)) &#123;
+                // 对数组做特殊处理
+                newParent = [];
+            &#125; else if (isType(parent, &#39;RegExp&#39;)) &#123;
+                // 对正则对象做特殊处理
+                newParent = new RegExp(parent.source, getRegExp(parent));
+                if (parent.lastIndex) &#123;
+                    newParent.lastIndex = parent.lastIndex;
+                &#125;
+            &#125; else if (isType(parent, &#39;Date&#39;)) &#123;
+                // 对Date对象做特殊处理
+                newParent = new Date(parent.getTime());
+            &#125; else &#123;
+                // 处理对象原型
+                newParent = Object.create(parent.__proto__);
+            &#125;
+            
+            // 把索引对象存储，原来对象：拷贝后的对象，可能内部会互相引用
+            _map.set(parent, newParent);
+
+            for (let i in parent) &#123;
+                // 递归
+                newParent[i] = _clone(parent[i]);
+            &#125;
+        
+            return newParent;
+        &#125;;
+        return _clone(parent);
+    &#125;;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

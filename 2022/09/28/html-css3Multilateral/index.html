@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | 实现Demo之CSS3d多面体</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,59 +135,186 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>实现Demo之CSS3d多面体 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/28
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/HTML">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 HTML
             </a>
         </span>
         
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
+
         
     </div>
-    <div id="archives">
-        
+
+    <div class="content" v-pre>
+        <h3 id="CSS3d多面体"><a href="#CSS3d多面体" class="headerlink" title="CSS3d多面体"></a>CSS3d多面体</h3><p><strong>ps:</strong> <em>简单探索css3的3d属性，制作一个立体的多面体结构的自动轮播，可以根据手势进行左右拖拽，简易Demo如下</em></p>
+<h4 id="css-Code"><a href="#css-Code" class="headerlink" title="css Code"></a>css Code</h4><pre><code class="css">    /*n边形的外角和为360  360/n
+            n变形的内角 180 - 360/n*/
+    * &#123;
+        margin: 0;
+        padding: 0;
+    &#125;
+
+    html,
+    body &#123;
+        background-image: radial-gradient(#fff, #000);
+        height: 100%;
+        overflow: hidden;
+
+    &#125;
+
+    #wrap &#123;
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        width: 300px;
+        height: 300px;
+        /*border: 1px solid;*/
+
+        perspective: 1000px;
+        user-select: none;
+    &#125;
+
+    #wrap&gt;.box &#123;
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        width: 300px;
+        height: 300px;
+        transition: 10s transform;
+        transform-style: preserve-3d;
+        animation-name: rotate;
+        animation-duration: 48s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        animation-fill-mode: forwards;
+    &#125;
+
+    #wrap&gt;.box&gt;div &#123;
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(0, 0, 0, 0.1);
+        text-align: center;
+        font: 50px/300px &quot;微软雅黑&quot;;
+        backface-visibility: visible;
+    &#125;
+
+
+    @keyframes rotate &#123;
+        form &#123;
+            transform: rotateY(var(--beginDeg));
+        &#125;
+
+        to &#123;
+            transform: rotateY(var(--endDeg));
+        &#125;
+    &#125;
+
+    #wrap:hover&gt;.box &#123;
+        animation-play-state: paused;
+    &#125;
+</code></pre>
+<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;title&gt;CSS3d多面体&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style=&quot;--beginDeg:0deg;--endDeg:360deg;&quot;&gt;
+    &lt;div id=&quot;wrap&quot;&gt;
+        &lt;div class=&quot;box&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">   //n：棱数
+    window.onload = function () &#123;
+        createLZ(11);
+        var down = false;
+        var startX = 0;
+        var baseRotate = 0;
+        var currentRotate = 0;
+        var wrap = document.getElementById(&#39;wrap&#39;);
+        var body = document.body;
+        var boxNode = document.querySelector(&quot;#wrap &gt; .box&quot;);
+        // wrap元素鼠标按下滑动事件
+        wrap.onmousedown = function (e) &#123;
+            down = true
+            startX = e.clientX;
+        &#125;
+        wrap.onmousemove = function (e) &#123;
+            if (down) &#123;
+                currentRotate = baseRotate + (e.clientX - startX) / 10;
+                boxNode.style.transform = &quot;rotateY(&quot; + currentRotate + &quot;deg)&quot;;
+            &#125;
+        &#125;
+        window.onmouseup = function (e) &#123;
+            baseRotate = currentRotate;
+            down = false;
+            body.style.cssText = &quot;--beginDeg:&quot; + currentRotate + &quot;deg;--endDeg:&quot; + (currentRotate + 360) + &quot;deg;&quot;;
+        &#125;
+
+    &#125;
+
+    function createLZ(n) &#123;
+        var boxNode = document.querySelector(&quot;#wrap &gt; .box&quot;);
+        var stlyleNode = document.createElement(&quot;style&quot;);
+        //外角
+        var degOut = 360 / n;
+        //内角
+        var degIn = 180 - 360 / n;
+
+        var text = &quot;&quot;;
+        var cssText = &quot;&quot;;
+        for (var i = 0; i &lt; n; i++) &#123;
+            text += &quot;&lt;div&gt;&lt;/div&gt;&quot;;
+            cssText += `#wrap &gt; .box &gt; div:nth-child($&#123;i + 1&#125;)&#123;transform: rotateY($&#123;i * degOut&#125;deg);background: url(./img/$&#123;i&#125;.jpeg) center no-repeat;&#125;`;
+        &#125;
+
+        boxNode.innerHTML = text;
+        var mianNode = document.querySelector(&quot;#wrap &gt; .box &gt; div&quot;);
+        //棱长
+        var length = mianNode.offsetWidth;
+
+        cssText += &quot;#wrap &gt; .box&#123;transform-origin: center center -&quot; + (length / 2 * Math.tan((degIn / 2) * Math.PI / 180)) + &quot;px;&#125;&quot;;
+        cssText += &quot;#wrap &gt; .box &gt; div&#123;transform-origin: center center -&quot; + (length / 2 * Math.tan((degIn / 2) * Math.PI / 180)) + &quot;px;&#125;&quot;;
+
+
+        stlyleNode.innerHTML = cssText;
+        document.head.appendChild(stlyleNode);
+    &#125;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

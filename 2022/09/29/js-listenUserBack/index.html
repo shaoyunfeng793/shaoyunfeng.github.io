@@ -5,11 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | 实现Demo之CSS3d多面体</title>
+    <title>杨红蓝 | 监听用户返回页面</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
-    <link rel="icon" href="/images/avatar.jpg">
+    <link rel="icon" href="/images/avatar.png">
     <link rel="stylesheet" href="/css/antd.min.css">
     
     <link rel="stylesheet" href="/css/full-theme.css">
@@ -139,23 +139,23 @@
 <div class="articlebg"></div>
 <div class="article">
     <div>
-        <h1>实现Demo之CSS3d多面体 </h1>
+        <h1>监听用户返回页面 </h1>
     </div>
     <div class="info">
         <span class="date">
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
             </span>
-            2022/9/28
+            2022/9/29
         </span>
 
         
         <span class="category">
-            <a href="/categories/HTML">
+            <a href="/categories/Js">
                 <span class="icon">
                     <a-icon type="book" theme="filled" />
                 </span>
-                HTML
+                Js
             </a>
         </span>
         
@@ -164,151 +164,98 @@
     </div>
 
     <div class="content" v-pre>
-        <h3 id="CSS3d多面体"><a href="#CSS3d多面体" class="headerlink" title="CSS3d多面体"></a>CSS3d多面体</h3><p><strong>ps:</strong> <em>简单探索css3的3d属性，制作一个立体的多面体结构的自动轮播，可以根据手势进行左右拖拽，简易Demo如下</em></p>
-<h4 id="css-Code"><a href="#css-Code" class="headerlink" title="css Code"></a>css Code</h4><pre><code class="css">    /*n边形的外角和为360  360/n
-            n变形的内角 180 - 360/n*/
-    * &#123;
-        margin: 0;
-        padding: 0;
+        <h3 id="监听用户返回页面"><a href="#监听用户返回页面" class="headerlink" title="监听用户返回页面"></a>监听用户返回页面</h3><h4 id="业务场景"><a href="#业务场景" class="headerlink" title="业务场景"></a>业务场景</h4><p>在h5支付页面完成后，需要判断用户返回再去请求后端接口是否支付成功，在进行后续步骤…</p>
+<h4 id="code-Explain"><a href="#code-Explain" class="headerlink" title="code Explain"></a>code Explain</h4><p>这边就只展示解决兼容移动端浏览器去请求后端是否支付订单的步骤；</p>
+<p>解释一下为啥使用两种监听事件，还有为啥要用sessionStorage去存储sign_paying这个是否支付中状态</p>
+<p>在一些移动端浏览器中，各个浏览器五花八门，一些浏览器的行为也千姿百态，</p>
+<p>在ios的safari浏览器中，前进后退是走缓存的，安卓浏览器中一些走缓存一些不走缓存，如果不用localStorage存储状态每次前进后退会导致sign_paying一直都被重置为false，导致不去请求支付结果接口，从而导致不执行支付成功或失败的逻辑</p>
+<p>pageshow事件是不管页面走不走缓存都会触发的window事件，页面刷新也会执行，也就是说只要来到这个页面就执行，但是后台挂起在打开不执行</p>
+<p>visibilitychange事件将后台挂起在打开会执行，</p>
+<p>正如上面所说的各个浏览器心怀鬼胎，我们都猜不到他们的行为是如何的，在拉起支付宝（针对原生支付）的行为上也不太清楚，就我测试的ios是直接跳到新的页面在提示拉起（产生前进&#x2F;后退），在安卓上有的也是跳到新的页面在提示拉起（产生前进&#x2F;后退），有的直接在当前页就直接提示拉起（不产生前进&#x2F;后退）；</p>
+<p>因此同时监听上2个事件，并在监听事件里加上httpCount:0时才能执行httpQueryOrderPay， signStack是用来限制只走一遍查询，因为2个监听可能同时都会执行httpQueryOrderPay</p>
+<p>还有一点就是可能有人会觉得奇怪为什么把httpQueryOrderPay用setTimeout变为异步， 因为在部分手机（在我测试来看 三星默认浏览器存在这个问题）会导致ajax请求xhr.status返回0，导致直接走到error；具体原因我也不太清楚T_T，但是只要异步一下就OK了。</p>
+<p>这些也只是为了知道啥时候才去请求支付结果接口，不然也大可以直接在页面一展示就去请求轮询，但是对服务器压力太大~</p>
+<p><strong>ps:</strong> <em>以下其实是vue的代码…勉强看一下…</em></p>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    // visibilityChange事件兼容性写法
+    var hidden, visibilityChange;
+    if (typeof document.hidden !== &quot;undefined&quot;) &#123; // Opera 12.10 and Firefox 18 and later support
+        hidden = &quot;hidden&quot;;
+        visibilityChange = &quot;visibilitychange&quot;;
+    &#125; else if (typeof document.msHidden !== &quot;undefined&quot;) &#123;
+        hidden = &quot;msHidden&quot;;
+        visibilityChange = &quot;msvisibilitychange&quot;;
+    &#125; else if (typeof document.webkitHidden !== &quot;undefined&quot;) &#123;
+        hidden = &quot;webkitHidden&quot;;
+        visibilityChange = &quot;webkitvisibilitychange&quot;;
     &#125;
 
-    html,
-    body &#123;
-        background-image: radial-gradient(#fff, #000);
-        height: 100%;
-        overflow: hidden;
-
+    // 监听用户返回页面的事件
+    if (sessionStorage.getItem(&#39;qyyz_paying&#39;) == &#39;true&#39;) &#123;
+        this.signStack.push(&#39;reload&#39;)
+        this.httpQueryOrderPay(&#39;reload&#39;);
     &#125;
+    window.addEventListener(&#39;pageshow&#39;, this.pageShow, false);
+    document.addEventListener(visibilityChange, this.visibilityChange, false);
 
-    #wrap &#123;
-        position: absolute;
-        left: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
-        width: 300px;
-        height: 300px;
-        /*border: 1px solid;*/
+    // 参数说明： httpCount: 请求是否支付的接口次数, httpQueryOrderPay根据自己的接口逻辑来替换，
+    methods: &#123;
 
-        perspective: 1000px;
-        user-select: none;
-    &#125;
+        pageShow() &#123;
+            if (sessionStorage.getItem(&#39;sign_paying&#39;) == &#39;true&#39;) &#123; // 是否支付中
+                // 轮询是否支付了
+            this.signStack.push(&#39;pageShow&#39;);
+                setTimeout(() =&gt; &#123;
+                    this.httpQueryOrderPay(&#39;pageShow&#39;);
+                &#125;, 0)
 
-    #wrap&gt;.box &#123;
-        position: absolute;
-        left: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
-        width: 300px;
-        height: 300px;
-        transition: 10s transform;
-        transform-style: preserve-3d;
-        animation-name: rotate;
-        animation-duration: 48s;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
-        animation-fill-mode: forwards;
-    &#125;
-
-    #wrap&gt;.box&gt;div &#123;
-        position: absolute;
-        width: 300px;
-        height: 300px;
-        background: rgba(0, 0, 0, 0.1);
-        text-align: center;
-        font: 50px/300px &quot;微软雅黑&quot;;
-        backface-visibility: visible;
-    &#125;
-
-
-    @keyframes rotate &#123;
-        form &#123;
-            transform: rotateY(var(--beginDeg));
-        &#125;
-
-        to &#123;
-            transform: rotateY(var(--endDeg));
-        &#125;
-    &#125;
-
-    #wrap:hover&gt;.box &#123;
-        animation-play-state: paused;
-    &#125;
-</code></pre>
-<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;title&gt;CSS3d多面体&lt;/title&gt;
-&lt;/head&gt;
-
-&lt;body style=&quot;--beginDeg:0deg;--endDeg:360deg;&quot;&gt;
-    &lt;div id=&quot;wrap&quot;&gt;
-        &lt;div class=&quot;box&quot;&gt;&lt;/div&gt;
-    &lt;/div&gt;
-&lt;/body&gt;
-
-&lt;/html&gt;
-</code></pre>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">   //n：棱数
-    window.onload = function () &#123;
-        createLZ(11);
-        var down = false;
-        var startX = 0;
-        var baseRotate = 0;
-        var currentRotate = 0;
-        var wrap = document.getElementById(&#39;wrap&#39;);
-        var body = document.body;
-        var boxNode = document.querySelector(&quot;#wrap &gt; .box&quot;);
-        // wrap元素鼠标按下滑动事件
-        wrap.onmousedown = function (e) &#123;
-            down = true
-            startX = e.clientX;
-        &#125;
-        wrap.onmousemove = function (e) &#123;
-            if (down) &#123;
-                currentRotate = baseRotate + (e.clientX - startX) / 10;
-                boxNode.style.transform = &quot;rotateY(&quot; + currentRotate + &quot;deg)&quot;;
             &#125;
-        &#125;
-        window.onmouseup = function (e) &#123;
-            baseRotate = currentRotate;
-            down = false;
-            body.style.cssText = &quot;--beginDeg:&quot; + currentRotate + &quot;deg;--endDeg:&quot; + (currentRotate + 360) + &quot;deg;&quot;;
-        &#125;
+        &#125;,
+        visibilityChange() &#123;
+            if (!document[hidden]) &#123;
+                if (sessionStorage.getItem(&#39;sign_paying&#39;) == &#39;true&#39;) &#123; // 是否支付中
+                    // 轮询是否支付了
+                this.signStack.push(&#39;visibilityChange&#39;);
+                    setTimeout(() =&gt; &#123;
+                        this.httpQueryOrderPay(&#39;visibilityChange&#39;);
+                    &#125;, 0)
+                &#125;
+            &#125;
+        &#125;,
+        httpQueryOrderPay(type) &#123;
+            if (type !== this.signStack[0]) &#123; // 谁最先执行就走哪个
+                return;
+            &#125;
+            this.httpCount++;
+            ajax(&#123;
+                url: &#39;查询订单支付结果的接口&#39;,
+                type: &#39;get&#39;,
+                data: &#123;
+                    orderId: 订单id
+                &#125;,
+                success: res =&gt; &#123;
+                    if (res.result) &#123;
+                        this.httpCount = 0;
+                        sessionStorage.setItem(&#39;sign_paying&#39;, false);
 
-    &#125;
-
-    function createLZ(n) &#123;
-        var boxNode = document.querySelector(&quot;#wrap &gt; .box&quot;);
-        var stlyleNode = document.createElement(&quot;style&quot;);
-        //外角
-        var degOut = 360 / n;
-        //内角
-        var degIn = 180 - 360 / n;
-
-        var text = &quot;&quot;;
-        var cssText = &quot;&quot;;
-        for (var i = 0; i &lt; n; i++) &#123;
-            text += &quot;&lt;div&gt;&lt;/div&gt;&quot;;
-            cssText += `#wrap &gt; .box &gt; div:nth-child($&#123;i + 1&#125;)&#123;transform: rotateY($&#123;i * degOut&#125;deg);background: url(./img/$&#123;i&#125;.jpeg) center no-repeat;&#125;`;
-        &#125;
-
-        boxNode.innerHTML = text;
-        var mianNode = document.querySelector(&quot;#wrap &gt; .box &gt; div&quot;);
-        //棱长
-        var length = mianNode.offsetWidth;
-
-        cssText += &quot;#wrap &gt; .box&#123;transform-origin: center center -&quot; + (length / 2 * Math.tan((degIn / 2) * Math.PI / 180)) + &quot;px;&#125;&quot;;
-        cssText += &quot;#wrap &gt; .box &gt; div&#123;transform-origin: center center -&quot; + (length / 2 * Math.tan((degIn / 2) * Math.PI / 180)) + &quot;px;&#125;&quot;;
-
-
-        stlyleNode.innerHTML = cssText;
-        document.head.appendChild(stlyleNode);
+                    &#125; else &#123;
+                        if (this.httpCount &lt; 3) &#123; // 轮询不超过3次
+                            setTimeout(() =&gt; &#123;
+                                this.httpQueryOrderPay(type);
+                            &#125;, 500)
+                        &#125; else if (this.httpCount == 3) &#123; // 轮询到第3次没有找到,则提示用户
+                            this.httpCount = 0;
+                            sessionStorage.setItem(&#39;sign_paying&#39;, false);
+                            // 挽留提示
+                        &#125;
+                    &#125;
+                &#125;,
+                //异常处理
+                error: e =&gt; &#123;
+                    this.httpCount = 0;
+                    sessionStorage.setItem(&#39;sign_paying&#39;, false);
+                &#125;
+            &#125;)
+        &#125;,
     &#125;
 </code></pre>
 

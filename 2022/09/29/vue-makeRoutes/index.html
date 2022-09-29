@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | 动态生成vue路由</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,59 +135,91 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>动态生成vue路由 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/29
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/Vue">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 Vue
             </a>
         </span>
         
+
         
     </div>
-    <div id="archives">
-        
+
+    <div class="content" v-pre>
+        <h3 id="动态生成vue路由"><a href="#动态生成vue路由" class="headerlink" title="动态生成vue路由"></a>动态生成vue路由</h3><p><strong>ps:</strong> <em>实现动态路由，通过后端返回的菜单，然后<code>addRoutes</code>进行动态生成vue的路由，详情：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/shaoyunfeng93/p/16266729.html">https://www.cnblogs.com/shaoyunfeng93/p/16266729.html</a></em></p>
+<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><p>因为在路由中存在毫无实意的父级目录，所以需要有个<code>router-view</code>来承接子页面的展示</p>
+<pre><code class="vue">// RouterView组件
+&lt;template&gt;
+  &lt;router-view&gt;&lt;/router-view&gt;
+&lt;/template&gt;
+</code></pre>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><p>动态生成路由需要和后端开发人员约定好配置的参数,而且<em>后端配置的url需要和前端文件的目录结构一致</em>…<br>用来处理后端返回的菜单拼接成<code>vue-router</code>的格式, 该vue项目是根据<code>vue-admin-template</code>模板<strong>二次开发</strong>的…</p>
+<pre><code class="js">  // 加载视图组件
+  function loadView(componentUrl) &#123;
+      return resolve =&gt; require.ensure([], () =&gt; resolve(require(&#39;@/views&#39; + componentUrl)))
+  &#125;
+
+  // 递归构造路由
+  function buildRoutes(routes) &#123;
+      return routes.map(route =&gt; &#123;
+          let _route = &#123;&#125;;
+          let meta = &#123;
+              title: route.name,
+              icon: route.icon,
+          &#125;;
+          if (route.type == 1) &#123; // 目录
+              _route.component = route.parentId == 0 ? Layout : RouterView;
+              if (route.children &amp;&amp; route.children[0]) &#123;
+                  _route.redirect = route.children[0].path;
+              &#125;
+          &#125; else if (route.type == 2) &#123; // 菜单
+              _route.component = loadView(route.url)
+              meta.actionButtonList = route.children || [];
+          &#125;
+          return &#123;
+              path: route.url,
+              name: route.code,
+              ..._route,
+              meta,
+              children: route.type == 1 ? buildRoutes(route.children || []) : [], // 只有目录才去在构造children路由
+          &#125;
+      &#125;)
+  &#125;
+  // 递归过滤掉有重定向却没有children的父级路由
+  function filterAsyncRoutes(routes) &#123;
+      routes = routes.filter(d =&gt; &#123;
+          return d.type != 1 || (d.children &amp;&amp; d.children.length &gt; 0)
+      &#125;)
+      routes.forEach(route =&gt; &#123;
+          if (route.children &amp;&amp; route.children.length &gt; 0) &#123;
+              route.children = filterAsyncRoutes(route.children)
+          &#125;
+      &#125;)
+      return routes
+  &#125;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

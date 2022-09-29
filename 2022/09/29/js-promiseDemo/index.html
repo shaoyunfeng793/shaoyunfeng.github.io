@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | 照猫画虎之实现Promise</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,59 +135,147 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>照猫画虎之实现Promise </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/29
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/Js">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 Js
             </a>
         </span>
         
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
+
         
     </div>
-    <div id="archives">
+
+    <div class="content" v-pre>
+        <h3 id="照猫画虎之实现Promise"><a href="#照猫画虎之实现Promise" class="headerlink" title="照猫画虎之实现Promise"></a>照猫画虎之实现Promise</h3><p><strong>ps:</strong> <em>简单的模拟实现一下<code>Promise</code>，好像只是行到意不到…hhh~</em></p>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">  // promise(丑陋的)
+    class UglyPromise &#123;
+        constructor(callback)&#123;
+            this.status = &#39;pending&#39;
+            this.value = undefined
+            this.sucessCb = []
+            this.failedCb = []
+            
+            const resolve = value =&gt; &#123;
+            if(this.status === &#39;pending&#39;)&#123;
+                this.status = &#39;success&#39;
+                this.value = value
+                this.sucessCb.forEach(fn =&gt; &#123;
+                fn(value)
+                &#125;)
+            &#125;
+            &#125;
+            
+            const reject = value =&gt; &#123;
+            if(this.status === &#39;pending&#39;)&#123;
+                this.status = &#39;failed&#39;
+                this.value = value
+                this.failedCb.forEach(fn =&gt; &#123;
+                fn(value)
+                &#125;)
+            &#125;
+            &#125;
+            
+            try &#123;
+            callback(resolve, reject)
+            &#125; catch(e) &#123;
+            reject(e)
+            &#125;
+        &#125;
+    
+        then(successCb, failedCb)&#123;
+            
+            if(typeof successCb === &#39;function&#39;)&#123;
+            if(this.status == &#39;pending&#39;)&#123;
+                this.sucessCb.push(successCb)
+            &#125;else&#123;
+                successCb(this.value)
+            &#125;
+            &#125;
+            if(typeof failedCb === &#39;function&#39;)&#123;
+            
+            if(this.status == &#39;pending&#39;)&#123;
+                this.failedCb.push(failedCb)
+            &#125;else&#123;
+                failedCb(this.value)
+            &#125;
+            &#125;
+            
+            return this
+        &#125;
         
+        catch(failedCb)&#123;
+            if(typeof failedCb === &#39;function&#39;)&#123;
+            if(this.status == &#39;pending&#39;)&#123;
+                this.failedCb.push(failedCb)
+            &#125;else&#123;
+                failedCb(this.value)
+            &#125;
+            &#125;
+        &#125;
+        
+    &#125;
+ 
+    UglyPromise.resolve = value =&gt;&#123;
+        return new UglyPromise(rev =&gt; &#123;
+        rev(value)
+        &#125;)
+    &#125;
+    
+    UglyPromise.race = arr =&gt;&#123;
+        return new MyPromise((rev,rej) =&gt; &#123;
+        for(let i = 0;i &lt; arr.length;i++)&#123;
+            arr[i].then(res =&gt; &#123;
+            rev(res)
+            &#125;).catch(e =&gt; &#123;
+            rej(e)
+            &#125;)
+        &#125;
+        &#125;)
+    &#125;
+    
+    UglyPromise.all = arr =&gt;&#123;
+        let length = arr.length;
+        let count = 0;
+        let result = new Array(length);
+        if(length == 0)&#123;
+            return UglyPromise.resolve()
+        &#125;
+        return new UglyPromise((rev,rej) =&gt; &#123;
+        for(let i = 0;i&lt;arr.length;i++)&#123;
+            arr[i].then(res =&gt; &#123;
+            result[i] = res // 为了结果顺序与开始顺序一致
+            if(++count == length)&#123;
+                rev(result)
+            &#125;
+            &#125;).catch(e =&gt; &#123;
+            rej(e)
+            &#125;)
+        &#125;
+        &#125;)
+    &#125;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

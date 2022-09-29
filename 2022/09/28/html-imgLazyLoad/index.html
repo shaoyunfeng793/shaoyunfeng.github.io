@@ -5,11 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | 实现Demo之自动轮播加手势滑动偏移</title>
+    <title>杨红蓝 | 实现图片懒加载</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
-    <link rel="icon" href="/images/avatar.jpg">
+    <link rel="icon" href="/images/avatar.png">
     <link rel="stylesheet" href="/css/antd.min.css">
     
     <link rel="stylesheet" href="/css/full-theme.css">
@@ -139,7 +139,7 @@
 <div class="articlebg"></div>
 <div class="article">
     <div>
-        <h1>实现Demo之自动轮播加手势滑动偏移 </h1>
+        <h1>实现图片懒加载 </h1>
     </div>
     <div class="info">
         <span class="date">
@@ -164,110 +164,60 @@
     </div>
 
     <div class="content" v-pre>
-        <h3 id="自动轮播加手势滑动偏移"><a href="#自动轮播加手势滑动偏移" class="headerlink" title="自动轮播加手势滑动偏移"></a>自动轮播加手势滑动偏移</h3><p><strong>ps:</strong> <em>实现一个商品展示自动循环轮播，且用户可以通过手势来控制左右滑动，简易Demo如下</em></p>
-<h4 id="css-Code"><a href="#css-Code" class="headerlink" title="css Code"></a>css Code</h4><pre><code class="css">     * &#123;
-            padding: 0;
-            margin: 0;
-        &#125;
-
-        html,
-        body &#123;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        &#125;
-
-        .container &#123;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        &#125;
-
-        .awrad_outer &#123;
-            width: 300px;
-            overflow: hidden;
-        &#125;
-
-        .awrad_list &#123;
-            width: 900px;
-            overflow: hidden;
-        &#125;
-
-        .award_list_item &#123;
-            float: left;
-            background-color: skyblue;
-            width: 100px;
-            height: 100px;
-            line-height: 100px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-        &#125;
-</code></pre>
+        <h3 id="实现图片懒加载"><a href="#实现图片懒加载" class="headerlink" title="实现图片懒加载"></a>实现图片懒加载</h3><p><strong>ps:</strong> <em>简单探索下<code>IntersectionObserver</code>这个api，可以监听元素是否出现在可视窗口，利用这个特性以及dataset实现图片懒加载,简易Demo如下</em></p>
 <h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;title&gt;Demo之自动轮播加手势滑动偏移&lt;/title&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-    &lt;div class=&quot;container&quot;&gt;
-        &lt;div class=&quot;awrad_outer&quot;&gt;
-            &lt;div class=&quot;awrad_list&quot;&gt;
-                &lt;div class=&quot;award_list_item&quot;&gt;1&lt;/div&gt;
-                &lt;div class=&quot;award_list_item&quot;&gt;2&lt;/div&gt;
-                &lt;div class=&quot;award_list_item&quot;&gt;3&lt;/div&gt;
-                &lt;div class=&quot;award_list_item&quot;&gt;4&lt;/div&gt;
-                &lt;div class=&quot;award_list_item&quot;&gt;5&lt;/div&gt;
-                &lt;div class=&quot;award_list_item&quot;&gt;6&lt;/div&gt;
-                &lt;div class=&quot;award_list_item&quot;&gt;7&lt;/div&gt;
-                &lt;div class=&quot;award_list_item&quot;&gt;8&lt;/div&gt;
-                &lt;div class=&quot;award_list_item&quot;&gt;9&lt;/div&gt;
-            &lt;/div&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
-&lt;/body&gt;
+    &lt;head&gt;
+        &lt;title&gt;&lt;/title&gt;
+        &lt;meta charset=&quot;UTF-8&quot;&gt;
+        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+        &lt;style&gt;
+            ul&#123;
+                list-style: none;
+            &#125;
+            img&#123;
+                width: 200px;
+                height: 200px;
+                background: #ddd;
+            &#125;
+        &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+    &lt;ul&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2943125063,3292210397&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2024373923,2140139723&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097108640&amp;di=85ad12ff7eb7f9572016612de1135925&amp;imgtype=0&amp;src=http%3A%2F%2Fa-ssl.duitang.com%2Fuploads%2Fitem%2F201407%2F18%2F20140718063817_s3Gnz.gif&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097122497&amp;di=1dff2a1a87c795199973d6f351ab88c6&amp;imgtype=0&amp;src=http%3A%2F%2Fimg2.imgtn.bdimg.com%2Fit%2Fu%3D1120712552%2C1362700559%26fm%3D214%26gp%3D0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097135282&amp;di=bbb17f186fa620e910ad079e5f998711&amp;imgtype=0&amp;src=http%3A%2F%2Fimg4.imgtn.bdimg.com%2Fit%2Fu%3D2230676464%2C2378994766%26fm%3D214%26gp%3D0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097163421&amp;di=8cd014f555709f796fe643adde44afc3&amp;imgtype=0&amp;src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fa044ad345982b2b7014e90fe33adcbef76099b33.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097184425&amp;di=4dbac84b3f735da758433becd9d4e9ee&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.duitang.com%2Fuploads%2Fitem%2F201407%2F13%2F20140713000933_dC2z3.thumb.700_0.gif&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097216523&amp;di=e3393b6449183d29f689e10783c9694b&amp;imgtype=0&amp;src=http%3A%2F%2Fimgsrc.baidu.com%2Fforum%2Fw%253d580%2Fsign%3D2b04e747fd1f4134e0370576151e95c1%2F05460b2442a7d933458f9ed7ad4bd11372f00167.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=149701518,1608548313&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2692023635,939588326&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=268907504,1715864470&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097268873&amp;di=0ec97e5a4185af04869e5f150a1bf18d&amp;imgtype=0&amp;src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20171129%2Ff510b6d293264e0cba3072353e5eb067.gif&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=366871761,2360018043&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3251940718,1404860427&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2476878483,4014399276&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2055680573,3089421073&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3926221861,1230045557&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;/body&gt;
 &lt;/html&gt;
 </code></pre>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    var awrad_outer = document.querySelector(&#39;.awrad_outer&#39;);
-    var awrad_list = document.querySelector(&#39;.awrad_list&#39;);
-    var offsetVal = 0;
-    var downX = null;
-    function move() &#123;
-        if (downX != null) &#123;
-            return;
-        &#125;
-        offsetVal--;
-        if (offsetVal &lt;= -600) &#123;
-            offsetVal = 0;
-        &#125;
-        awrad_list.style.transform = `translateX($&#123;offsetVal&#125;px)`;
-        requestAnimationFrame(move)
-    &#125;
-    move();
-    awrad_outer.addEventListener(&#39;touchstart&#39;, function (e) &#123;
-        downX = e.targetTouches[0].clientX;
-    &#125;)
-    awrad_outer.addEventListener(&#39;touchmove&#39;, function (e) &#123;
-        let clientX = e.targetTouches[0].clientX;
-        offsetVal += clientX - downX;
-        downX = clientX; // 修正参照值
-        if (offsetVal &gt; 0) &#123;
-            offsetVal = 0;
-        &#125; else if (offsetVal &lt; -600) &#123;
-            offsetVal = -600;
-        &#125;
-        awrad_list.style.transform = `translateX($&#123;offsetVal&#125;px)`;
-    &#125;)
-    awrad_outer.addEventListener(&#39;touchend&#39;, function (e) &#123;
-        downX = null;
-        move();
-    &#125;)
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">  var imglist = document.querySelectorAll(&#39;img&#39;)
+  var observer = new IntersectionObserver(entries=&gt;&#123;
+      entries.forEach(entry=&gt;&#123;
+
+          if(entry.intersectionRatio&gt;0)&#123;
+              entry.target.src = entry.target.dataset.src
+              observer.unobserve(entry.target)
+          &#125;
+      &#125;)
+  &#125;)
+  imglist.forEach(imgitem=&gt;&#123;
+      observer.observe(imgitem)
+  &#125;)
 </code></pre>
 
     </div>

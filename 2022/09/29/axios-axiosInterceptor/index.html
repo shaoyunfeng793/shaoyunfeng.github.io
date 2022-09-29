@@ -5,11 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | 实现图片懒加载</title>
+    <title>杨红蓝 | axios拦截器配置</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
-    <link rel="icon" href="/images/avatar.jpg">
+    <link rel="icon" href="/images/avatar.png">
     <link rel="stylesheet" href="/css/antd.min.css">
     
     <link rel="stylesheet" href="/css/full-theme.css">
@@ -139,23 +139,23 @@
 <div class="articlebg"></div>
 <div class="article">
     <div>
-        <h1>实现图片懒加载 </h1>
+        <h1>axios拦截器配置 </h1>
     </div>
     <div class="info">
         <span class="date">
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
             </span>
-            2022/9/28
+            2022/9/29
         </span>
 
         
         <span class="category">
-            <a href="/categories/HTML">
+            <a href="/categories/axios">
                 <span class="icon">
                     <a-icon type="book" theme="filled" />
                 </span>
-                HTML
+                axios
             </a>
         </span>
         
@@ -164,60 +164,71 @@
     </div>
 
     <div class="content" v-pre>
-        <h3 id="实现图片懒加载"><a href="#实现图片懒加载" class="headerlink" title="实现图片懒加载"></a>实现图片懒加载</h3><p><strong>ps:</strong> <em>简单探索下<code>IntersectionObserver</code>这个api，可以监听元素是否出现在可视窗口，利用这个特性以及dataset实现图片懒加载,简易Demo如下</em></p>
-<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-    &lt;head&gt;
-        &lt;title&gt;&lt;/title&gt;
-        &lt;meta charset=&quot;UTF-8&quot;&gt;
-        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
-        &lt;style&gt;
-            ul&#123;
-                list-style: none;
-            &#125;
-            img&#123;
-                width: 200px;
-                height: 200px;
-                background: #ddd;
-            &#125;
-        &lt;/style&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-    &lt;ul&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2943125063,3292210397&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2024373923,2140139723&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097108640&amp;di=85ad12ff7eb7f9572016612de1135925&amp;imgtype=0&amp;src=http%3A%2F%2Fa-ssl.duitang.com%2Fuploads%2Fitem%2F201407%2F18%2F20140718063817_s3Gnz.gif&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097122497&amp;di=1dff2a1a87c795199973d6f351ab88c6&amp;imgtype=0&amp;src=http%3A%2F%2Fimg2.imgtn.bdimg.com%2Fit%2Fu%3D1120712552%2C1362700559%26fm%3D214%26gp%3D0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097135282&amp;di=bbb17f186fa620e910ad079e5f998711&amp;imgtype=0&amp;src=http%3A%2F%2Fimg4.imgtn.bdimg.com%2Fit%2Fu%3D2230676464%2C2378994766%26fm%3D214%26gp%3D0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097163421&amp;di=8cd014f555709f796fe643adde44afc3&amp;imgtype=0&amp;src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fa044ad345982b2b7014e90fe33adcbef76099b33.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097184425&amp;di=4dbac84b3f735da758433becd9d4e9ee&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.duitang.com%2Fuploads%2Fitem%2F201407%2F13%2F20140713000933_dC2z3.thumb.700_0.gif&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097216523&amp;di=e3393b6449183d29f689e10783c9694b&amp;imgtype=0&amp;src=http%3A%2F%2Fimgsrc.baidu.com%2Fforum%2Fw%253d580%2Fsign%3D2b04e747fd1f4134e0370576151e95c1%2F05460b2442a7d933458f9ed7ad4bd11372f00167.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=149701518,1608548313&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2692023635,939588326&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=268907504,1715864470&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097268873&amp;di=0ec97e5a4185af04869e5f150a1bf18d&amp;imgtype=0&amp;src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20171129%2Ff510b6d293264e0cba3072353e5eb067.gif&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=366871761,2360018043&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3251940718,1404860427&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2476878483,4014399276&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2055680573,3089421073&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
-       &lt;li&gt;&lt;img data-src=&quot;https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3926221861,1230045557&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
-    &lt;/ul&gt;
-    &lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">  var imglist = document.querySelectorAll(&#39;img&#39;)
-  var observer = new IntersectionObserver(entries=&gt;&#123;
-      entries.forEach(entry=&gt;&#123;
+        <h3 id="axios拦截器配置"><a href="#axios拦截器配置" class="headerlink" title="axios拦截器配置"></a>axios拦截器配置</h3><p><strong>ps:</strong> <em>http请求很多都喜欢配置拦截器，生成专属request方法，通过设置请求拦截器注入token，设置响应拦截器对响应作出响应的处理，比如报错信息，这样就不需要每次在catch里去提示错误信息了</em></p>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    import axios from &quot;axios&quot;;
+    import router from &#39;@/router/index.js&#39;;
+    import &#123; Message &#125; from &quot;element-ui&quot;;
+    import &#123; getToken, removeToken &#125; from &#39;@/utils/auth&#39;
+    const service = axios.create(&#123;
+    timeout: 20000 // 请求超时时间
+    &#125;);
 
-          if(entry.intersectionRatio&gt;0)&#123;
-              entry.target.src = entry.target.dataset.src
-              observer.unobserve(entry.target)
-          &#125;
-      &#125;)
-  &#125;)
-  imglist.forEach(imgitem=&gt;&#123;
-      observer.observe(imgitem)
-  &#125;)
+    // request拦截器，
+    service.interceptors.request.use(
+    config =&gt; &#123;
+        // 权限校验
+        var sysToken = getToken();
+        if (sysToken &amp;&amp; sysToken.length &gt; 0) &#123;
+        config.headers[&#39;Authorization&#39;] = sysToken
+        &#125;
+        return config;
+    &#125;,
+    error =&gt; &#123;
+        return Promise.reject(error);
+    &#125;
+    );
+    // response拦截器，
+    service.interceptors.response.use(
+    response =&gt; &#123;
+        if (response.config.responseType === &#39;blob&#39;) &#123;
+
+        if (response.status != 200) &#123;
+
+            Message.error(&#39;请求失败&#39; + response.status);
+            return Promise.reject()
+        &#125; else if (!response.headers[&quot;content-disposition&quot;]) &#123;
+
+            Message.error(&#39;暂无接口访问权限&#39;);
+            return Promise.reject()
+        &#125;
+        return response
+
+        &#125; else &#123;
+
+        if (response.data.code !== 0) &#123;
+            let errMsg = response.data.msg;
+            if (response.data.code == 401) &#123; // token失效
+            if (getToken()) &#123;
+                Message.error(errMsg);
+                removeToken()
+                router.replace(&#39;/Login&#39;)
+            &#125;
+            &#125; else &#123;
+            Message.error(errMsg);
+            &#125;
+            return Promise.reject(errMsg)
+        &#125;
+        return response.data;
+        &#125;
+
+    &#125;,
+    error =&gt; &#123;
+        Message.error(&#39;请求服务器失败&#39;);
+        return Promise.reject(error);
+    &#125;
+    );
+
+    export default service
 </code></pre>
 
     </div>

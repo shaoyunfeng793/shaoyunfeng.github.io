@@ -5,11 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | 实现Demo之滚动信息展示/弹幕</title>
+    <title>杨红蓝 | 阿里oss上传工具函数</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
-    <link rel="icon" href="/images/avatar.jpg">
+    <link rel="icon" href="/images/avatar.png">
     <link rel="stylesheet" href="/css/antd.min.css">
     
     <link rel="stylesheet" href="/css/full-theme.css">
@@ -139,23 +139,23 @@
 <div class="articlebg"></div>
 <div class="article">
     <div>
-        <h1>实现Demo之滚动信息展示/弹幕 </h1>
+        <h1>阿里oss上传工具函数 </h1>
     </div>
     <div class="info">
         <span class="date">
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
             </span>
-            2022/9/28
+            2022/9/29
         </span>
 
         
         <span class="category">
-            <a href="/categories/HTML">
+            <a href="/categories/Js">
                 <span class="icon">
                     <a-icon type="book" theme="filled" />
                 </span>
-                HTML
+                Js
             </a>
         </span>
         
@@ -164,158 +164,124 @@
     </div>
 
     <div class="content" v-pre>
-        <h3 id="弹幕飘屏-amp-一个横框内的滚动信息展示"><a href="#弹幕飘屏-amp-一个横框内的滚动信息展示" class="headerlink" title="弹幕飘屏&amp;一个横框内的滚动信息展示"></a>弹幕飘屏&amp;一个横框内的滚动信息展示</h3><p><strong>ps:</strong> <em>实现一个展示给用户信息的横幅条，比如xxx购买了xxx产品真种滚屏信息或者弹幕效果，简易Demo如下</em></p>
-<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;title&gt;Demo之滚动信息展示/弹幕&lt;/title&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-    &lt;!-- 把选择器传入到下面的js函数中即可 --&gt;
-    &lt;div id=&quot;walk&quot;&gt;&lt;/div&gt; 
-    &lt;div id=&quot;danmaku&quot;&gt;&lt;/div&gt; 
-&lt;/body&gt;
-&lt;/html&gt;
+        <h3 id="阿里oss上传工具函数"><a href="#阿里oss上传工具函数" class="headerlink" title="阿里oss上传工具函数"></a>阿里oss上传工具函数</h3><p><strong>ps:</strong> <em>现在很多图片上传都是托管到阿里云oss上的,前端方法如下</em></p>
+<h4 id="安装-ali-oss"><a href="#安装-ali-oss" class="headerlink" title="安装 ali-oss"></a>安装 ali-oss</h4><p><code>compressorjs</code>用来压缩图片，<code>ali-oss</code>用来上传oss</p>
+<pre><code class="bash">    npm install ali-oss
+    npm install compressorjs
 </code></pre>
-<h4 id="js-Code-For-竖向滚动信息条"><a href="#js-Code-For-竖向滚动信息条" class="headerlink" title="js Code For 竖向滚动信息条"></a>js Code For 竖向滚动信息条</h4><pre><code class="js">    function Walk(&#123;
-    selector,
-    speed = 1,
-    data = [],
-    danweiLucheng,
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    import OSS from &#39;ali-oss&#39;;
+    import Compressor from &#39;compressorjs&#39;;
+    import &#123; randomString &#125; from &#39;@/utils/index.js&#39;;
 
-&#125;) &#123;
-    this.dom = document.querySelector(selector);
-    this.data = data;
-    this.speed = speed;
-    this.danweiLucheng = danweiLucheng;
-    this.timer = null;
-    this.init();
-    this.render();
-&#125;;
-Walk.prototype.render = function () &#123;
-    let htmlStr = &#39;&#39;;
-    this.data.concat(this.data[0]).forEach(d =&gt; &#123;
-        htmlStr += `&lt;div class=&quot;walking-item&quot;&gt;
-                        &lt;div class=&quot;walking-text&quot;&gt;$&#123;d.message&#125;&lt;/div&gt;
-                        &lt;img class=&quot;walking-img&quot;
-                            src=&quot;$&#123;d.icon&#125;&quot;&gt;
-                    &lt;/div&gt;`;
-    &#125;);
-    this.dom.innerHTML = htmlStr;
-&#125;;
-Walk.prototype.init = function () &#123;
-    this.index = 0;
-    this.lucheng = 0;
-    this.storeLucheng = 0;
-&#125;;
-Walk.prototype.playFrame = function () &#123;
-    setTimeout(() =&gt; &#123;
-
-        this.lucheng = this.storeLucheng;
-        this.timer = setInterval(() =&gt; &#123;
-            this.lucheng += this.speed;
-            this.dom.style.transform = `translate3d(0, -$&#123;this.lucheng&#125;px, 0)`;
-            if (this.lucheng - this.storeLucheng &gt;= this.danweiLucheng) &#123;
-                this.index++; //第一个动画结束，index下标下移
-                this.storeLucheng = this.lucheng;
-                if (this.index &gt;= this.data.length) &#123;
-                    this.dom.style.transform = &#39;translate3d(0, 0, 0)&#39;;
-                    this.init();
-                &#125;
-                clearInterval(this.timer);
-                this.playFrame();
-            &#125;
-
-        &#125;, 20)
-    &#125;, 1500)
-&#125;;
-</code></pre>
-<h4 id="js-Code-For-弹幕"><a href="#js-Code-For-弹幕" class="headerlink" title="js Code For 弹幕"></a>js Code For 弹幕</h4><pre><code class="js">; (function () &#123;
-    var Danmaku = window.Danmaku = function (&#123;
-        selector,
-        data = [],
-        speed = 1,
-        itemWidth = 180,
-        itemHeigth = 30,
-        spaceWidth = 50,
-    &#125;) &#123;
-        this.dom = document.querySelector(selector);
-        this.data = data;
-        this.speed = speed;
-        this.itemWidth = itemWidth;
-        this.itemHeigth = itemHeigth;
-        this.offsetWidth = this.data.length * this.itemWidth + (this.data.length - 1) * spaceWidth;
-        this.currentOffset = this.initOffset = window.innerWidth;
-        this.spaceWidth = spaceWidth;
-        this.init();
-        this.render();
-    &#125;
-    Danmaku.prototype.init = function () &#123;
-        this.currentOffset = this.initOffset;
-        this.dom.style.cssText = `width:$&#123;this.offsetWidth&#125;px;display:flex;background:transparent;transform:translate3d($&#123;this.initOffset&#125;px,0,0)`;
-    &#125;
-    Danmaku.prototype.render = function () &#123;
-        let htmlStr = &#39;&#39;;
-        let styleDom = document.createElement(&#39;style&#39;);
-        styleDom.innerHTML = `
-            .danmaku-item&#123;
-                width:$&#123;this.itemWidth&#125;px;
-                line-height:$&#123;this.itemHeigth&#125;px;
-                display:flex;
-                font-size: 12px;
-                color: #fff;
-                background: rgba(0, 0, 0, 0.7);
-                border-radius: $&#123;this.itemHeigth / 2&#125;px;
-                align-items: center;
-                margin-right: $&#123;this.spaceWidth&#125;px;
-                padding: 0 10px;
-            &#125;
-            .danmaku-item:nth-child(odd)&#123;
-                transform:translate3d(0,$&#123;this.itemHeigth / 3&#125;px,0);
-            &#125;
-            .danmaku-item:nth-child(even)&#123;
-                transform:translate3d(0,-$&#123;this.itemHeigth / 3&#125;px,0);
-            &#125;
-            .danmaku-text&#123;
-                flex: 1;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                word-break: break-all;
-            &#125;
-            .danmaku-img&#123;
-                width: 26px;
-                height: 26px;
-                border-radius: 13px;
-                object-fit: contain;
-                margin-right: 10px;
-            &#125;
-            `;
-        document.head.appendChild(styleDom);
-        this.data.forEach(d =&gt; &#123;
-            htmlStr += `&lt;div class=&quot;danmaku-item&quot;&gt;
-                            &lt;img class=&quot;danmaku-img&quot; src=&quot;$&#123;d.icon&#125;&quot;&gt;
-                            &lt;div class=&quot;danmaku-text&quot;&gt;$&#123;d.time&#125; 获得了星耀款&lt;/div&gt;
-                        &lt;/div&gt;`;
-        &#125;);
-        this.dom.innerHTML = htmlStr;
+    const &#123; accessKeyId, accessKeySecret, region, endpoint &#125; = &#123;
+    region: &#39;your region&#39;,
+    accessKeyId: &#39;your accessKeyId&#39;,
+    accessKeySecret: &#39;your accessKeySecret&#39;,
+    endpoint: &#39;oss-cn-hangzhou.aliyuncs.com&#39;
     &#125;;
-    Danmaku.prototype.playFrame = function () &#123;
-        this.currentOffset -= this.speed;
-        this.dom.style.transform = `translate3d($&#123;this.currentOffset&#125;px,0,0)`;
-        if (this.currentOffset &lt;= -this.offsetWidth) &#123;
-            this.init();
+
+    const client = new OSS(&#123;
+    // yourRegion填写Bucket所在地域。以华东1（杭州）为例，Region填写为oss-cn-hangzhou。
+    region: region,
+    // 从STS服务获取的临时访问密钥（AccessKey ID和AccessKey Secret）。
+    accessKeyId: accessKeyId,
+    accessKeySecret: accessKeySecret,
+    endpoint: endpoint,
+    // 填写Bucket名称。
+    bucket: &#39;mdhw&#39;
+    &#125;);
+    /**
+     * 图片压缩
+     */
+    function compressImage(fileList, backType, limitSize, quality) &#123;
+    const promiseAry = [];
+    const maxSize = limitSize * 1024 * 1024;
+    fileList.forEach(image =&gt; &#123;
+        promiseAry.push(new Promise((resolve, reject) =&gt; &#123;
+        if (image.size &lt;= maxSize) &#123; // 没操过限制，不用压缩
+            resolve(image)
         &#125;
-        requestAnimationFrame(() =&gt; &#123;
-            this.playFrame();
-        &#125;)
+        else &#123;
+            new Compressor(image, &#123;
+            // maxWidth: 750,
+            // maxHeight: 750,
+            quality: quality || 0.8,
+            success(result) &#123;
+                let file = new File([result], image.name, &#123; type: image.type &#125;)
+
+                if (!backType || backType == &#39;blob&#39;) &#123;
+                resolve(result)
+                &#125; else if (backType == &#39;file&#39;) &#123;
+                resolve(file)
+                &#125; else &#123;
+                resolve(file)
+                &#125;
+            &#125;,
+            error(err) &#123;
+                console.log(&#39;图片压缩失败----&gt;&gt;&gt;&gt;&gt;&#39;, err)
+                resolve(image)
+            &#125;
+            &#125;)
+        &#125;
+        &#125;))
+    &#125;)
+    return Promise.all(promiseAry)
     &#125;
 
-&#125;)();
+    const defaultLimit = 1;
+    /**
+     *
+     * @param fileList 上传图片的资源路径
+     * @param dir oss要保存的文件夹
+     * @param limitSize oss图片限制 默认1m 0为不限制
+     * @returns &#123;OSS文件路径&#125;
+     */
+
+    async function uploadOSS(fileList, dir = &#39;file&#39;, &#123;
+    limitSize = defaultLimit, compress = false
+    &#125;) &#123;
+    return new Promise((resolve, reject) =&gt; &#123;
+        const promiseAry = [];
+        let randomVal, randomStr, imgtype, fileName, tmpAry, maxSize = limitSize * 1024 * 1024;
+        let _Promise = compress ? compressImage(fileList, &#39;file&#39;, limitSize) : Promise.resolve(fileList)
+
+        if (compress) &#123;
+        console.log(&#39;压缩前的图片列表&#39;, fileList)
+        &#125;
+        _Promise.then(fileList =&gt; &#123;
+        if (compress) &#123;
+            console.log(&#39;压缩后的图片列表&#39;, fileList)
+        &#125;
+        const canUploadList = limitSize == 0 ? fileList : fileList.filter(file =&gt; file.size &lt;= maxSize);
+        canUploadList.forEach(file =&gt; &#123;
+
+            tmpAry = file.name.split(&#39;.&#39;);
+            imgtype = tmpAry[tmpAry.length - 1]
+            randomVal = +new Date();
+            randomStr = randomString()
+            fileName = `$&#123;randomVal&#125;_$&#123;randomStr&#125;.$&#123;imgtype&#125;`
+            promiseAry.push(client.put(`$&#123;dir&#125;/$&#123;fileName&#125;`, file, &#123;
+            headers: &#123;
+                &#39;aa&#39;: &#39;aa&#39;
+            &#125;
+            &#125;))
+        &#125;)
+        Promise.all(promiseAry).then(result =&gt; &#123;
+            let code = canUploadList.length == fileList.length ? 1 : 0
+            resolve(&#123;
+            result,
+            code,
+            msg: code == 1 ? &#39;上传成功&#39; : `$&#123;fileList.length == 1 ? &#39;&#39; : &#39;部分&#39;&#125;图片大小超过$&#123;limitSize&#125;M`
+            &#125;);
+        &#125;).catch(e =&gt; &#123;
+            reject(e)
+        &#125;)
+        &#125;)
+
+    &#125;);
+    &#125;
+
+    export &#123; uploadOSS, defaultLimit &#125;
 </code></pre>
 
     </div>

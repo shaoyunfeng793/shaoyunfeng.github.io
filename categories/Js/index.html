@@ -5,11 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | 深入浅出之拖拽事件</title>
+    <title>杨红蓝 | Js</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
-    <link rel="icon" href="/images/avatar.jpg">
+    <link rel="icon" href="/images/avatar.png">
     <link rel="stylesheet" href="/css/antd.min.css">
     
     <link rel="stylesheet" href="/css/full-theme.css">
@@ -135,149 +135,184 @@
 
                 <div id="main">
                      
-<link rel="stylesheet" href="/css/post-body.css">
-<div class="articlebg"></div>
-<div class="article">
-    <div>
-        <h1>深入浅出之拖拽事件 </h1>
-    </div>
-    <div class="info">
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/28
-        </span>
-
+<div class="categories-tags">
+    
+    <div class="all-s">
         
-        <span class="category">
-            <a href="/categories/Vue">
+        
+        <span>
+            <a href="/categories/axios/" style=background:#03a9f4>
                 <span class="icon">
-                    <a-icon type="book" theme="filled" />
-                </span>
+                    <a-icon type="book" theme="filled" /></span>
+                axios
+            </a>
+        </span>
+        
+        
+        
+        <span>
+            <a href="/categories/HTML/" style=background:#03a9f4>
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                HTML
+            </a>
+        </span>
+        
+        
+        
+        <span>
+            <a href="/categories/Js/" style='background:linear-gradient(120deg, #9abbf7 0%, #ffbbf4 100%)'>
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Js
+            </a>
+        </span>
+        
+        
+        
+        <span>
+            <a href="/categories/Vue/" style=background:#03a9f4>
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
                 Vue
             </a>
         </span>
         
-
         
     </div>
+    <div id="archives">
+        
+        <a-timeline>
+            <a-timeline-item timestamp="2022/9/29" placement="top" color="#a5c2f5">
+                <a-card hoverable>
+                    <div class="item-time">2022/9/29</div>
+                    <a href="/2022/09/29/js-aliOssUpload/">
+                        <h3>阿里oss上传工具函数</h3>
+                    </a>
+                    <div class="info">
+                        
+                        <span class="category">
+                            <a href="/categories/Js">
+                                <span class="icon">
+                                    <a-icon type="book" theme="filled" />
+                                </span>
+                                Js
+                            </a>
+                        </span>
+                        
 
-    <div class="content" v-pre>
-        <h3 id="深入浅出之拖拽事件"><a href="#深入浅出之拖拽事件" class="headerlink" title="深入浅出之拖拽事件"></a>深入浅出之拖拽事件</h3><p><strong>ps:</strong> <em>简单探索下drag事件，把一些元素拉到目标区域，还可从目标区域拉回原来区域，简易Demo如下</em></p>
-<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><pre><code class="vue">&lt;template&gt;
-  &lt;div class=&quot;app-container&quot;&gt;
-    &lt;div class=&quot;table-container&quot;&gt;
-      &lt;el-row :gutter=&quot;20&quot;&gt;
-        &lt;el-col :span=&quot;4&quot;&gt;
-          &lt;div class=&quot;drag-from-zone&quot;&gt;
-            &lt;div
-              class=&quot;drag-item&quot;
-              v-for=&quot;(item, idx) in list&quot;
-              :key=&quot;idx&quot;
-              draggable=&quot;true&quot;
-              @dragstart=&quot;dragstart($event, item, idx)&quot;
-              @dragend=&quot;dragend($event)&quot;
-            &gt;
-              &#123;&#123; item.name &#125;&#125;
-            &lt;/div&gt;
-          &lt;/div&gt;
-        &lt;/el-col&gt;
-        &lt;el-col :span=&quot;20&quot;&gt;
-          &lt;div
-            id=&quot;target&quot;
-            @dragover=&quot;dragover($event)&quot;
-            @drop=&quot;drop($event)&quot;
-            class=&quot;drag-target-zone&quot;
-          &gt;
-            &lt;div
-              class=&quot;drag-item&quot;
-              v-for=&quot;(item, idx) in targetList&quot;
-              :key=&quot;idx&quot;
-              @dragstart=&quot;dragstart($event, item)&quot;
-              @dragend=&quot;dragend($event)&quot;
-            &gt;
-              &#123;&#123; item.name &#125;&#125;
-              &lt;i class=&quot;el-icon-close&quot; @click=&quot;removeItem(item)&quot;&gt;&lt;/i&gt;
-            &lt;/div&gt;
-          &lt;/div&gt;
-        &lt;/el-col&gt;
-      &lt;/el-row&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/template&gt;
+                        
+                    </div>
+                </a-card>
+            </a-timeline-item>
+        </a-timeline>
+        
+        <a-timeline>
+            <a-timeline-item timestamp="2022/9/29" placement="top" color="#a5c2f5">
+                <a-card hoverable>
+                    <div class="item-time">2022/9/29</div>
+                    <a href="/2022/09/29/js-deepClone/">
+                        <h3>实现对象深拷贝函数</h3>
+                    </a>
+                    <div class="info">
+                        
+                        <span class="category">
+                            <a href="/categories/Js">
+                                <span class="icon">
+                                    <a-icon type="book" theme="filled" />
+                                </span>
+                                Js
+                            </a>
+                        </span>
+                        
 
-&lt;script&gt;
-var tmpData;
-export default &#123;
-  data() &#123;
-    return &#123;
-      list: [
-        &#123; id: 1, name: &quot;元素1&quot; &#125;,
-        &#123; id: 2, name: &quot;元素2&quot; &#125;,
-        &#123; id: 3, name: &quot;元素3&quot; &#125;,
-        &#123; id: 4, name: &quot;元素4&quot; &#125;,
-        &#123; id: 5, name: &quot;元素5&quot; &#125;,
-        &#123; id: 6, name: &quot;元素6&quot; &#125;,
-        &#123; id: 7, name: &quot;元素7&quot; &#125;,
-        &#123; id: 8, name: &quot;元素8&quot; &#125;,
-        &#123; id: 9, name: &quot;元素9&quot; &#125;,
-        &#123; id: 10, name: &quot;元素10&quot; &#125;,
-      ],
-      targetList: [],
-    &#125;;
-  &#125;,
-  methods: &#123;
-    dragstart(e, item) &#123;
-      //拖拽开始时将item存入vuex
-      console.log(&quot;拖拽开始 =&gt;&quot;, item);
-      tmpData = item;
-    &#125;,
-    dragend(e) &#123;
-      //拖拽结束执行的事件
-      console.log(&quot;拖拽结束 =&gt;&quot;, e);
-    &#125;,
-    dragover(e) &#123;
-      //拖拽在这个div里面拖拽时执行的事件
-      //一定要执行preventDefault(),否则drop事件不会被触发
-      e.preventDefault();
-    &#125;,
-    drop(e) &#123;
-      //在div里拖拽停止时执行的事件
-      this.list = this.list.filter((item) =&gt; item.id !== tmpData.id);
-      this.targetList.push(tmpData);
-    &#125;,
-    removeItem(data)&#123;
-      this.targetList = this.targetList.filter((item) =&gt; item.id !== data.id);
-      this.list.push(data);
-    &#125;,
-  &#125;,
-&#125;;
-&lt;/script&gt;
+                        
+                    </div>
+                </a-card>
+            </a-timeline-item>
+        </a-timeline>
+        
+        <a-timeline>
+            <a-timeline-item timestamp="2022/9/29" placement="top" color="#a5c2f5">
+                <a-card hoverable>
+                    <div class="item-time">2022/9/29</div>
+                    <a href="/2022/09/29/js-listenUserBack/">
+                        <h3>监听用户返回页面</h3>
+                    </a>
+                    <div class="info">
+                        
+                        <span class="category">
+                            <a href="/categories/Js">
+                                <span class="icon">
+                                    <a-icon type="book" theme="filled" />
+                                </span>
+                                Js
+                            </a>
+                        </span>
+                        
 
-&lt;style scoped&gt;
-.drag-from-zone &#123;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-&#125;
-.drag-item &#123;
-  display: inline-block;
-  padding: 10px 5px;
-  cursor: pointer;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-&#125;
-.drag-target-zone &#123;
-  height: 500px;
-  border: 1px solid #ccc;
-&#125;
-&lt;/style&gt;
-</code></pre>
+                        
+                    </div>
+                </a-card>
+            </a-timeline-item>
+        </a-timeline>
+        
+        <a-timeline>
+            <a-timeline-item timestamp="2022/9/29" placement="top" color="#a5c2f5">
+                <a-card hoverable>
+                    <div class="item-time">2022/9/29</div>
+                    <a href="/2022/09/29/js-promiseDemo/">
+                        <h3>照猫画虎之实现Promise</h3>
+                    </a>
+                    <div class="info">
+                        
+                        <span class="category">
+                            <a href="/categories/Js">
+                                <span class="icon">
+                                    <a-icon type="book" theme="filled" />
+                                </span>
+                                Js
+                            </a>
+                        </span>
+                        
 
+                        
+                    </div>
+                </a-card>
+            </a-timeline-item>
+        </a-timeline>
+        
+        <a-timeline>
+            <a-timeline-item timestamp="2022/9/29" placement="top" color="#a5c2f5">
+                <a-card hoverable>
+                    <div class="item-time">2022/9/29</div>
+                    <a href="/2022/09/29/js-handWriteFunc/">
+                        <h3>js手写函数</h3>
+                    </a>
+                    <div class="info">
+                        
+                        <span class="category">
+                            <a href="/categories/Js">
+                                <span class="icon">
+                                    <a-icon type="book" theme="filled" />
+                                </span>
+                                Js
+                            </a>
+                        </span>
+                        
+
+                        
+                    </div>
+                </a-card>
+            </a-timeline-item>
+        </a-timeline>
+        
     </div>
-
-    
+    <script>
+        new Vue({
+            el: '#archives'
+        })
+    </script>
 </div>
                      
 <footer id="footer">

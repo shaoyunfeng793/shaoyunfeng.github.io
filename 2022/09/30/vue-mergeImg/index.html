@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | 阿里oss上传工具函数</title>
+    <title>杨红蓝 | vue项目动态制定图片</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -139,23 +139,23 @@
 <div class="articlebg"></div>
 <div class="article">
     <div>
-        <h1>阿里oss上传工具函数 </h1>
+        <h1>vue项目动态制定图片 </h1>
     </div>
     <div class="info">
         <span class="date">
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
             </span>
-            2022/9/29
+            2022/9/30
         </span>
 
         
         <span class="category">
-            <a href="/categories/Js">
+            <a href="/categories/Vue">
                 <span class="icon">
                     <a-icon type="book" theme="filled" />
                 </span>
-                Js
+                Vue
             </a>
         </span>
         
@@ -164,124 +164,67 @@
     </div>
 
     <div class="content" v-pre>
-        <h3 id="阿里oss上传工具函数"><a href="#阿里oss上传工具函数" class="headerlink" title="阿里oss上传工具函数"></a>阿里oss上传工具函数</h3><p><strong>ps:</strong> <em>现在很多图片上传都是托管到阿里云oss上的,前端方法如下</em></p>
-<h4 id="安装-ali-oss"><a href="#安装-ali-oss" class="headerlink" title="安装 ali-oss"></a>安装 ali-oss</h4><p><code>compressorjs</code>用来压缩图片，<code>ali-oss</code>用来上传oss</p>
-<pre><code class="bash">    npm install ali-oss
-    npm install compressorjs
+        <h3 id="vue项目动态制定图片"><a href="#vue项目动态制定图片" class="headerlink" title="vue项目动态制定图片"></a>vue项目动态制定图片</h3><p><strong>ps:</strong> <em>业务需求：需要在一张指定的背景图上放一张代表用户信息的二维码，并在二维码底部写一些编号，然后生成一张图片下载…</em></p>
+<h4 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h4><p><code>js-file-download</code> 可以用来下载图片；</p>
+<p><code>merge-images</code> 可以把两张图片合成一张；</p>
+<p><code>qrcode</code> 可以动态生成二维码图片；</p>
+<pre><code class="bash">    npm i js-file-download
+    npm i merge-images
+    npm i qrcode 
 </code></pre>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    import OSS from &#39;ali-oss&#39;;
-    import Compressor from &#39;compressorjs&#39;;
-    import &#123; randomString &#125; from &#39;@/utils/index.js&#39;;
-
-    const &#123; accessKeyId, accessKeySecret, region, endpoint &#125; = &#123;
-    region: &#39;your region&#39;,
-    accessKeyId: &#39;your accessKeyId&#39;,
-    accessKeySecret: &#39;your accessKeySecret&#39;,
-    endpoint: &#39;oss-cn-hangzhou.aliyuncs.com&#39;
-    &#125;;
-
-    const client = new OSS(&#123;
-    // yourRegion填写Bucket所在地域。以华东1（杭州）为例，Region填写为oss-cn-hangzhou。
-    region: region,
-    // 从STS服务获取的临时访问密钥（AccessKey ID和AccessKey Secret）。
-    accessKeyId: accessKeyId,
-    accessKeySecret: accessKeySecret,
-    endpoint: endpoint,
-    // 填写Bucket名称。
-    bucket: &#39;mdhw&#39;
-    &#125;);
-    /**
-     * 图片压缩
-     */
-    function compressImage(fileList, backType, limitSize, quality) &#123;
-    const promiseAry = [];
-    const maxSize = limitSize * 1024 * 1024;
-    fileList.forEach(image =&gt; &#123;
-        promiseAry.push(new Promise((resolve, reject) =&gt; &#123;
-        if (image.size &lt;= maxSize) &#123; // 没操过限制，不用压缩
-            resolve(image)
-        &#125;
-        else &#123;
-            new Compressor(image, &#123;
-            // maxWidth: 750,
-            // maxHeight: 750,
-            quality: quality || 0.8,
-            success(result) &#123;
-                let file = new File([result], image.name, &#123; type: image.type &#125;)
-
-                if (!backType || backType == &#39;blob&#39;) &#123;
-                resolve(result)
-                &#125; else if (backType == &#39;file&#39;) &#123;
-                resolve(file)
-                &#125; else &#123;
-                resolve(file)
+<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><pre><code class="vue">&lt;script&gt;
+    import fileDownload from &quot;js-file-download&quot;;
+    import mergeImages from &quot;merge-images&quot;;
+    import QRCode from &quot;qrcode&quot;;
+    export default &#123;
+        methods:&#123;
+            downloadItem(ary, sleep = 1000)&#123;
+                let row = ary.shift();
+                if(!row)&#123;
+                    return
                 &#125;
+                let textImg = drawText(&#123;
+                    text: `$&#123;row.loginName&#125;_$&#123;row.shareCount&#125;`,
+                    color: &quot;#fff&quot;,
+                    fontSize: 30,
+                    width: &quot;750&quot;,
+                &#125;);
+                this.makeQrCode(row.shareCode).then((url) =&gt; &#123;
+                    mergeImages(
+                        [
+                        &quot;https://mdhw.oss-cn-hangzhou.aliyuncs.com/h5/share_bg.png?v=2.0&quot;,
+                        &#123; src: url, x: 149, y: 478 &#125;,
+                        &#123; src: textImg, x: 0, y: 995 &#125;,
+                        ],
+                        &#123;
+                        crossOrigin: &quot;Anonymous&quot;,
+                        &#125;
+                    ).then((b64) =&gt; &#123;
+                        fileDownload(
+                            dataURLtoFile(b64),
+                            `$&#123;row.loginName&#125;_$&#123;row.shareCount&#125;.png`
+                        );
+                        // 需要延时下载，因为如果批量下载的 且不延时 那么会导致批量下载的图片部分丢失
+                        setTimeout(()=&gt;&#123;
+                            this.downloadItem(ary, sleep)
+                        &#125;, sleep)
+                    &#125;);
+                &#125;);
             &#125;,
-            error(err) &#123;
-                console.log(&#39;图片压缩失败----&gt;&gt;&gt;&gt;&gt;&#39;, err)
-                resolve(image)
-            &#125;
-            &#125;)
+        
+            makeQrCode(shareCode) &#123;
+                return QRCode.toDataURL(
+                    `https://www.nairongmiao.xyz/share.html?shareCode=$&#123;shareCode&#125;`,
+                    &#123;
+                    errorCorrectionLevel: &quot;H&quot;,
+                    width: 477,
+                    margin: 1,
+                    &#125;
+                );
+            &#125;,
         &#125;
-        &#125;))
-    &#125;)
-    return Promise.all(promiseAry)
     &#125;
-
-    const defaultLimit = 1;
-    /**
-     *
-     * @param fileList 上传图片的资源路径
-     * @param dir oss要保存的文件夹
-     * @param limitSize oss图片限制 默认1m 0为不限制
-     * @returns &#123;OSS文件路径&#125;
-     */
-
-    async function uploadOSS(fileList, dir = &#39;file&#39;, &#123;
-    limitSize = defaultLimit, compress = false
-    &#125;) &#123;
-    return new Promise((resolve, reject) =&gt; &#123;
-        const promiseAry = [];
-        let randomVal, randomStr, imgtype, fileName, tmpAry, maxSize = limitSize * 1024 * 1024;
-        let _Promise = compress ? compressImage(fileList, &#39;file&#39;, limitSize) : Promise.resolve(fileList)
-
-        if (compress) &#123;
-        console.log(&#39;压缩前的图片列表&#39;, fileList)
-        &#125;
-        _Promise.then(fileList =&gt; &#123;
-        if (compress) &#123;
-            console.log(&#39;压缩后的图片列表&#39;, fileList)
-        &#125;
-        const canUploadList = limitSize == 0 ? fileList : fileList.filter(file =&gt; file.size &lt;= maxSize);
-        canUploadList.forEach(file =&gt; &#123;
-
-            tmpAry = file.name.split(&#39;.&#39;);
-            imgtype = tmpAry[tmpAry.length - 1]
-            randomVal = +new Date();
-            randomStr = randomString()
-            fileName = `$&#123;randomVal&#125;_$&#123;randomStr&#125;.$&#123;imgtype&#125;`
-            promiseAry.push(client.put(`$&#123;dir&#125;/$&#123;fileName&#125;`, file, &#123;
-            headers: &#123;
-                &#39;aa&#39;: &#39;aa&#39;
-            &#125;
-            &#125;))
-        &#125;)
-        Promise.all(promiseAry).then(result =&gt; &#123;
-            let code = canUploadList.length == fileList.length ? 1 : 0
-            resolve(&#123;
-            result,
-            code,
-            msg: code == 1 ? &#39;上传成功&#39; : `$&#123;fileList.length == 1 ? &#39;&#39; : &#39;部分&#39;&#125;图片大小超过$&#123;limitSize&#125;M`
-            &#125;);
-        &#125;).catch(e =&gt; &#123;
-            reject(e)
-        &#125;)
-        &#125;)
-
-    &#125;);
-    &#125;
-
-    export &#123; uploadOSS, defaultLimit &#125;
+&lt;/script&gt;
 </code></pre>
 
     </div>

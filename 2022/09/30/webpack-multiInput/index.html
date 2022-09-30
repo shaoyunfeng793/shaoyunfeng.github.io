@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | Webpack之多入口&amp;三种hash</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,69 +135,67 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>Webpack之多入口&amp;三种hash </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/Webpack">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Webpack/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 Webpack
             </a>
         </span>
         
+
         
     </div>
-    <div id="archives">
-        
+
+    <div class="content" v-pre>
+        <h3 id="Webpack之多入口-amp-三种hash"><a href="#Webpack之多入口-amp-三种hash" class="headerlink" title="Webpack之多入口&amp;三种hash"></a>Webpack之多入口&amp;三种hash</h3><p>webpack三种hash</p>
+<p>1.全局hash: <code>hash</code> 修改一个地方所有文件hash都改变</p>
+<p>2.内容hash: <code>contentHash</code>  根据自身文件修改了才会变hash</p>
+<p>3.分组hash: <code>chunkHash</code>  根据多入口文件分组 不同组之间hash值不相影响， 组内文件修改，该组hash改变</p>
+<h4 id="Webpack-配置"><a href="#Webpack-配置" class="headerlink" title="Webpack 配置"></a>Webpack 配置</h4><pre><code class="js">    module.exports = &#123;
+        entry: &#123;
+            main: &#39;./js/main.js&#39;,
+            other: &#39;./js/other.js&#39;
+        &#125;,
+        output: &#123;
+            filename: &#39;[name].[hash/contentHash/chunkHash].js&#39;,
+            path: path.resolve(__dirname, &#39;dist&#39;)
+        &#125;,
+        plugins: [
+            new HtmlWebpackPlugin(&#123;
+                filename: &#39;index.html&#39;,
+                template: &#39;./src/index.html&#39;,
+                chunks: [&#39;main&#39;]
+            &#125;),
+            new HtmlWebpackPlugin(&#123;
+                filename: &#39;other.html&#39;,
+                template: &#39;./src/other.html&#39;,
+                chunks: [&#39;other&#39;]
+            &#125;),
+        ]
+        // ...
+    &#125;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

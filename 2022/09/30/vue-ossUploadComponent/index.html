@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN ">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>杨红蓝 | ElementUI二开Alioss上传组件</title>
+    <meta name="author" content="Yanghonglan">
+    <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
+    <meta name="keywords" content=" ">
+    <link rel="icon" href="/images/avatar.png">
+    <link rel="stylesheet" href="/css/antd.min.css">
+    
+    <link rel="stylesheet" href="/css/full-theme.css">
+    
+    <script src="/js/vue.js"></script>
+    <script src="/js/antd.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+
+    <div id="loading"
+        style="height: 100vh; width: 100%; position: fixed;display: flex;z-index: 200; justify-content: space-between;">
+        <div id="loadleft" style="width: 50%;background-color: #ffffff;transition: width 0.6s ease-out;"></div>
+        <div id="loadright" style="width: 50%;background-color: #ffffff;transition: width 0.6s ease-out;"></div>
+        <div
+            style="position: fixed; height: 100vh; width: 100%;display: flex;justify-content: center;align-items: center;">
+            <div id="loadcontent"
+                style="width:400px;height:400px;padding:50px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:solid 10px#a3ddfb; text-align:center;opacity:1;transition:opacity 0.3s ease-out;">
+                <div>
+                    <h2>LOADING...</h2>
+                    <p>加载过慢请开启缓存(浏览器默认开启)</p>
+                    <div>
+                        <img src="/images/dancingkitty.gif" alt="loading">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="layout">
+        <transition name="into">
+            <div v-show="show_page" style="display: none;">
+                <div id="menu_show">
+                    
+    <nav id="menu">
+        <div class="desktop-menu">
+            <span class="title">
+                杨红蓝's Blog
+            </span>
+            
+                <a href="/">
+                    <span>
+                        <a-icon type="home" theme="filled" />
+                    </span>
+                    <span>
+                        主页
+                    </span>
+                </a>
+                
+                <a href="/archives">
+                    <span>
+                        <a-icon type="read" theme="filled" />
+                    </span>
+                    <span>
+                        文章
+                    </span>
+                </a>
+                
+                <a href="/categories">
+                    <span>
+                        <a-icon type="book" theme="filled" />
+                    </span>
+                    <span>
+                        分类
+                    </span>
+                </a>
+                
+        </div>
+
+        <div :class="'phone-menu ' + menu_show" id="phone-menu">
+            <div :class="'title'" @click="menu_show=!menu_show">
+                <span style="margin-right: 10px;">
+                    <a-icon type="appstore" theme="filled" />
+                </span>
+                <span>
+                    杨红蓝
+                </span>
+            </div>
+            <div class="items" v-show="menu_show">
+                
+                    <a href="/">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="home"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                主页
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="/archives">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="read"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                文章
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="/categories">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="book"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                分类
+                            </div>
+                        </div>
+                    </a>
+                    
+            </div>
+            <div class="curtain" v-show="menu_show"></div>
+        </div>
+
+    </nav>
+                </div>
+
+                <div id="main">
+                     
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>ElementUI二开Alioss上传组件 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+        
+        <span class="category">
+            <a href="/categories/Vue">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" />
+                </span>
+                Vue
+            </a>
+        </span>
+        
+
+        
+    </div>
+
+    <div class="content" v-pre>
+        <h3 id="ElementUI二开Alioss上传组件"><a href="#ElementUI二开Alioss上传组件" class="headerlink" title="ElementUI二开Alioss上传组件"></a>ElementUI二开Alioss上传组件</h3><p>本文代码只是vue前端组件代码，还需要依赖<code>vuedraggable</code>组件库（支持拖拽排序）；还需要<strong>ossUpload.js</strong>工具函数（详见另外一文：<em><strong>阿里oss上传工具函数</strong></em>）</p>
+<p>该组件写的时候大部分都是参照elementUI的上传组件（其实是本来的业务代码都是通过后端上传，后面领导说要用oss，所以就写了这个组件），所以使用到了elementUI的部分组件</p>
+<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><pre><code class="vue">&lt;template&gt;
+  &lt;div&gt;
+    &lt;div class=&quot;flex-wrap&quot;&gt;
+      &lt;div class=&quot;oss-upload&quot;&gt;
+        &lt;slot&gt;&lt;/slot&gt;
+        &lt;label v-if=&quot;!disabled&quot; class=&quot;hand&quot;&gt;
+          &lt;input
+            :multiple=&quot;multiple&quot;
+            type=&quot;file&quot;
+            class=&quot;hidden&quot;
+            @change=&quot;change&quot;
+          /&gt;
+        &lt;/label&gt;
+      &lt;/div&gt;
+
+      &lt;el-button
+        v-if=&quot;!disabled &amp;&amp; onDelete &amp;&amp; value&quot;
+        @click=&quot;handleDelete&quot;
+        type=&quot;text&quot;
+        size=&quot;small&quot;
+        &gt;删除&lt;/el-button
+      &gt;
+
+      &lt;slot name=&quot;tips&quot;&gt;
+        &lt;span class=&quot;tips&quot;&gt;&#123;&#123; tips &#125;&#125;&lt;/span&gt;
+      &lt;/slot&gt;
+    &lt;/div&gt;
+    &lt;draggable
+      class=&quot;drag-list&quot;
+      v-if=&quot;!disabled &amp;&amp; showFileList &amp;&amp; filelist.length &gt; 0&quot;
+      v-model=&quot;filelist&quot;
+      @change=&quot;drag&quot;
+    &gt;
+      &lt;div class=&quot;drag-item&quot; v-for=&quot;(item, idx) in filelist&quot; :key=&quot;idx&quot;&gt;
+        &lt;img class=&quot;drag-item-img&quot; :src=&quot;item&quot; /&gt;
+        &lt;i class=&quot;el-icon-error&quot; @click=&quot;remove(idx)&quot;&gt;&lt;/i&gt;
+      &lt;/div&gt;
+    &lt;/draggable&gt;
+    &lt;template v-else-if=&quot;showFileList &amp;&amp; filelist.length &gt; 0&quot;&gt;
+      &lt;div class=&quot;drag-list&quot;&gt;
+        &lt;div class=&quot;drag-item&quot; v-for=&quot;(item, idx) in filelist&quot; :key=&quot;idx&quot;&gt;
+          &lt;img class=&quot;drag-item-img&quot; :src=&quot;item&quot; /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/template&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+import draggable from &quot;vuedraggable&quot;;
+import &#123; uploadOSS, defaultLimit &#125; from &quot;@/utils/ossUpload&quot;;
+export default &#123;
+  components: &#123;
+    draggable,
+  &#125;,
+  props: &#123;
+    value: String,
+    limit: [String, Number],
+    maxCount: [String, Number],
+    tips: String,
+    disabled: &#123;
+      type: Boolean,
+      default: false,
+    &#125;,
+    compress: &#123;
+      type: Boolean,
+      default: false,
+    &#125;,
+    showUploadResult: &#123;
+      type: Boolean,
+      default: true,
+    &#125;,
+    multiple: &#123;
+      type: Boolean,
+      default: false,
+    &#125;,
+    showFileList: &#123;
+      type: Boolean,
+      default: false,
+    &#125;,
+    fileList: &#123;
+      type: Array,
+      default: () =&gt; [],
+    &#125;,
+    onBeforeUpload: &#123;
+      type: Function,
+      default: () =&gt; &#123;&#125;,
+    &#125;,
+    onSuccess: &#123;
+      type: Function,
+      default: () =&gt; &#123;&#125;,
+    &#125;,
+    onError: &#123;
+      type: Function,
+      default: () =&gt; &#123;&#125;,
+    &#125;,
+    onChange: &#123;
+      type: Function,
+      default: () =&gt; &#123;&#125;,
+    &#125;,
+    onDelete: &#123;
+      type: Function,
+      default: null,
+    &#125;,
+    dir: &#123;
+      type: String,
+      default: &quot;file&quot;,
+    &#125;,
+  &#125;,
+  watch: &#123;
+    fileList: &#123;
+      handler(val) &#123;
+        this.filelist = val || [];
+      &#125;,
+      immediate: true,
+    &#125;,
+  &#125;,
+  data() &#123;
+    return &#123;
+      filelist: [],
+    &#125;;
+  &#125;,
+  methods: &#123;
+    clearFileList() &#123;
+      this.filelist = [];
+    &#125;,
+    handleDelete() &#123;
+      this.onDelete &amp;&amp; this.onDelete();
+    &#125;,
+    remove(index) &#123;
+      this.filelist = this.filelist.filter((item, idx) =&gt; idx !== index);
+      this.onChange(this.filelist);
+    &#125;,
+    drag() &#123;
+      this.onChange(this.filelist);
+    &#125;,
+    change(e) &#123;
+      const files = Array.from(e.target.files);
+      const limit = Number(this.limit);
+      const maxCount = Number(this.maxCount);
+      if (maxCount === maxCount) &#123;
+        // maxCount值有效，则限制数量
+        if (this.filelist.length + files.length &gt; maxCount) &#123;
+          this.$message.warning(`最多上传$&#123;maxCount&#125;张图片`);
+          return;
+        &#125;
+      &#125;
+      // 限制图片类型
+      const _files = files.filter((d) =&gt; &#123;
+        if (d.type == &quot;image/png&quot; || d.type == &quot;image/jpeg&quot;) &#123;
+          return true;
+        &#125; else &#123;
+          return false;
+        &#125;
+      &#125;);
+      e.target.value = null;
+
+      // 存在不符合的图片类型
+      if (_files.length !== files.length) &#123;
+        this.$message.warning(&quot;图片类型不是png或者jpeg&quot;);
+      &#125;
+      // 没有有效的图片直接返回
+      if (_files.length === 0) &#123;
+        return;
+      &#125;
+      this.onBeforeUpload(); // 上传前钩子
+      uploadOSS(_files, this.dir, &#123;
+        limitSize: isNaN(limit) ? defaultLimit : limit,
+        compress: this.compress,
+      &#125;)
+        .then((&#123; result, code, msg &#125;) =&gt; &#123;
+          this.showUploadResult &amp;&amp;
+            this.$message(&#123;
+              type: code == 1 ? &quot;success&quot; : &quot;warning&quot;,
+              message: msg,
+            &#125;);
+          result.forEach((res) =&gt; &#123;
+            this.filelist.push(res.url);
+          &#125;);
+
+          if (this.multiple || this.filelist[this.filelist.length - 1]) &#123;
+            this.onSuccess(
+              result,
+              this.multiple
+                ? this.filelist
+                : this.filelist[this.filelist.length - 1]
+            );
+          &#125;
+        &#125;)
+        .catch((err) =&gt; &#123;
+          console.error(err);
+          this.onError(err);
+        &#125;);
+    &#125;,
+  &#125;,
+&#125;;
+&lt;/script&gt;
+
+&lt;style scoped&gt;
+.oss-upload img &#123;
+  display: block;
+&#125;
+.flex-wrap &#123;
+  display: inline-flex;
+  align-items: center;
+&#125;
+.oss-upload &#123;
+  display: inline-block;
+  position: relative;
+  margin-right: 10px;
+&#125;
+.hand &#123;
+  z-index: 99;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+&#125;
+.hidden &#123;
+  display: none;
+&#125;
+
+.el-icon-error &#123;
+  position: absolute;
+  right: -7px;
+  top: -7px;
+  font-size: 18px;
+  cursor: pointer;
+  color: #f56c6c;
+&#125;
+.drag-list &#123;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px 0;
+&#125;
+.drag-item &#123;
+  position: relative;
+  margin-right: 10px;
+&#125;
+
+.drag-item-img &#123;
+  object-fit: contain;
+  width: 100px;
+  height: 100px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+&#125;
+
+.tips &#123;
+  font-size: 12px;
+  color: #999;
+&#125;
+&lt;/style&gt;
+</code></pre>
+
+    </div>
+
+    
+</div>
+                     
+<footer id="footer">
+    <div class="footer-wrap">
+        <div>
+            © 杨红蓝
+            <span class="footer-icon">
+                <a-icon type="flag" theme="filled" /></span>
+            @Yanghonglan
+        </div>
+        
+    </div>
+
+</footer>
+
+<script src="/js/highlight.min.js"></script>
+<script src="/js/particle.js"></script>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+    <script>
+    new Vue({
+        el: "#layout",
+        data: {
+            show_page: false,
+            onload_menu: false,
+            menu_show: false,
+            card_top: 100
+        },
+        created: function () {
+            var that = this
+            window.onload = function () {
+                that.show_page = true
+                document.getElementById("loadcontent").style.opacity = 0
+                setTimeout(function () {
+                    document.getElementById("loadleft").style.width = 0
+                    document.getElementById("loadright").style.width = 0
+                }, 300)
+                setTimeout(function () {
+                    document.getElementById("loading").style = "display:none"
+                }, 600)
+            }
+        },
+        mounted: function () {
+            var that = this
+            window.addEventListener('scroll', function (e) {
+                that.menu_show = false
+            })
+        },
+        methods: {
+            home_click: function () {
+                window.scrollTo({
+                    top: window.innerHeight - 80,
+                    behavior: "smooth",
+                });
+            }
+        }
+    })
+</script>
+
+</body>
+
+</html>

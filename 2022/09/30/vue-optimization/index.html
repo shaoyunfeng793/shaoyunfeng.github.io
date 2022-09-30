@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | vue项目小优化配置</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,69 +135,66 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>vue项目小优化配置 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/Vue">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 Vue
             </a>
         </span>
         
-        
-        
-        <span>
-            <a href="/categories/Webpack/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Webpack
-            </a>
-        </span>
-        
+
         
     </div>
-    <div id="archives">
-        
+
+    <div class="content" v-pre>
+        <h3 id="vue项目小优化配置"><a href="#vue项目小优化配置" class="headerlink" title="vue项目小优化配置"></a>vue项目小优化配置</h3><p><strong>ps:</strong> <em>部署到线上的时候网页加载很慢…，领导叫我去优化下，于是就直接用<code>gzip</code>压缩大法，但是需要后端配合开启gzip，嗯…速度飞起…</em></p>
+<h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">  chainWebpack(config)&#123;
+    // ...
+    config
+        .when(process.env.NODE_ENV !== &#39;development&#39;,
+            config =&gt; &#123;
+                /* 开启gzip压缩，需要后端配合 */
+                config
+                    .plugin(&#39;compressionWebpackPlugin&#39;)
+                    .use(&#39;compression-webpack-plugin&#39;, [&#123;
+                        filename: &#39;[path].gz[query]&#39;,
+                        algorithm: &#39;gzip&#39;,
+                        test: new RegExp(&quot;\\.(&quot; + productionGzipExtensions.join(&quot;|&quot;) + &quot;)$&quot;),
+                        threshold: 10240,
+                        minRatio: 0.8,
+                        deleteOriginalAssets: false
+                    &#125;])
+                /* 配置打包后删除console.log和debugger */
+                config.optimization.minimizer(&#39;terser&#39;).tap((args) =&gt; &#123;
+                    args[0].terserOptions.compress.drop_debugger = true
+                    args[0].terserOptions.compress.pure_funcs = [&#39;console.log&#39;]
+                    return args
+                &#125;)
+            &#125;
+        )
+&#125;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

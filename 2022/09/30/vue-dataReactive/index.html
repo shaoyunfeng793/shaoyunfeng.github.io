@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | Vue源码之数据响应原理</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,69 +135,97 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>Vue源码之数据响应原理 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/Vue">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 Vue
             </a>
         </span>
         
-        
-        
-        <span>
-            <a href="/categories/Webpack/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Webpack
-            </a>
-        </span>
-        
+
         
     </div>
-    <div id="archives">
-        
+
+    <div class="content" v-pre>
+        <h3 id="Vue源码之数据响应原理"><a href="#Vue源码之数据响应原理" class="headerlink" title="Vue源码之数据响应原理"></a>Vue源码之数据响应原理</h3><p><strong>ps:</strong> <em>简单了解一下vue数据响应的原理，vue2通过es5的<code>defineProperty</code>来劫持数据，所以不兼容ie8及以下版本，vue3通过<code>Proxy</code>来进行数据劫持…</em></p>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">  // 监听数据路口
+  function observe(value) &#123;
+      if (typeof value != &#39;object&#39;) &#123;
+          return
+      &#125;
+      let ob;
+      if (value.__ob__ !== undefined) &#123;
+          ob = value.__ob__;
+      &#125; else &#123;
+          ob = new Observer(value);
+      &#125;
+      return ob;
+  &#125;
+  // 数据劫持
+  function defineReactive(data, key, val) &#123;
+     if(!val)&#123;
+      val = data[key];
+     &#125;
+    //  也可使用proxy reflect方式来劫持 会更为便捷
+      Object.defineProperty(data, key, &#123;
+          get() &#123;
+              return val;
+          &#125;,
+          set(newVal) &#123;
+              console.log(&#39;修改了属性:&#39; + key)
+              val = newVal;
+              observe(newVal);
+          &#125;
+      &#125;)
+      observe(val)
+  &#125;
+ 
+  class Observer &#123;
+      constructor(val)&#123;
+          Object.defineProperty(val, &#39;__ob__&#39;, &#123;
+              value: this,
+              enumerable: false
+          &#125;);
+          this.walk(val);
+      &#125;
+ 
+      walk(value)&#123;
+          for (let k in value) &#123;
+              defineReactive(value, k)
+          &#125;
+      &#125;
+  &#125;
+
+  // 测试
+  var obj = &#123;
+      a: 1,
+      b: &#123;
+          c: 2
+      &#125;
+  &#125;
+  observe(obj)
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

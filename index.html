@@ -166,9 +166,9 @@
 
 <div class="post">
 
-    <a href="/2022/09/29/php-dealImage/">
+    <a href="/2022/09/30/webpack-multiInput/">
         <h2>
-            PHP处理图片
+            Webpack之多入口&三种hash
         </h2>
     </a>
 
@@ -176,10 +176,10 @@
 
         
         <span class="category">
-            <a href="/categories/axios">
+            <a href="/categories/Webpack">
                 <span class="icon">
                     <a-icon type="book" theme="filled" /></span>
-                axios
+                Webpack
             </a>
         </span>
         
@@ -188,7 +188,7 @@
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
             </span>
-            2022/9/29
+            2022/9/30
         </span>
 
     </div>
@@ -197,89 +197,120 @@
         <div class="content" v-pre>
             
             
-            <h3 id="使用GD库实现图片处理工具函数"><a href="#使用GD库实现图片处理工具函数" class="headerlink" title="使用GD库实现图片处理工具函数"></a>使用GD库实现图片处理工具函数</h3><p><strong>ps:</strong> <em>使用php完成对图片的裁切或者调整图片大小(缩放)</em></p>
-<h4 id="php-Code"><a href="#php-Code" class="headerlink" title="php Code"></a>php Code</h4><pre><code class="php">&lt;?php
-    /* img_deal(String $file,String $save,Array $options)参数
-        $file 用户上传文件的路径
-        $save 保存的路径
-    
-        $options参数:
-        - type 裁切(clip)或者是缩放(scale) 默认裁切
-    
-        - scale参数 (至少写一个参数)
-        - scale_w 缩放后的宽度 (如果只设置其中一值则按原图比例缩放)
-        - scale_h 缩放后的高度
-    
-        - clip参数 (全都得写)
-        - clip_w 裁切后的宽度
-        - clip_h 裁切后的高度
-        - clip_x 裁切起点x坐标(以图片左上顶点为原点,向下y正方向,向右x正方向)
-        - clip_y 裁切起点y坐标
-    */
-    function img_deal($file,$save,$options)&#123;
-    
-        //上传的原图片
-        $img_src = imagecreatefromjpeg($file);
-        //原图片的宽高
-        $src_w = imagesx($img_src);
-        $src_h = imagesy($img_src);
-        
-        switch ($options[&#39;type&#39;]) &#123;
-            case &#39;scale&#39;:
-                if(is_numeric($options[&#39;scale_w&#39;]) &amp;&amp; is_numeric($options[&#39;scale_h&#39;]))&#123;
-                    $dist_w = $options[&#39;scale_w&#39;];
-                    $dist_h = $options[&#39;scale_h&#39;];
-                &#125;elseif(is_numeric($options[&#39;scale_w&#39;]))&#123;
-                    $dist_w = $options[&#39;scale_w&#39;];
-                    $dist_h = $src_h*$dist_w/$src_w;
-                &#125;elseif(is_numeric($options[&#39;scale_h&#39;]))&#123;
-                    $dist_h = $options[&#39;scale_h&#39;];
-                    $dist_w = $src_w*$dist_h/$src_h;
-                &#125;else&#123;
-                    echo &#39;Image deal is Failed&lt;br&gt;&#39;;
-                    return false;
-                &#125;
-                //设置目标图片大小
-                $img_dist = imagecreatetruecolor($dist_w,$dist_h);
-                //图片进行处理
-                imagecopyresampled($img_dist, $img_src, 0, 0, 0, 0, $dist_w, $dist_h, $src_w, $src_h);
-    
-                break;
-            
-            default:
-                //设置目标图片大小
-                $img_dist = imagecreatetruecolor($options[&#39;clip_w&#39;],$options[&#39;clip_h&#39;]);
-                $keys = array_keys($options);
-                $str = implode($keys, &#39;,&#39;);
-                preg_match_all(&#39;/clip_/&#39;, $str, $matches);
-                if(count($matches[0]) !== 4)&#123;
-                    echo &#39;Image deal is Failed&lt;br&gt;&#39;;
-                    return false;
-                &#125;
-    
-                //图片进行处理
-                imagecopyresampled($img_dist, $img_src, 0, 0, $options[&#39;clip_x&#39;], $options[&#39;clip_y&#39;], $options[&#39;clip_w&#39;], $options[&#39;clip_h&#39;], $options[&#39;clip_w&#39;], $options[&#39;clip_h&#39;]);
-                
-                break;
-                
-        &#125;
-        //将图片保存
-        $status = imagejpeg($img_dist,$save);
-        if($status)&#123;
-            echo &#39;Image deal is Success&lt;br&gt;&#39;;
-        &#125;else&#123;
-            echo &#39;Image deal is Failed&lt;br&gt;&#39;;
-        &#125;
-        //释放内存空间
-        imagedestroy($img_dist);
-        imagedestroy($img_src);
-    
-        //返回保存状态结果
-        return $status;
-    
+            <h3 id="Webpack之多入口-amp-三种hash"><a href="#Webpack之多入口-amp-三种hash" class="headerlink" title="Webpack之多入口&amp;三种hash"></a>Webpack之多入口&amp;三种hash</h3><p>webpack三种hash</p>
+<p>1.全局hash: <code>hash</code> 修改一个地方所有文件hash都改变</p>
+<p>2.内容hash: <code>contentHash</code>  根据自身文件修改了才会变hash</p>
+<p>3.分组hash: <code>chunkHash</code>  根据多入口文件分组 不同组之间hash值不相影响， 组内文件修改，该组hash改变</p>
+<h4 id="Webpack-配置"><a href="#Webpack-配置" class="headerlink" title="Webpack 配置"></a>Webpack 配置</h4><pre><code class="js">    module.exports = &#123;
+        entry: &#123;
+            main: &#39;./js/main.js&#39;,
+            other: &#39;./js/other.js&#39;
+        &#125;,
+        output: &#123;
+            filename: &#39;[name].[hash/contentHash/chunkHash].js&#39;,
+            path: path.resolve(__dirname, &#39;dist&#39;)
+        &#125;,
+        plugins: [
+            new HtmlWebpackPlugin(&#123;
+                filename: &#39;index.html&#39;,
+                template: &#39;./src/index.html&#39;,
+                chunks: [&#39;main&#39;]
+            &#125;),
+            new HtmlWebpackPlugin(&#123;
+                filename: &#39;other.html&#39;,
+                template: &#39;./src/other.html&#39;,
+                chunks: [&#39;other&#39;]
+            &#125;),
+        ]
+        // ...
     &#125;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/30/webpack-multiInput/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/09/30/webpack-optimization/">
+        <h2>
+            Webpack之抽离压缩css
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Webpack">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Webpack
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Webpack之抽离压缩css"><a href="#Webpack之抽离压缩css" class="headerlink" title="Webpack之抽离压缩css"></a>Webpack之抽离压缩css</h3><p>使用 <code>mini-css-extract-plugin</code> 插件的内置loader 替换 <code>style-loader</code></p>
+<p>使用 <code>terser-webpack-plugin</code> 插件压缩js代码</p>
+<p>使用 <code>optimize-css-assets-webpack-plugin</code> 插件压缩css代码</p>
+<h4 id="Webpack-配置"><a href="#Webpack-配置" class="headerlink" title="Webpack 配置"></a>Webpack 配置</h4><pre><code class="js">    const MiniCSSExtractPlugin = require(&#39;mini-css-extract-plugin&#39;);
  
-?&gt;
+   
+    const TerserPlugin = require(&#39;terser-webpack-plugin&#39;);  // 压缩js插件
+    const OptimizeCssAssetsWebpackPlugin = require(&#39;optimize-css-assets-webpack-plugin&#39;);  // 压缩css插件
+    
+    module.exports = &#123;
+        // ...
+        module: &#123;
+            rules: [
+                &#123;
+                    test: /\.css/,
+                    loader: [
+                        MiniCSSExtractPlugin.loader, // 替换 style-loader
+                        &#39;css-loader&#39;,
+                        &#39;postcss-loader&#39;,  // autoprefixer
+                    ],
+                &#125;
+            ]
+        &#125;,
+        plugins: [
+            new MiniCSSExtractPlugin(&#123;
+                filename: &#39;css/main.[contentHash:8].css&#39;
+            &#125;)
+        ],
+        // 优化配置
+        optimization: &#123;
+            minimizer: &#123;
+                // 压缩js
+                new TerserPlugin(),
+                // 压缩css
+                new OptimizeCssAssetsWebpackPlugin()
+            &#125;
+        &#125;  
+    &#125;
 </code></pre>
 
             
@@ -291,16 +322,16 @@
         
     </div>
 
-    <a href="/2022/09/29/php-dealImage/ " class="go-post">
+    <a href="/2022/09/30/webpack-optimization/ " class="go-post">
         阅读全文
     </a>
 </div>
 
 <div class="post">
 
-    <a href="/2022/09/29/axios-axiosInterceptor/">
+    <a href="/2022/09/30/webpack-mergeConfig/">
         <h2>
-            axios拦截器配置
+            Webpack之拆分/合并配置
         </h2>
     </a>
 
@@ -308,10 +339,10 @@
 
         
         <span class="category">
-            <a href="/categories/axios">
+            <a href="/categories/Webpack">
                 <span class="icon">
                     <a-icon type="book" theme="filled" /></span>
-                axios
+                Webpack
             </a>
         </span>
         
@@ -320,7 +351,7 @@
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
             </span>
-            2022/9/29
+            2022/9/30
         </span>
 
     </div>
@@ -329,71 +360,49 @@
         <div class="content" v-pre>
             
             
-            <h3 id="axios拦截器配置"><a href="#axios拦截器配置" class="headerlink" title="axios拦截器配置"></a>axios拦截器配置</h3><p><strong>ps:</strong> <em>http请求很多都喜欢配置拦截器，生成专属request方法，通过设置请求拦截器注入token，设置响应拦截器对响应作出响应的处理，比如报错信息，这样就不需要每次在catch里去提示错误信息了</em></p>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    import axios from &quot;axios&quot;;
-    import router from &#39;@/router/index.js&#39;;
-    import &#123; Message &#125; from &quot;element-ui&quot;;
-    import &#123; getToken, removeToken &#125; from &#39;@/utils/auth&#39;
-    const service = axios.create(&#123;
-    timeout: 20000 // 请求超时时间
-    &#125;);
-
-    // request拦截器，
-    service.interceptors.request.use(
-    config =&gt; &#123;
-        // 权限校验
-        var sysToken = getToken();
-        if (sysToken &amp;&amp; sysToken.length &gt; 0) &#123;
-        config.headers[&#39;Authorization&#39;] = sysToken
-        &#125;
-        return config;
-    &#125;,
-    error =&gt; &#123;
-        return Promise.reject(error);
+            <h3 id="Webpack之拆分-x2F-合并配置"><a href="#Webpack之拆分-x2F-合并配置" class="headerlink" title="Webpack之拆分&#x2F;合并配置"></a>Webpack之拆分&#x2F;合并配置</h3><p>使用 <code>webpack-merge</code> 合并配置；</p>
+<p>对应script为：<br>build:dev webpack –config webpack.dev.config.js；<br>build:prod webpack –config webpack.prod.config.js；</p>
+<h4 id="webpack-base-config-js"><a href="#webpack-base-config-js" class="headerlink" title="webpack.base.config.js"></a>webpack.base.config.js</h4><p>提取公共配置</p>
+<pre><code class="js">    const path = requrie(&#39;path&#39;);
+    const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
+    
+    module.exports = &#123;
+        entry: &#123;
+            main: &#39;./src/index.js&#39;
+        &#125;,
+        output: &#123;
+            filename: &#39;[name].js&#39;,
+            path: path.resolve(__dirname, &#39;dist&#39;)
+        &#125;,
+        plugins: [
+            new HtmlWebpackPlugin(&#123;
+                template: &#39;./src/index.html&#39;
+            &#125;)
+        ],
+        // ...
     &#125;
-    );
-    // response拦截器，
-    service.interceptors.response.use(
-    response =&gt; &#123;
-        if (response.config.responseType === &#39;blob&#39;) &#123;
-
-        if (response.status != 200) &#123;
-
-            Message.error(&#39;请求失败&#39; + response.status);
-            return Promise.reject()
-        &#125; else if (!response.headers[&quot;content-disposition&quot;]) &#123;
-
-            Message.error(&#39;暂无接口访问权限&#39;);
-            return Promise.reject()
-        &#125;
-        return response
-
-        &#125; else &#123;
-
-        if (response.data.code !== 0) &#123;
-            let errMsg = response.data.msg;
-            if (response.data.code == 401) &#123; // token失效
-            if (getToken()) &#123;
-                Message.error(errMsg);
-                removeToken()
-                router.replace(&#39;/Login&#39;)
-            &#125;
-            &#125; else &#123;
-            Message.error(errMsg);
-            &#125;
-            return Promise.reject(errMsg)
-        &#125;
-        return response.data;
-        &#125;
-
-    &#125;,
-    error =&gt; &#123;
-        Message.error(&#39;请求服务器失败&#39;);
-        return Promise.reject(error);
+</code></pre>
+<h4 id="webpack-dev-config-js"><a href="#webpack-dev-config-js" class="headerlink" title="webpack.dev.config.js"></a>webpack.dev.config.js</h4><p>开发环境配置</p>
+<pre><code class="js">    const baseConfig = require(&#39;./weback.base.config.js&#39;);
+    const &#123; smart: merge &#125; = require(&#39;webpack-merge&#39;);
+    
+    const devConfig = &#123;
+        mode: &#39;development&#39;
+        // 开发环境配置....
     &#125;
-    );
-
-    export default service
+    
+    module.export = merge(baseConfig, devConfig);
+</code></pre>
+<h4 id="webpack-prod-config-js"><a href="#webpack-prod-config-js" class="headerlink" title="webpack.prod.config.js"></a>webpack.prod.config.js</h4><p>生产环境配置</p>
+<pre><code class="js">    const baseConfig = require(&#39;./weback.base.config.js&#39;);
+    const &#123; smart: merge &#125; = require(&#39;webpack-merge&#39;);
+    
+    const devConfig = &#123;
+        mode: &#39;development&#39;
+        // 开发环境配置....
+    &#125;
+    
+    module.export = merge(baseConfig, devConfig);
 </code></pre>
 
             
@@ -405,114 +414,14 @@
         
     </div>
 
-    <a href="/2022/09/29/axios-axiosInterceptor/ " class="go-post">
+    <a href="/2022/09/30/webpack-mergeConfig/ " class="go-post">
         阅读全文
     </a>
 </div>
 
 <div class="post">
 
-    <a href="/2022/09/29/vue-makeRoutes/">
-        <h2>
-            动态生成vue路由
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Vue">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/29
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="动态生成vue路由"><a href="#动态生成vue路由" class="headerlink" title="动态生成vue路由"></a>动态生成vue路由</h3><p><strong>ps:</strong> <em>实现动态路由，通过后端返回的菜单，然后<code>addRoutes</code>进行动态生成vue的路由，详情：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/shaoyunfeng93/p/16266729.html">https://www.cnblogs.com/shaoyunfeng93/p/16266729.html</a></em></p>
-<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><p>因为在路由中存在毫无实意的父级目录，所以需要有个<code>router-view</code>来承接子页面的展示</p>
-<pre><code class="vue">// RouterView组件
-&lt;template&gt;
-  &lt;router-view&gt;&lt;/router-view&gt;
-&lt;/template&gt;
-</code></pre>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><p>动态生成路由需要和后端开发人员约定好配置的参数,而且<em>后端配置的url需要和前端文件的目录结构一致</em>…<br>用来处理后端返回的菜单拼接成<code>vue-router</code>的格式, 该vue项目是根据<code>vue-admin-template</code>模板<strong>二次开发</strong>的…</p>
-<pre><code class="js">  // 加载视图组件
-  function loadView(componentUrl) &#123;
-      return resolve =&gt; require.ensure([], () =&gt; resolve(require(&#39;@/views&#39; + componentUrl)))
-  &#125;
-
-  // 递归构造路由
-  function buildRoutes(routes) &#123;
-      return routes.map(route =&gt; &#123;
-          let _route = &#123;&#125;;
-          let meta = &#123;
-              title: route.name,
-              icon: route.icon,
-          &#125;;
-          if (route.type == 1) &#123; // 目录
-              _route.component = route.parentId == 0 ? Layout : RouterView;
-              if (route.children &amp;&amp; route.children[0]) &#123;
-                  _route.redirect = route.children[0].path;
-              &#125;
-          &#125; else if (route.type == 2) &#123; // 菜单
-              _route.component = loadView(route.url)
-              meta.actionButtonList = route.children || [];
-          &#125;
-          return &#123;
-              path: route.url,
-              name: route.code,
-              ..._route,
-              meta,
-              children: route.type == 1 ? buildRoutes(route.children || []) : [], // 只有目录才去在构造children路由
-          &#125;
-      &#125;)
-  &#125;
-  // 递归过滤掉有重定向却没有children的父级路由
-  function filterAsyncRoutes(routes) &#123;
-      routes = routes.filter(d =&gt; &#123;
-          return d.type != 1 || (d.children &amp;&amp; d.children.length &gt; 0)
-      &#125;)
-      routes.forEach(route =&gt; &#123;
-          if (route.children &amp;&amp; route.children.length &gt; 0) &#123;
-              route.children = filterAsyncRoutes(route.children)
-          &#125;
-      &#125;)
-      return routes
-  &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/29/vue-makeRoutes/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/29/js-aliOssUpload/">
+    <a href="/2022/09/30/js-aliOssUpload/">
         <h2>
             阿里oss上传工具函数
         </h2>
@@ -534,7 +443,7 @@
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
             </span>
-            2022/9/29
+            2022/9/30
         </span>
 
     </div>
@@ -672,16 +581,16 @@
         
     </div>
 
-    <a href="/2022/09/29/js-aliOssUpload/ " class="go-post">
+    <a href="/2022/09/30/js-aliOssUpload/ " class="go-post">
         阅读全文
     </a>
 </div>
 
 <div class="post">
 
-    <a href="/2022/09/29/js-listenUserBack/">
+    <a href="/2022/09/30/vue-ossUploadComponent/">
         <h2>
-            监听用户返回页面
+            ElementUI二开Alioss上传组件
         </h2>
     </a>
 
@@ -689,10 +598,10 @@
 
         
         <span class="category">
-            <a href="/categories/Js">
+            <a href="/categories/Vue">
                 <span class="icon">
                     <a-icon type="book" theme="filled" /></span>
-                Js
+                Vue
             </a>
         </span>
         
@@ -701,7 +610,7 @@
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
             </span>
-            2022/9/29
+            2022/9/30
         </span>
 
     </div>
@@ -710,1055 +619,263 @@
         <div class="content" v-pre>
             
             
-            <h3 id="监听用户返回页面"><a href="#监听用户返回页面" class="headerlink" title="监听用户返回页面"></a>监听用户返回页面</h3><h4 id="业务场景"><a href="#业务场景" class="headerlink" title="业务场景"></a>业务场景</h4><p>在h5支付页面完成后，需要判断用户返回再去请求后端接口是否支付成功，在进行后续步骤…</p>
-<h4 id="code-Explain"><a href="#code-Explain" class="headerlink" title="code Explain"></a>code Explain</h4><p>这边就只展示解决兼容移动端浏览器去请求后端是否支付订单的步骤；</p>
-<p>解释一下为啥使用两种监听事件，还有为啥要用sessionStorage去存储sign_paying这个是否支付中状态</p>
-<p>在一些移动端浏览器中，各个浏览器五花八门，一些浏览器的行为也千姿百态，</p>
-<p>在ios的safari浏览器中，前进后退是走缓存的，安卓浏览器中一些走缓存一些不走缓存，如果不用localStorage存储状态每次前进后退会导致sign_paying一直都被重置为false，导致不去请求支付结果接口，从而导致不执行支付成功或失败的逻辑</p>
-<p>pageshow事件是不管页面走不走缓存都会触发的window事件，页面刷新也会执行，也就是说只要来到这个页面就执行，但是后台挂起在打开不执行</p>
-<p>visibilitychange事件将后台挂起在打开会执行，</p>
-<p>正如上面所说的各个浏览器心怀鬼胎，我们都猜不到他们的行为是如何的，在拉起支付宝（针对原生支付）的行为上也不太清楚，就我测试的ios是直接跳到新的页面在提示拉起（产生前进&#x2F;后退），在安卓上有的也是跳到新的页面在提示拉起（产生前进&#x2F;后退），有的直接在当前页就直接提示拉起（不产生前进&#x2F;后退）；</p>
-<p>因此同时监听上2个事件，并在监听事件里加上httpCount:0时才能执行httpQueryOrderPay， signStack是用来限制只走一遍查询，因为2个监听可能同时都会执行httpQueryOrderPay</p>
-<p>还有一点就是可能有人会觉得奇怪为什么把httpQueryOrderPay用setTimeout变为异步， 因为在部分手机（在我测试来看 三星默认浏览器存在这个问题）会导致ajax请求xhr.status返回0，导致直接走到error；具体原因我也不太清楚T_T，但是只要异步一下就OK了。</p>
-<p>这些也只是为了知道啥时候才去请求支付结果接口，不然也大可以直接在页面一展示就去请求轮询，但是对服务器压力太大~</p>
-<p><strong>ps:</strong> <em>以下其实是vue的代码…勉强看一下…</em></p>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    // visibilityChange事件兼容性写法
-    var hidden, visibilityChange;
-    if (typeof document.hidden !== &quot;undefined&quot;) &#123; // Opera 12.10 and Firefox 18 and later support
-        hidden = &quot;hidden&quot;;
-        visibilityChange = &quot;visibilitychange&quot;;
-    &#125; else if (typeof document.msHidden !== &quot;undefined&quot;) &#123;
-        hidden = &quot;msHidden&quot;;
-        visibilityChange = &quot;msvisibilitychange&quot;;
-    &#125; else if (typeof document.webkitHidden !== &quot;undefined&quot;) &#123;
-        hidden = &quot;webkitHidden&quot;;
-        visibilityChange = &quot;webkitvisibilitychange&quot;;
-    &#125;
-
-    // 监听用户返回页面的事件
-    if (sessionStorage.getItem(&#39;qyyz_paying&#39;) == &#39;true&#39;) &#123;
-        this.signStack.push(&#39;reload&#39;)
-        this.httpQueryOrderPay(&#39;reload&#39;);
-    &#125;
-    window.addEventListener(&#39;pageshow&#39;, this.pageShow, false);
-    document.addEventListener(visibilityChange, this.visibilityChange, false);
-
-    // 参数说明： httpCount: 请求是否支付的接口次数, httpQueryOrderPay根据自己的接口逻辑来替换，
-    methods: &#123;
-
-        pageShow() &#123;
-            if (sessionStorage.getItem(&#39;sign_paying&#39;) == &#39;true&#39;) &#123; // 是否支付中
-                // 轮询是否支付了
-            this.signStack.push(&#39;pageShow&#39;);
-                setTimeout(() =&gt; &#123;
-                    this.httpQueryOrderPay(&#39;pageShow&#39;);
-                &#125;, 0)
-
-            &#125;
-        &#125;,
-        visibilityChange() &#123;
-            if (!document[hidden]) &#123;
-                if (sessionStorage.getItem(&#39;sign_paying&#39;) == &#39;true&#39;) &#123; // 是否支付中
-                    // 轮询是否支付了
-                this.signStack.push(&#39;visibilityChange&#39;);
-                    setTimeout(() =&gt; &#123;
-                        this.httpQueryOrderPay(&#39;visibilityChange&#39;);
-                    &#125;, 0)
-                &#125;
-            &#125;
-        &#125;,
-        httpQueryOrderPay(type) &#123;
-            if (type !== this.signStack[0]) &#123; // 谁最先执行就走哪个
-                return;
-            &#125;
-            this.httpCount++;
-            ajax(&#123;
-                url: &#39;查询订单支付结果的接口&#39;,
-                type: &#39;get&#39;,
-                data: &#123;
-                    orderId: 订单id
-                &#125;,
-                success: res =&gt; &#123;
-                    if (res.result) &#123;
-                        this.httpCount = 0;
-                        sessionStorage.setItem(&#39;sign_paying&#39;, false);
-
-                    &#125; else &#123;
-                        if (this.httpCount &lt; 3) &#123; // 轮询不超过3次
-                            setTimeout(() =&gt; &#123;
-                                this.httpQueryOrderPay(type);
-                            &#125;, 500)
-                        &#125; else if (this.httpCount == 3) &#123; // 轮询到第3次没有找到,则提示用户
-                            this.httpCount = 0;
-                            sessionStorage.setItem(&#39;sign_paying&#39;, false);
-                            // 挽留提示
-                        &#125;
-                    &#125;
-                &#125;,
-                //异常处理
-                error: e =&gt; &#123;
-                    this.httpCount = 0;
-                    sessionStorage.setItem(&#39;sign_paying&#39;, false);
-                &#125;
-            &#125;)
-        &#125;,
-    &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/29/js-listenUserBack/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/29/js-handWriteFunc/">
-        <h2>
-            js手写函数
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Js">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/29
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="js手写函数"><a href="#js手写函数" class="headerlink" title="js手写函数"></a>js手写函数</h3><p><strong>ps:</strong> <em>好像面试的时候都喜欢让手写 …</em></p>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    // url的queryString转成对象
-    function queryStr2Obj(url) &#123;
-        const query = &#123;&#125;;
-        const search = url.split(&#39;?&#39;)[1];
-        if (!search) &#123;
-            return &#123;&#125;
-        &#125;
-        search.split(&#39;&amp;&#39;).forEach(item =&gt; &#123;
-            let [key, value] = item.replace(&#39;=&#39;, &#39;:&#39;).split(&#39;:&#39;);
-            query[key] = decodeURIComponent(value);
-
-        &#125;);
-        return query;
-    &#125;
-
-    // list数组转tree数组
-    const currentArray = [
-        &#123; id: &quot;01&quot;, name: &quot;张大大&quot;, pid: &quot;&quot;, job: &quot;项目经理&quot; &#125;,
-        &#123; id: &quot;02&quot;, name: &quot;小亮&quot;, pid: &quot;01&quot;, job: &quot;产品leader&quot; &#125;,
-        &#123; id: &quot;03&quot;, name: &quot;小美&quot;, pid: &quot;01&quot;, job: &quot;UIleader&quot; &#125;,
-        &#123; id: &quot;04&quot;, name: &quot;老马&quot;, pid: &quot;01&quot;, job: &quot;技术leader&quot; &#125;,
-        &#123; id: &quot;05&quot;, name: &quot;老王&quot;, pid: &quot;01&quot;, job: &quot;测试leader&quot; &#125;,
-        &#123; id: &quot;06&quot;, name: &quot;老李&quot;, pid: &quot;01&quot;, job: &quot;运维leader&quot; &#125;,
-        &#123; id: &quot;07&quot;, name: &quot;小丽&quot;, pid: &quot;02&quot;, job: &quot;产品经理&quot; &#125;,
-        &#123; id: &quot;08&quot;, name: &quot;大光&quot;, pid: &quot;02&quot;, job: &quot;产品经理&quot; &#125;,
-        &#123; id: &quot;09&quot;, name: &quot;小高&quot;, pid: &quot;03&quot;, job: &quot;UI设计师&quot; &#125;,
-        &#123; id: &quot;10&quot;, name: &quot;小刘&quot;, pid: &quot;04&quot;, job: &quot;前端工程师&quot; &#125;,
-        &#123; id: &quot;11&quot;, name: &quot;小华&quot;, pid: &quot;04&quot;, job: &quot;后端工程师&quot; &#125;,
-        &#123; id: &quot;12&quot;, name: &quot;小李&quot;, pid: &quot;04&quot;, job: &quot;后端工程师&quot; &#125;,
-        &#123; id: &quot;13&quot;, name: &quot;小赵&quot;, pid: &quot;05&quot;, job: &quot;测试工程师&quot; &#125;,
-        &#123; id: &quot;14&quot;, name: &quot;小强&quot;, pid: &quot;05&quot;, job: &quot;测试工程师&quot; &#125;,
-        &#123; id: &quot;15&quot;, name: &quot;小涛&quot;, pid: &quot;06&quot;, job: &quot;运维工程师&quot; &#125;
-    ];
-
-    function list2tree(list, pid) &#123;
-        let children = list.filter(item =&gt; item.pid == pid);
-        return children.map(item =&gt; &#123;
-            item.children = list2tree(list, item.id);
-            return item;
-        &#125;)
-    &#125;
-    // tree数组转list数组
-    function tree2list(tree) &#123;
-        const list = [], queue = [...tree];
-        while (queue.length) &#123;
-            let &#123; children, ...node &#125; = queue.shift();
-            if (children) &#123;
-                queue.push(...children)
-            &#125;
-            list.push(node)
-        &#125;
-        return list;
-    &#125;
-    // 多维数组，每每元素组合，不重复
-    /*
-    * 如： arr =  [[1,2],[3,4]]  =&gt; combination(arr) =&gt; [[1,3],[1,4],[2,3],[2,4]]
-    */
-    function combination(arr) &#123;
-        const ary = [];
-        const store = [];
-        const fn = function (i = 0) &#123;
-            for (let j = 0; j &lt; arr[i].length; j++) &#123;
-                if (i &lt; arr.length - 1) &#123;
-                    store[i] = arr[i][j];
-                    fn(i + 1)
-                &#125; else &#123;
-                    ary.push([...store, arr[i][j]])
-                &#125;
-            &#125;
-        &#125;
-        fn();
-
-        return ary;
-    &#125;
-    // 函数柯里化（思路：递归收集参数，参数刚好时调用原函数）
-    function curry(fn, args = []) &#123;
-
-        return (...arg) =&gt; &#123;
-            let _arg = args.concat(arg)
-            if (_arg.length != fn.length) &#123;
-                return curry(fn, _arg)
-            &#125; else &#123;
-                return fn(..._arg)
-            &#125;
-        &#125;
-    &#125;
-    // 节流
-    function throttle(fn, delay) &#123;
-        // 重置定时器
-        let timer = null;
-        // 返回闭包函数
-        return function () &#123;
-            // 记录事件参数
-            let args = arguments;
-            // 如果定时器为空
-            if (!timer) &#123;
-                // 开启定时器
-                timer = setTimeout(() =&gt; &#123;
-                    // 执行函数
-                    fn.apply(this, args);
-                    // 函数执行完毕后重置定时器
-                    timer = null;
-                &#125;, delay);
-            &#125;
-        &#125;
-    &#125;
-    // 防抖
-    function debounce(fn, delay = 500) &#123;
-        // timer是一个定时器
-        let timer = null;
-        // 返回一个闭包函数，用闭包保存timer确保其不会销毁，重复点击会清理上一次的定时器
-        return function () &#123;
-            // 保存事件参数，防止fn函数需要事件参数里的数据
-            let arg = arguments;
-            // 调用一次就清除上一次的定时器
-            clearTimeout(timer);
-            // 开启这一次的定时器
-            timer = setTimeout(() =&gt; &#123;
-                // 若不改变this指向，则会指向fn定义环境
-                fn.apply(this, arg);
-            &#125;, delay)
-        &#125;
-    &#125;
-    // call
-    function mycall(that, ...args) &#123;
-        that = that == null ? window : new Object(that)
-        that.fn = this;
-        that.fn(...args);
-        delete that.fn;
-    &#125;
-    Function.prototype.mycall = mycall
-    // apply
-    function myapply(that, args) &#123;
-        that = that == null ? window : new Object(that)
-        that.fn = this;
-        that.fn(...args);
-        delete that.fn;
-    &#125;
-    Function.prototype.myapply = myapply
-    // bind
-    function mybind(that) &#123;
-        let fn = this;
-        return function (...args) &#123;
-            fn.apply(that, args);
-        &#125;
-    &#125;
-    Function.prototype.mybind = mybind
-    // new
-    function myNew(fn, ...args) &#123;
-        let obj = Object.create(fn.prototype);
-        fn.apply(obj, args);
-        return obj;
-    &#125;
-
-    // instanceof实现
-    function instanceOf(origin, target) &#123;
-
-        while (1) &#123;
-            if (origin.__proto__ == target.prototype) &#123;
-                return true
-            &#125;
-            if (origin.__proto__ == null) &#123;
-                return false
-            &#125;
-            origin = origin.__proto__
-        &#125;
-    &#125;
-    // 数组乱序
-    function shuffle(arr) &#123;
-        let len = arr.length;
-        for (let i = 0; i &lt; len - 1; i++) &#123;
-            let index = parseInt(Math.random() * (len - i));
-            let temp = arr[index];
-            arr[index] = arr[len - i - 1];
-            arr[len - i - 1] = temp;
-        &#125;
-        return arr;
-    &#125;
-    // 随机字串
-    function randomString(len) &#123;
-        len = len || 8;
-        let $chars = &#39;ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678&#39;;    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
-        let maxPos = $chars.length;
-        let str = &#39;&#39;;
-        for (let i = 0; i &lt; len; i++) &#123;
-            str += $chars.charAt(Math.floor(Math.random() * maxPos));
-        &#125;
-        return str;
-    &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/29/js-handWriteFunc/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/29/js-deepClone/">
-        <h2>
-            实现对象深拷贝函数
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Js">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/29
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="实现对象深拷贝函数"><a href="#实现对象深拷贝函数" class="headerlink" title="实现对象深拷贝函数"></a>实现对象深拷贝函数</h3><p><strong>ps:</strong> <em><code>深拷贝</code>需要根据不同的类型值进行不同的拷贝特性,Reg对象的一些属性拷贝，</em></p>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    // 判断是否是某类型
-    const isType = (obj, type) =&gt; &#123;
-        if (typeof obj !== &#39;object&#39;) return false;
-        const typeString = Object.prototype.toString.call(obj);
-        let flag;
-        switch (type) &#123;
-            case &#39;Array&#39;:
-            flag = typeString === &#39;[object Array]&#39;;
-            break;
-            case &#39;Date&#39;:
-            flag = typeString === &#39;[object Date]&#39;;
-            break;
-            case &#39;RegExp&#39;:
-            flag = typeString === &#39;[object RegExp]&#39;;
-            break;
-            default:
-            flag = false;
-        &#125;
-        return flag;
-        &#125;;
-        // 获取到正则修饰符
-        const getRegExp = re =&gt; &#123;
-        var flags = &#39;&#39;;
-        if (re.global) flags += &#39;g&#39;;
-        if (re.ignoreCase) flags += &#39;i&#39;;
-        if (re.multiline) flags += &#39;m&#39;;
-        return flags;
-        &#125;;
-        // 深度克隆
-        const deepClone = parent =&gt; &#123;
-        // 旧对象 ：新对象 map
-        let _map = new WeakMap();
-        
-        const _clone = parent =&gt; &#123;
-            if (parent === null) return null;
-            if (typeof parent !== &#39;object&#39;) return parent;
-            if (_map.get(parent)) return _map.get(parent);
-            
-            let newParent;
-            if (isType(parent, &#39;Array&#39;)) &#123;
-                // 对数组做特殊处理
-                newParent = [];
-            &#125; else if (isType(parent, &#39;RegExp&#39;)) &#123;
-                // 对正则对象做特殊处理
-                newParent = new RegExp(parent.source, getRegExp(parent));
-                if (parent.lastIndex) &#123;
-                    newParent.lastIndex = parent.lastIndex;
-                &#125;
-            &#125; else if (isType(parent, &#39;Date&#39;)) &#123;
-                // 对Date对象做特殊处理
-                newParent = new Date(parent.getTime());
-            &#125; else &#123;
-                // 处理对象原型
-                newParent = Object.create(parent.__proto__);
-            &#125;
-            
-            // 把索引对象存储，原来对象：拷贝后的对象，可能内部会互相引用
-            _map.set(parent, newParent);
-
-            for (let i in parent) &#123;
-                // 递归
-                newParent[i] = _clone(parent[i]);
-            &#125;
-        
-            return newParent;
-        &#125;;
-        return _clone(parent);
-    &#125;;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/29/js-deepClone/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/29/js-promiseDemo/">
-        <h2>
-            照猫画虎之实现Promise
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Js">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/29
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="照猫画虎之实现Promise"><a href="#照猫画虎之实现Promise" class="headerlink" title="照猫画虎之实现Promise"></a>照猫画虎之实现Promise</h3><p><strong>ps:</strong> <em>简单的模拟实现一下<code>Promise</code>，好像只是行到意不到…hhh~</em></p>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">  // promise(丑陋的)
-    class UglyPromise &#123;
-        constructor(callback)&#123;
-            this.status = &#39;pending&#39;
-            this.value = undefined
-            this.sucessCb = []
-            this.failedCb = []
-            
-            const resolve = value =&gt; &#123;
-            if(this.status === &#39;pending&#39;)&#123;
-                this.status = &#39;success&#39;
-                this.value = value
-                this.sucessCb.forEach(fn =&gt; &#123;
-                fn(value)
-                &#125;)
-            &#125;
-            &#125;
-            
-            const reject = value =&gt; &#123;
-            if(this.status === &#39;pending&#39;)&#123;
-                this.status = &#39;failed&#39;
-                this.value = value
-                this.failedCb.forEach(fn =&gt; &#123;
-                fn(value)
-                &#125;)
-            &#125;
-            &#125;
-            
-            try &#123;
-            callback(resolve, reject)
-            &#125; catch(e) &#123;
-            reject(e)
-            &#125;
-        &#125;
-    
-        then(successCb, failedCb)&#123;
-            
-            if(typeof successCb === &#39;function&#39;)&#123;
-            if(this.status == &#39;pending&#39;)&#123;
-                this.sucessCb.push(successCb)
-            &#125;else&#123;
-                successCb(this.value)
-            &#125;
-            &#125;
-            if(typeof failedCb === &#39;function&#39;)&#123;
-            
-            if(this.status == &#39;pending&#39;)&#123;
-                this.failedCb.push(failedCb)
-            &#125;else&#123;
-                failedCb(this.value)
-            &#125;
-            &#125;
-            
-            return this
-        &#125;
-        
-        catch(failedCb)&#123;
-            if(typeof failedCb === &#39;function&#39;)&#123;
-            if(this.status == &#39;pending&#39;)&#123;
-                this.failedCb.push(failedCb)
-            &#125;else&#123;
-                failedCb(this.value)
-            &#125;
-            &#125;
-        &#125;
-        
-    &#125;
- 
-    UglyPromise.resolve = value =&gt;&#123;
-        return new UglyPromise(rev =&gt; &#123;
-        rev(value)
-        &#125;)
-    &#125;
-    
-    UglyPromise.race = arr =&gt;&#123;
-        return new MyPromise((rev,rej) =&gt; &#123;
-        for(let i = 0;i &lt; arr.length;i++)&#123;
-            arr[i].then(res =&gt; &#123;
-            rev(res)
-            &#125;).catch(e =&gt; &#123;
-            rej(e)
-            &#125;)
-        &#125;
-        &#125;)
-    &#125;
-    
-    UglyPromise.all = arr =&gt;&#123;
-        let length = arr.length;
-        let count = 0;
-        let result = new Array(length);
-        if(length == 0)&#123;
-            return UglyPromise.resolve()
-        &#125;
-        return new UglyPromise((rev,rej) =&gt; &#123;
-        for(let i = 0;i&lt;arr.length;i++)&#123;
-            arr[i].then(res =&gt; &#123;
-            result[i] = res // 为了结果顺序与开始顺序一致
-            if(++count == length)&#123;
-                rev(result)
-            &#125;
-            &#125;).catch(e =&gt; &#123;
-            rej(e)
-            &#125;)
-        &#125;
-        &#125;)
-    &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/29/js-promiseDemo/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/28/html-css3Multilateral/">
-        <h2>
-            实现Demo之CSS3d多面体
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/HTML">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/28
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="CSS3d多面体"><a href="#CSS3d多面体" class="headerlink" title="CSS3d多面体"></a>CSS3d多面体</h3><p><strong>ps:</strong> <em>简单探索css3的3d属性，制作一个立体的多面体结构的自动轮播，可以根据手势进行左右拖拽，简易Demo如下</em></p>
-<h4 id="css-Code"><a href="#css-Code" class="headerlink" title="css Code"></a>css Code</h4><pre><code class="css">    /*n边形的外角和为360  360/n
-            n变形的内角 180 - 360/n*/
-    * &#123;
-        margin: 0;
-        padding: 0;
-    &#125;
-
-    html,
-    body &#123;
-        background-image: radial-gradient(#fff, #000);
-        height: 100%;
-        overflow: hidden;
-
-    &#125;
-
-    #wrap &#123;
-        position: absolute;
-        left: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
-        width: 300px;
-        height: 300px;
-        /*border: 1px solid;*/
-
-        perspective: 1000px;
-        user-select: none;
-    &#125;
-
-    #wrap&gt;.box &#123;
-        position: absolute;
-        left: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
-        width: 300px;
-        height: 300px;
-        transition: 10s transform;
-        transform-style: preserve-3d;
-        animation-name: rotate;
-        animation-duration: 48s;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
-        animation-fill-mode: forwards;
-    &#125;
-
-    #wrap&gt;.box&gt;div &#123;
-        position: absolute;
-        width: 300px;
-        height: 300px;
-        background: rgba(0, 0, 0, 0.1);
-        text-align: center;
-        font: 50px/300px &quot;微软雅黑&quot;;
-        backface-visibility: visible;
-    &#125;
-
-
-    @keyframes rotate &#123;
-        form &#123;
-            transform: rotateY(var(--beginDeg));
-        &#125;
-
-        to &#123;
-            transform: rotateY(var(--endDeg));
-        &#125;
-    &#125;
-
-    #wrap:hover&gt;.box &#123;
-        animation-play-state: paused;
-    &#125;
-</code></pre>
-<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;title&gt;CSS3d多面体&lt;/title&gt;
-&lt;/head&gt;
-
-&lt;body style=&quot;--beginDeg:0deg;--endDeg:360deg;&quot;&gt;
-    &lt;div id=&quot;wrap&quot;&gt;
-        &lt;div class=&quot;box&quot;&gt;&lt;/div&gt;
+            <h3 id="ElementUI二开Alioss上传组件"><a href="#ElementUI二开Alioss上传组件" class="headerlink" title="ElementUI二开Alioss上传组件"></a>ElementUI二开Alioss上传组件</h3><p>本文代码只是vue前端组件代码，还需要依赖<code>vuedraggable</code>组件库（支持拖拽排序）；还需要<strong>ossUpload.js</strong>工具函数（详见另外一文：<em><strong>阿里oss上传工具函数</strong></em>）</p>
+<p>该组件写的时候大部分都是参照elementUI的上传组件（其实是本来的业务代码都是通过后端上传，后面领导说要用oss，所以就写了这个组件），所以使用到了elementUI的部分组件</p>
+<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><pre><code class="vue">&lt;template&gt;
+  &lt;div&gt;
+    &lt;div class=&quot;flex-wrap&quot;&gt;
+      &lt;div class=&quot;oss-upload&quot;&gt;
+        &lt;slot&gt;&lt;/slot&gt;
+        &lt;label v-if=&quot;!disabled&quot; class=&quot;hand&quot;&gt;
+          &lt;input
+            :multiple=&quot;multiple&quot;
+            type=&quot;file&quot;
+            class=&quot;hidden&quot;
+            @change=&quot;change&quot;
+          /&gt;
+        &lt;/label&gt;
+      &lt;/div&gt;
+
+      &lt;el-button
+        v-if=&quot;!disabled &amp;&amp; onDelete &amp;&amp; value&quot;
+        @click=&quot;handleDelete&quot;
+        type=&quot;text&quot;
+        size=&quot;small&quot;
+        &gt;删除&lt;/el-button
+      &gt;
+
+      &lt;slot name=&quot;tips&quot;&gt;
+        &lt;span class=&quot;tips&quot;&gt;&#123;&#123; tips &#125;&#125;&lt;/span&gt;
+      &lt;/slot&gt;
     &lt;/div&gt;
-&lt;/body&gt;
-
-&lt;/html&gt;
-</code></pre>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">   //n：棱数
-    window.onload = function () &#123;
-        createLZ(11);
-        var down = false;
-        var startX = 0;
-        var baseRotate = 0;
-        var currentRotate = 0;
-        var wrap = document.getElementById(&#39;wrap&#39;);
-        var body = document.body;
-        var boxNode = document.querySelector(&quot;#wrap &gt; .box&quot;);
-        // wrap元素鼠标按下滑动事件
-        wrap.onmousedown = function (e) &#123;
-            down = true
-            startX = e.clientX;
-        &#125;
-        wrap.onmousemove = function (e) &#123;
-            if (down) &#123;
-                currentRotate = baseRotate + (e.clientX - startX) / 10;
-                boxNode.style.transform = &quot;rotateY(&quot; + currentRotate + &quot;deg)&quot;;
-            &#125;
-        &#125;
-        window.onmouseup = function (e) &#123;
-            baseRotate = currentRotate;
-            down = false;
-            body.style.cssText = &quot;--beginDeg:&quot; + currentRotate + &quot;deg;--endDeg:&quot; + (currentRotate + 360) + &quot;deg;&quot;;
-        &#125;
-
-    &#125;
-
-    function createLZ(n) &#123;
-        var boxNode = document.querySelector(&quot;#wrap &gt; .box&quot;);
-        var stlyleNode = document.createElement(&quot;style&quot;);
-        //外角
-        var degOut = 360 / n;
-        //内角
-        var degIn = 180 - 360 / n;
-
-        var text = &quot;&quot;;
-        var cssText = &quot;&quot;;
-        for (var i = 0; i &lt; n; i++) &#123;
-            text += &quot;&lt;div&gt;&lt;/div&gt;&quot;;
-            cssText += `#wrap &gt; .box &gt; div:nth-child($&#123;i + 1&#125;)&#123;transform: rotateY($&#123;i * degOut&#125;deg);background: url(./img/$&#123;i&#125;.jpeg) center no-repeat;&#125;`;
-        &#125;
-
-        boxNode.innerHTML = text;
-        var mianNode = document.querySelector(&quot;#wrap &gt; .box &gt; div&quot;);
-        //棱长
-        var length = mianNode.offsetWidth;
-
-        cssText += &quot;#wrap &gt; .box&#123;transform-origin: center center -&quot; + (length / 2 * Math.tan((degIn / 2) * Math.PI / 180)) + &quot;px;&#125;&quot;;
-        cssText += &quot;#wrap &gt; .box &gt; div&#123;transform-origin: center center -&quot; + (length / 2 * Math.tan((degIn / 2) * Math.PI / 180)) + &quot;px;&#125;&quot;;
-
-
-        stlyleNode.innerHTML = cssText;
-        document.head.appendChild(stlyleNode);
-    &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/28/html-css3Multilateral/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/28/html-lottery/">
-        <h2>
-            实现Demo之H5幸运大转盘
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/HTML">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/28
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="H5幸运大转盘"><a href="#H5幸运大转盘" class="headerlink" title="H5幸运大转盘"></a>H5幸运大转盘</h3><h4 id="css-Code"><a href="#css-Code" class="headerlink" title="css Code"></a>css Code</h4><pre><code class="css">    * &#123;
-        margin: 0;
-        padding: 0;
-    &#125;
-
-    .container &#123;
-        background-image: url(./wheel-bodybg.png);
-        background-size: 100% 100%;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    &#125;
-
-    .wheel &#123;
-        width: 800px;
-        height: 800px;
-        position: relative;
-        background-image: url(./wheel-bg.png);
-        background-size: 100% 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    &#125;
-
-    .wheel-light &#123;
-        background-image: url(./wheel-bg2.png) !important;
-    &#125;
-
-    #wheelCanvas &#123;
-        width: 700px;
-        height: 700px;
-
-    &#125;
-
-    .transition &#123;
-        transition: all 2s;
-    &#125;
-
-    .pointer &#123;
-        display: block;
-        position: absolute;
-        width: 200px;
-        height: 200px;
-        background-color: transparent;
-        background-image: url(./wheel-pointer.png);
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center;
-        border: none;
-        outline: none;
-    &#125;
-
-    .pointer-animation &#123;
-        animation: scale 1s infinite linear alternate;
-    &#125;
-
-    @keyframes scale &#123;
-        0% &#123;
-            transform: scale(1);
-        &#125;
-
-        100% &#123;
-            transform: scale(1.1);
-        &#125;
-    &#125;
-</code></pre>
-<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;title&gt;幸运大转盘&lt;/title&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-    &lt;div class=&quot;container&quot;&gt;
-        &lt;div class=&quot;wheel&quot;&gt;
-            &lt;canvas id=&quot;wheelCanvas&quot; width=&quot;600px&quot; height=&quot;600px&quot;&gt;&lt;/canvas&gt;
-            &lt;button class=&quot;pointer pointer-animation&quot; id=&quot;getAward&quot;&gt;&lt;/button&gt;
+    &lt;draggable
+      class=&quot;drag-list&quot;
+      v-if=&quot;!disabled &amp;&amp; showFileList &amp;&amp; filelist.length &gt; 0&quot;
+      v-model=&quot;filelist&quot;
+      @change=&quot;drag&quot;
+    &gt;
+      &lt;div class=&quot;drag-item&quot; v-for=&quot;(item, idx) in filelist&quot; :key=&quot;idx&quot;&gt;
+        &lt;img class=&quot;drag-item-img&quot; :src=&quot;item&quot; /&gt;
+        &lt;i class=&quot;el-icon-error&quot; @click=&quot;remove(idx)&quot;&gt;&lt;/i&gt;
+      &lt;/div&gt;
+    &lt;/draggable&gt;
+    &lt;template v-else-if=&quot;showFileList &amp;&amp; filelist.length &gt; 0&quot;&gt;
+      &lt;div class=&quot;drag-list&quot;&gt;
+        &lt;div class=&quot;drag-item&quot; v-for=&quot;(item, idx) in filelist&quot; :key=&quot;idx&quot;&gt;
+          &lt;img class=&quot;drag-item-img&quot; :src=&quot;item&quot; /&gt;
         &lt;/div&gt;
-    &lt;/div&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    //抽奖转盘
-    var turnWheel = &#123;
-        reaward: [
-            &#123; name: &#39;380元优惠券&#39;, icon: &#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/signAward/1649132281714_4Y5c6zXd.png&#39; &#125;,
-            &#123; name: &#39;谢谢参与&#39;, icon: &#39;&#39; &#125;,
-            &#123; name: &#39;30积分&#39;, icon: &#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/signAward/1649132281714_4Y5c6zXd.png&#39; &#125;,
-            &#123; name: &#39;谢谢参与&#39;, icon: &#39;&#39; &#125;,
-            &#123; name: &#39;10积分&#39;, icon: &#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/signAward/1649132281714_4Y5c6zXd.png&#39; &#125;,
-            &#123; name: &#39;谢谢参与&#39;, icon: &#39;&#39; &#125;,
-        ], //转盘奖品
-        colors: [], //转盘奖品区块对应背景颜色
-        fontColor: &#39;#f00&#39;, //转盘奖品字体颜色
-        radius: 300, //转盘半径
-        textRadius: 320, //转盘奖品位置距离圆心的距离
+      &lt;/div&gt;
+    &lt;/template&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+import draggable from &quot;vuedraggable&quot;;
+import &#123; uploadOSS, defaultLimit &#125; from &quot;@/utils/ossUpload&quot;;
+export default &#123;
+  components: &#123;
+    draggable,
+  &#125;,
+  props: &#123;
+    value: String,
+    limit: [String, Number],
+    maxCount: [String, Number],
+    tips: String,
+    disabled: &#123;
+      type: Boolean,
+      default: false,
+    &#125;,
+    compress: &#123;
+      type: Boolean,
+      default: false,
+    &#125;,
+    showUploadResult: &#123;
+      type: Boolean,
+      default: true,
+    &#125;,
+    multiple: &#123;
+      type: Boolean,
+      default: false,
+    &#125;,
+    showFileList: &#123;
+      type: Boolean,
+      default: false,
+    &#125;,
+    fileList: &#123;
+      type: Array,
+      default: () =&gt; [],
+    &#125;,
+    onBeforeUpload: &#123;
+      type: Function,
+      default: () =&gt; &#123;&#125;,
+    &#125;,
+    onSuccess: &#123;
+      type: Function,
+      default: () =&gt; &#123;&#125;,
+    &#125;,
+    onError: &#123;
+      type: Function,
+      default: () =&gt; &#123;&#125;,
+    &#125;,
+    onChange: &#123;
+      type: Function,
+      default: () =&gt; &#123;&#125;,
+    &#125;,
+    onDelete: &#123;
+      type: Function,
+      default: null,
+    &#125;,
+    dir: &#123;
+      type: String,
+      default: &quot;file&quot;,
+    &#125;,
+  &#125;,
+  watch: &#123;
+    fileList: &#123;
+      handler(val) &#123;
+        this.filelist = val || [];
+      &#125;,
+      immediate: true,
+    &#125;,
+  &#125;,
+  data() &#123;
+    return &#123;
+      filelist: [],
     &#125;;
-
-    var timer = null;
-    var turning = false;
-    var wheelCanvas = document.getElementById(&quot;wheelCanvas&quot;);
-
-    turnWheel.reaward = turnWheel.reaward.map(d =&gt; &#123;
-        let img = new Image();
-        img.src = d.icon;
-        d.icon = img
-        return d
-    &#125;)
-    turnWheel.colors = [
-        &quot;#eecffe&quot;,
-        &quot;#FFFFFF&quot;,
-        &quot;#eecffe&quot;,
-        &quot;#FFFFFF&quot;,
-        &quot;#eecffe&quot;,
-        &quot;#FFFFFF&quot;,
-    ];
-    window.onload = function () &#123;
-
-        drawWheelCanvas(&#39;wheelCanvas&#39;, turnWheel);
-        var getAward = document.getElementById(&quot;getAward&quot;);
-        var index = 0; // 中奖将品的数组下标
-        getAward.addEventListener(&quot;click&quot;, function () &#123;
-            if (turning) &#123;
-                return;
-            &#125;
-            turning = true;
-            index = Math.floor(Math.random() * turnWheel.reaward.length);
-            wheelCanvas.classList.add(&quot;transition&quot;);
-            twinkle(() =&gt; &#123;
-                alert(&#39;中奖奖品下标：&#39; + index);
-            &#125;);
-            rotateWheel(index, turnWheel.reaward.length)
-        &#125;)
-    &#125;;
-
-    // 转盘灯闪烁 callback为抽奖结果后执行函数
-    function twinkle(callback) &#123;
-        let wheel = document.querySelector(&#39;.wheel&#39;);
-        let pointer = document.querySelector(&#39;.pointer&#39;);
-
-        pointer.classList.remove(&#39;pointer-animation&#39;);
-        timer = setInterval(() =&gt; &#123;
-            wheel.classList.toggle(&#39;wheel-light&#39;);
-        &#125;, 200);
-        setTimeout(() =&gt; &#123;
-            turning = false;
-            wheelCanvas.classList.remove(&#39;transition&#39;);
-            wheel.classList.remove(&#39;wheel-light&#39;);
-            pointer.classList.add(&#39;pointer-animation&#39;);
-            wheelCanvas.style.transform = &#39;rotate(0deg)&#39;;
-            timer &amp;&amp; clearInterval(timer);
-
-            typeof callback === &#39;function&#39; &amp;&amp; callback();
-
-        &#125;, 2000);
-    &#125;
-    // 旋转转盘 (index:中奖将品的数组下标)
-    function rotateWheel(awardIndex, awardCount) &#123;
-        let baseAngle = 360 / awardCount;
-        let rotateRound = 360 * 5; // 每次旋转5圈
-        wheelCanvas.style.transform = &#39;rotate(&#39; + ((270 - ((baseAngle / 2) + baseAngle * awardIndex)) + rotateRound) + &#39;deg)&#39;;
-    &#125;
-    // 绘制转盘
-    function drawWheelCanvas(canvasId, turnWheel) &#123;
-        let canvas = document.getElementById(canvasId);
-        let baseAngle = Math.PI * 2 / (turnWheel.reaward.length);
-        let ctx = canvas.getContext(&quot;2d&quot;);
-        let canvasW = canvas.width; // 画板的高度
-        let canvasH = canvas.height; // 画板的宽度
-        ctx.fillStyle = &quot;#fff000&quot;;
-        ctx.clearRect(0, 0, canvasW, canvasH);//去掉背景默认的黑色
-        ctx.font = &#39;26px Microsoft YaHei&#39;;
-        for (let index = 0; index &lt; turnWheel.reaward.length; index++) &#123;
-            let angle = index * baseAngle;
-            let rewardName = turnWheel.reaward[index].name;
-            let translateX = canvasW * 0.5 + Math.cos(angle + baseAngle / 2) * turnWheel.textRadius;
-            let translateY = canvasH * 0.5 + Math.sin(angle + baseAngle / 2) * turnWheel.textRadius;
-            ctx.fillStyle = turnWheel.colors[index];
-            ctx.beginPath();
-            ctx.arc(canvasW * 0.5, canvasH * 0.5, turnWheel.radius, angle, angle + baseAngle, false);
-            ctx.lineTo(canvasW * 0.5, canvasH * 0.5);
-            ctx.fill();
-            ctx.save();
-            ctx.fillStyle = turnWheel.fontColor;
-            ctx.translate(translateX, translateY);
-            ctx.rotate(angle + baseAngle / 2 + Math.PI / 2);
-            ctx.fillText(rewardName, -ctx.measureText(rewardName).width / 2, 100);
-            //添加对应图标
-            if (turnWheel.reaward[index] &amp;&amp; turnWheel.reaward[index].icon) &#123;
-
-                ctx.drawImage(turnWheel.reaward[index].icon, -40, 140, 80, 80);
-            &#125;
-
-            ctx.restore(); //很关键
+  &#125;,
+  methods: &#123;
+    clearFileList() &#123;
+      this.filelist = [];
+    &#125;,
+    handleDelete() &#123;
+      this.onDelete &amp;&amp; this.onDelete();
+    &#125;,
+    remove(index) &#123;
+      this.filelist = this.filelist.filter((item, idx) =&gt; idx !== index);
+      this.onChange(this.filelist);
+    &#125;,
+    drag() &#123;
+      this.onChange(this.filelist);
+    &#125;,
+    change(e) &#123;
+      const files = Array.from(e.target.files);
+      const limit = Number(this.limit);
+      const maxCount = Number(this.maxCount);
+      if (maxCount === maxCount) &#123;
+        // maxCount值有效，则限制数量
+        if (this.filelist.length + files.length &gt; maxCount) &#123;
+          this.$message.warning(`最多上传$&#123;maxCount&#125;张图片`);
+          return;
         &#125;
-    &#125;
+      &#125;
+      // 限制图片类型
+      const _files = files.filter((d) =&gt; &#123;
+        if (d.type == &quot;image/png&quot; || d.type == &quot;image/jpeg&quot;) &#123;
+          return true;
+        &#125; else &#123;
+          return false;
+        &#125;
+      &#125;);
+      e.target.value = null;
+
+      // 存在不符合的图片类型
+      if (_files.length !== files.length) &#123;
+        this.$message.warning(&quot;图片类型不是png或者jpeg&quot;);
+      &#125;
+      // 没有有效的图片直接返回
+      if (_files.length === 0) &#123;
+        return;
+      &#125;
+      this.onBeforeUpload(); // 上传前钩子
+      uploadOSS(_files, this.dir, &#123;
+        limitSize: isNaN(limit) ? defaultLimit : limit,
+        compress: this.compress,
+      &#125;)
+        .then((&#123; result, code, msg &#125;) =&gt; &#123;
+          this.showUploadResult &amp;&amp;
+            this.$message(&#123;
+              type: code == 1 ? &quot;success&quot; : &quot;warning&quot;,
+              message: msg,
+            &#125;);
+          result.forEach((res) =&gt; &#123;
+            this.filelist.push(res.url);
+          &#125;);
+
+          if (this.multiple || this.filelist[this.filelist.length - 1]) &#123;
+            this.onSuccess(
+              result,
+              this.multiple
+                ? this.filelist
+                : this.filelist[this.filelist.length - 1]
+            );
+          &#125;
+        &#125;)
+        .catch((err) =&gt; &#123;
+          console.error(err);
+          this.onError(err);
+        &#125;);
+    &#125;,
+  &#125;,
+&#125;;
+&lt;/script&gt;
+
+&lt;style scoped&gt;
+.oss-upload img &#123;
+  display: block;
+&#125;
+.flex-wrap &#123;
+  display: inline-flex;
+  align-items: center;
+&#125;
+.oss-upload &#123;
+  display: inline-block;
+  position: relative;
+  margin-right: 10px;
+&#125;
+.hand &#123;
+  z-index: 99;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+&#125;
+.hidden &#123;
+  display: none;
+&#125;
+
+.el-icon-error &#123;
+  position: absolute;
+  right: -7px;
+  top: -7px;
+  font-size: 18px;
+  cursor: pointer;
+  color: #f56c6c;
+&#125;
+.drag-list &#123;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px 0;
+&#125;
+.drag-item &#123;
+  position: relative;
+  margin-right: 10px;
+&#125;
+
+.drag-item-img &#123;
+  object-fit: contain;
+  width: 100px;
+  height: 100px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+&#125;
+
+.tips &#123;
+  font-size: 12px;
+  color: #999;
+&#125;
+&lt;/style&gt;
 </code></pre>
 
             
@@ -1770,7 +887,724 @@
         
     </div>
 
-    <a href="/2022/09/28/html-lottery/ " class="go-post">
+    <a href="/2022/09/30/vue-ossUploadComponent/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/09/30/vue-goodsSkuComponent/">
+        <h2>
+            ElementUI二开商品规格组件
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Vue">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Vue
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="ElementUI二开商品规格组件"><a href="#ElementUI二开商品规格组件" class="headerlink" title="ElementUI二开商品规格组件"></a>ElementUI二开商品规格组件</h3><p>使用到<code>element-ui</code>进行二次开发的组件</p>
+<p>电商后台需求-商品规格组件，参数是我们业务上需要的，不过八九不离十</p>
+<p>组件中的上传图片使用了oss-upload组件（详见另一文：<em><strong>ElementUI二开Alioss上传组件</strong></em>）</p>
+<p><img src="/images/goodsSku.png" alt="效果图"></p>
+<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><pre><code class="vue">&lt;template&gt;
+  &lt;div class=&quot;sku-list&quot;&gt;
+    &lt;template v-if=&quot;!disabled&quot;&gt;
+      &lt;div class=&quot;sku-list-head&quot;&gt;
+        &lt;el-button type=&quot;primary&quot; size=&quot;mini&quot; @click=&quot;addSkuRow&quot;
+          &gt;添加规格&lt;/el-button
+        &gt;
+      &lt;/div&gt;
+      &lt;div
+        class=&quot;sku-list-item&quot;
+        v-for=&quot;(item, index) in skuData.attrList&quot;
+        :key=&quot;index&quot;
+      &gt;
+        &lt;div class=&quot;sku-list-item-main&quot;&gt;
+          &lt;div class=&quot;sku-list-item__layout&quot;&gt;
+            &lt;span class=&quot;span&quot;&gt;规格名&lt;/span&gt;
+            &lt;el-input
+              size=&quot;small&quot;
+              v-model=&quot;item.attrName&quot;
+              class=&quot;input&quot;
+            &gt;&lt;/el-input&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;sku-list-item__layout&quot;&gt;
+            &lt;span class=&quot;span&quot;&gt;规格值&lt;/span&gt;
+            &lt;div class=&quot;sku-list-item-tags&quot;&gt;
+              &lt;el-tag
+                class=&quot;sku-list-item-tag&quot;
+                closable
+                @close=&quot;removeSkuAttr(index)&quot;
+                v-for=&quot;(subitem, i) in item.attrValue&quot;
+                :key=&quot;i&quot;
+                &gt;&#123;&#123; subitem.attrValue &#125;&#125;&lt;/el-tag
+              &gt;
+              &lt;el-button
+                size=&quot;small&quot;
+                icon=&quot;el-icon-plus&quot;
+                @click=&quot;addSkuAttr(index)&quot;
+                &gt;添加&lt;/el-button
+              &gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;el-button
+          type=&quot;text&quot;
+          size=&quot;small&quot;
+          class=&quot;sku-list-item-removeBtn&quot;
+          @click=&quot;removeSkuRow(index)&quot;
+          &gt;删除规格&lt;/el-button
+        &gt;
+      &lt;/div&gt;
+    &lt;/template&gt;
+    &lt;el-table border :data=&quot;skuData.skuList&quot;&gt;
+      &lt;el-table-column label=&quot;图片&quot; align=&quot;center&quot; width=&quot;120&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;oss-upload
+            :disabled=&quot;disabled&quot;
+            :on-success=&quot;
+              (res, file) =&gt; onUploadImgSuccess(res, file, scope.row)
+            &quot;
+            dir=&quot;erp/goods&quot;
+          &gt;
+            &lt;img
+              v-if=&quot;scope.row.icon&quot;
+              :src=&quot;scope.row.icon&quot;
+              class=&quot;goods-img&quot;
+            /&gt;
+            &lt;el-button v-else-if=&quot;!disabled&quot; type=&quot;text&quot; size=&quot;small&quot;
+              &gt;上传图片&lt;/el-button
+            &gt;
+          &lt;/oss-upload&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column
+        label=&quot;规格&quot;
+        align=&quot;center&quot;
+        prop=&quot;attrPath&quot;
+      &gt;&lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;供货价格&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;el-input
+            :readonly=&quot;disabled&quot;
+            v-model=&quot;scope.row.priceCost&quot;
+          &gt;&lt;/el-input&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;销售价格&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;el-input
+            :readonly=&quot;disabled&quot;
+            v-model=&quot;scope.row.priceCash&quot;
+          &gt;&lt;/el-input&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;划线价格&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;el-input
+            :readonly=&quot;disabled&quot;
+            v-model=&quot;scope.row.priceOriginal&quot;
+          &gt;&lt;/el-input&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;商品库存&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;el-input :readonly=&quot;disabled&quot; v-model=&quot;scope.row.stock&quot;&gt;&lt;/el-input&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;!-- &lt;el-table-column label=&quot;商品预警值&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;el-input :readonly=&quot;disabled&quot; v-model=&quot;scope.row.stock&quot;&gt;&lt;/el-input&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt; --&gt;
+      &lt;!-- &lt;el-table-column v-if=&quot;!disabled&quot; label=&quot;操作&quot; align=&quot;center&quot;&gt;
+        &lt;template&gt;
+          &lt;el-button type=&quot;text&quot; size=&quot;small&quot;&gt;删除&lt;/el-button&gt;
+          &lt;el-button type=&quot;text&quot; size=&quot;small&quot;&gt;上移&lt;/el-button&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt; --&gt;
+    &lt;/el-table&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default &#123;
+  model: &#123;
+    prop: &quot;skuData&quot;,
+    event: &quot;change&quot;,
+  &#125;,
+  props: &#123;
+    skuData: &#123;
+      type: Object,
+      default: () =&gt; (&#123;&#125;),
+    &#125;,
+    disabled: &#123;
+      type: Boolean,
+      default: false,
+    &#125;,
+  &#125;,
+  data() &#123;
+    return &#123;&#125;;
+  &#125;,
+  watch: &#123;
+    &quot;skuData.attrList&quot;: &#123;
+      handler() &#123;
+        if (!this.disabled) &#123;
+          this.$set(this.skuData, &quot;skuList&quot;, this.getTable());
+        &#125;
+      &#125;,
+      deep: true,
+      immediate: true,
+    &#125;,
+  &#125;,
+  methods: &#123;
+    // 添加规格行
+    addSkuRow(i) &#123;
+      this.skuData.attrList.push(&#123;
+        attrName: &quot;&quot;,
+        attrValue: [],
+      &#125;);
+      this.$emit(&quot;change&quot;, this.skuData);
+    &#125;,
+
+    // 删除规格行
+    removeSkuRow(i) &#123;
+      this.skuData.attrList.splice(i, 1);
+      this.$emit(&quot;change&quot;, this.skuData);
+    &#125;,
+    // 删除规格属性值
+    removeSkuAttr(a, b) &#123;
+      this.skuData.attrList[a].attrValue.splice(b, 1);
+      this.$emit(&quot;change&quot;, this.skuData);
+    &#125;,
+    // 添加规格属性值
+    addSkuAttr(i) &#123;
+      this.$prompt(&quot;请输入规格值&quot;, &quot;添加规格值&quot;, &#123;
+        confirmButtonText: &quot;确定&quot;,
+        cancelButtonText: &quot;取消&quot;,
+        inputPattern: /\S+/,
+        inputErrorMessage: &quot;规格值不能为空&quot;,
+        closeOnClickModal: false,
+      &#125;).then((&#123; value &#125;) =&gt; &#123;
+        this.skuData.attrList[i].attrValue.push(&#123;
+          attrValue: value,
+        &#125;);
+        this.$emit(&quot;change&quot;, this.skuData);
+      &#125;);
+    &#125;,
+    onUploadImgSuccess(res, file, row) &#123;
+      if (!file) &#123;
+        return;
+      &#125;
+      row.icon = file;
+      this.$emit(&quot;change&quot;, this.skuData);
+    &#125;,
+    getTable() &#123;
+      const table = [];
+      const attrValueAry = [];
+      const arr = [];
+      const tmpSkuData = (this.skuData.attrList || []).filter(
+        (d) =&gt; d.attrName != &quot;&quot; &amp;&amp; d.attrValue.length &gt; 0
+      );
+      if (!tmpSkuData || tmpSkuData.length == 0) &#123;
+        return [];
+      &#125;
+
+      tmpSkuData.forEach((item) =&gt; &#123;
+        attrValueAry.push(item.attrValue);
+      &#125;);
+
+      function func(skuarr = [], i) &#123;
+        for (let j = 0; j &lt; attrValueAry[i].length; j++) &#123;
+          if (i &lt; attrValueAry.length - 1) &#123;
+            skuarr[i] = attrValueAry[i][j];
+            func(skuarr, i + 1);
+          &#125; else &#123;
+            arr.push([...skuarr, attrValueAry[i][j]]);
+          &#125;
+        &#125;
+      &#125;
+      func([], 0);
+      arr.forEach((item) =&gt; &#123;
+        let attrPath = &quot;&quot;,
+          findItem,
+          tableItem;
+        item.forEach((d, idx) =&gt; &#123;
+          attrPath += `$&#123;tmpSkuData[idx].attrName&#125;:$&#123;d.attrValue&#125;;`;
+        &#125;);
+        findItem =
+          this.skuData.initSkulist.find((item) =&gt; &#123;
+            return attrPath.includes(item.attrPath);
+          &#125;) || &#123;&#125;;
+
+        tableItem = Object.assign(
+          &#123;
+            priceCost: 0,
+            priceCash: 0,
+            priceOriginal: 0,
+            stock: 0,
+            icon: null,
+          &#125;,
+          findItem,
+          &#123;
+            attrPath,
+          &#125;
+        );
+        table.push(tableItem);
+      &#125;);
+      return table;
+    &#125;,
+  &#125;,
+&#125;;
+&lt;/script&gt;
+
+&lt;style lang=&quot;scss&quot; scoped&gt;
+.sku-list &#123;
+  &amp;-head &#123;
+    margin-bottom: 10px;
+  &#125;
+  &amp;-item &#123;
+    display: flex;
+    align-items: center;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 20px 50px;
+
+    &amp;-main &#123;
+      flex: 1;
+    &#125;
+    &amp;-removeBtn &#123;
+      margin-left: 20px;
+      color: #f56c6c;
+    &#125;
+    &amp;__layout &#123;
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      &amp;:last-child &#123;
+        margin-bottom: 0;
+      &#125;
+      .input &#123;
+        width: 240px;
+      &#125;
+      .span &#123;
+        font-size: 13px;
+        font-weight: bold;
+        margin-right: 10px;
+      &#125;
+    &#125;
+    &amp;-tags &#123;
+      flex: 1;
+    &#125;
+    &amp;-tag &#123;
+      margin-bottom: 10px;
+      margin-right: 10px;
+    &#125;
+  &#125;
+&#125;
+&lt;/style&gt;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/30/vue-goodsSkuComponent/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/09/30/vue-mergeImg/">
+        <h2>
+            vue项目动态制定图片
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Vue">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Vue
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="vue项目动态制定图片"><a href="#vue项目动态制定图片" class="headerlink" title="vue项目动态制定图片"></a>vue项目动态制定图片</h3><p><strong>ps:</strong> <em>业务需求：需要在一张指定的背景图上放一张代表用户信息的二维码，并在二维码底部写一些编号，然后生成一张图片下载…</em></p>
+<h4 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h4><p><code>js-file-download</code> 可以用来下载图片；</p>
+<p><code>merge-images</code> 可以把两张图片合成一张；</p>
+<p><code>qrcode</code> 可以动态生成二维码图片；</p>
+<pre><code class="bash">    npm i js-file-download
+    npm i merge-images
+    npm i qrcode 
+</code></pre>
+<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><pre><code class="vue">&lt;script&gt;
+    import fileDownload from &quot;js-file-download&quot;;
+    import mergeImages from &quot;merge-images&quot;;
+    import QRCode from &quot;qrcode&quot;;
+    export default &#123;
+        methods:&#123;
+            downloadItem(ary, sleep = 1000)&#123;
+                let row = ary.shift();
+                if(!row)&#123;
+                    return
+                &#125;
+                let textImg = drawText(&#123;
+                    text: `$&#123;row.loginName&#125;_$&#123;row.shareCount&#125;`,
+                    color: &quot;#fff&quot;,
+                    fontSize: 30,
+                    width: &quot;750&quot;,
+                &#125;);
+                this.makeQrCode(row.shareCode).then((url) =&gt; &#123;
+                    mergeImages(
+                        [
+                        &quot;https://mdhw.oss-cn-hangzhou.aliyuncs.com/h5/share_bg.png?v=2.0&quot;,
+                        &#123; src: url, x: 149, y: 478 &#125;,
+                        &#123; src: textImg, x: 0, y: 995 &#125;,
+                        ],
+                        &#123;
+                        crossOrigin: &quot;Anonymous&quot;,
+                        &#125;
+                    ).then((b64) =&gt; &#123;
+                        fileDownload(
+                            dataURLtoFile(b64),
+                            `$&#123;row.loginName&#125;_$&#123;row.shareCount&#125;.png`
+                        );
+                        // 需要延时下载，因为如果批量下载的 且不延时 那么会导致批量下载的图片部分丢失
+                        setTimeout(()=&gt;&#123;
+                            this.downloadItem(ary, sleep)
+                        &#125;, sleep)
+                    &#125;);
+                &#125;);
+            &#125;,
+        
+            makeQrCode(shareCode) &#123;
+                return QRCode.toDataURL(
+                    `https://www.nairongmiao.xyz/share.html?shareCode=$&#123;shareCode&#125;`,
+                    &#123;
+                    errorCorrectionLevel: &quot;H&quot;,
+                    width: 477,
+                    margin: 1,
+                    &#125;
+                );
+            &#125;,
+        &#125;
+    &#125;
+&lt;/script&gt;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/30/vue-mergeImg/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/09/30/vue-waterMark/">
+        <h2>
+            vue项目页面增加水印
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Vue">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Vue
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="vue项目页面增加水印"><a href="#vue项目页面增加水印" class="headerlink" title="vue项目页面增加水印"></a>vue项目页面增加水印</h3><p><strong>ps:</strong> <em>领导说要在后台上面添加带上用户名字的水印，嗯…加个指令…，还有就是可能需要使用<code>pointer-event: none;</code>来让这个水印层不会影响到页面的事件操作</em></p>
+<h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">    Vue.directive(&#39;watermark&#39;, (el,binding) =&gt; &#123;
+        let text = binding.value.text;
+        let font = binding.value.font || &quot;16px Microsoft JhengHei&quot;;
+        let textColor = binding.value.textColor || &quot;rgba(215, 215, 215, 0.2)&quot;;
+        let width = binding.value.width || 400;
+        let height = binding.value.height || 200;
+        let textRotate = binding.value.textRotate||-20;
+        
+        function addWaterMarker(parentNode) &#123;
+            var can = document.createElement(&#39;canvas&#39;);
+            var cans = can.getContext(&#39;2d&#39;);
+            parentNode.appendChild(can);
+            can.width = width;
+            can.height = height;
+            can.style.display = &#39;none&#39;;
+            cans.rotate(textRotate * Math.PI / 180);
+            cans.font = font;
+            cans.fillStyle = textColor ;
+            cans.textAlign = &#39;left&#39;;
+            cans.textBaseline = &#39;Middle&#39;;
+            cans.fillText(text, 0,  can.height);
+            parentNode.style.backgroundImage = &quot;url(&quot; + can.toDataURL(&quot;image/png&quot;) + &quot;)&quot;;
+        &#125;
+        addWaterMarker(el)
+    &#125;)
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/30/vue-waterMark/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/09/30/vue-optimization/">
+        <h2>
+            vue项目小优化配置
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Vue">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Vue
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="vue项目小优化配置"><a href="#vue项目小优化配置" class="headerlink" title="vue项目小优化配置"></a>vue项目小优化配置</h3><p><strong>ps:</strong> <em>部署到线上的时候网页加载很慢…，领导叫我去优化下，于是就直接用<code>gzip</code>压缩大法，但是需要后端配合开启gzip，嗯…速度飞起…</em></p>
+<h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">  chainWebpack(config)&#123;
+    // ...
+    config
+        .when(process.env.NODE_ENV !== &#39;development&#39;,
+            config =&gt; &#123;
+                /* 开启gzip压缩，需要后端配合 */
+                config
+                    .plugin(&#39;compressionWebpackPlugin&#39;)
+                    .use(&#39;compression-webpack-plugin&#39;, [&#123;
+                        filename: &#39;[path].gz[query]&#39;,
+                        algorithm: &#39;gzip&#39;,
+                        test: new RegExp(&quot;\\.(&quot; + productionGzipExtensions.join(&quot;|&quot;) + &quot;)$&quot;),
+                        threshold: 10240,
+                        minRatio: 0.8,
+                        deleteOriginalAssets: false
+                    &#125;])
+                /* 配置打包后删除console.log和debugger */
+                config.optimization.minimizer(&#39;terser&#39;).tap((args) =&gt; &#123;
+                    args[0].terserOptions.compress.drop_debugger = true
+                    args[0].terserOptions.compress.pure_funcs = [&#39;console.log&#39;]
+                    return args
+                &#125;)
+            &#125;
+        )
+&#125;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/30/vue-optimization/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/09/30/vue-dataReactive/">
+        <h2>
+            Vue源码之数据响应原理
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Vue">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Vue
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Vue源码之数据响应原理"><a href="#Vue源码之数据响应原理" class="headerlink" title="Vue源码之数据响应原理"></a>Vue源码之数据响应原理</h3><p><strong>ps:</strong> <em>简单了解一下vue数据响应的原理，vue2通过es5的<code>defineProperty</code>来劫持数据，所以不兼容ie8及以下版本，vue3通过<code>Proxy</code>来进行数据劫持…</em></p>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">  // 监听数据路口
+  function observe(value) &#123;
+      if (typeof value != &#39;object&#39;) &#123;
+          return
+      &#125;
+      let ob;
+      if (value.__ob__ !== undefined) &#123;
+          ob = value.__ob__;
+      &#125; else &#123;
+          ob = new Observer(value);
+      &#125;
+      return ob;
+  &#125;
+  // 数据劫持
+  function defineReactive(data, key, val) &#123;
+     if(!val)&#123;
+      val = data[key];
+     &#125;
+    //  也可使用proxy reflect方式来劫持 会更为便捷
+      Object.defineProperty(data, key, &#123;
+          get() &#123;
+              return val;
+          &#125;,
+          set(newVal) &#123;
+              console.log(&#39;修改了属性:&#39; + key)
+              val = newVal;
+              observe(newVal);
+          &#125;
+      &#125;)
+      observe(val)
+  &#125;
+ 
+  class Observer &#123;
+      constructor(val)&#123;
+          Object.defineProperty(val, &#39;__ob__&#39;, &#123;
+              value: this,
+              enumerable: false
+          &#125;);
+          this.walk(val);
+      &#125;
+ 
+      walk(value)&#123;
+          for (let k in value) &#123;
+              defineReactive(value, k)
+          &#125;
+      &#125;
+  &#125;
+
+  // 测试
+  var obj = &#123;
+      a: 1,
+      b: &#123;
+          c: 2
+      &#125;
+  &#125;
+  observe(obj)
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/30/vue-dataReactive/ " class="go-post">
         阅读全文
     </a>
 </div>
@@ -1796,6 +1630,12 @@
             <a href="/page/2/">
                 <span class="page-num">
                     2
+                </span>
+            </a>
+            
+            <a href="/page/3">
+                <span class="page-num">
+                    3
                 </span>
             </a>
             

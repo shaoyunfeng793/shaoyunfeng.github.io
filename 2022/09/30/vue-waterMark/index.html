@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | vue项目页面增加水印</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,69 +135,66 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>vue项目页面增加水印 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/Vue">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 Vue
             </a>
         </span>
         
-        
-        
-        <span>
-            <a href="/categories/Webpack/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Webpack
-            </a>
-        </span>
-        
+
         
     </div>
-    <div id="archives">
+
+    <div class="content" v-pre>
+        <h3 id="vue项目页面增加水印"><a href="#vue项目页面增加水印" class="headerlink" title="vue项目页面增加水印"></a>vue项目页面增加水印</h3><p><strong>ps:</strong> <em>领导说要在后台上面添加带上用户名字的水印，嗯…加个指令…，还有就是可能需要使用<code>pointer-event: none;</code>来让这个水印层不会影响到页面的事件操作</em></p>
+<h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">    Vue.directive(&#39;watermark&#39;, (el,binding) =&gt; &#123;
+        let text = binding.value.text;
+        let font = binding.value.font || &quot;16px Microsoft JhengHei&quot;;
+        let textColor = binding.value.textColor || &quot;rgba(215, 215, 215, 0.2)&quot;;
+        let width = binding.value.width || 400;
+        let height = binding.value.height || 200;
+        let textRotate = binding.value.textRotate||-20;
         
+        function addWaterMarker(parentNode) &#123;
+            var can = document.createElement(&#39;canvas&#39;);
+            var cans = can.getContext(&#39;2d&#39;);
+            parentNode.appendChild(can);
+            can.width = width;
+            can.height = height;
+            can.style.display = &#39;none&#39;;
+            cans.rotate(textRotate * Math.PI / 180);
+            cans.font = font;
+            cans.fillStyle = textColor ;
+            cans.textAlign = &#39;left&#39;;
+            cans.textBaseline = &#39;Middle&#39;;
+            cans.fillText(text, 0,  can.height);
+            parentNode.style.backgroundImage = &quot;url(&quot; + can.toDataURL(&quot;image/png&quot;) + &quot;)&quot;;
+        &#125;
+        addWaterMarker(el)
+    &#125;)
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

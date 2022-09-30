@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | Webpack之抽离压缩css</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,69 +135,78 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>Webpack之抽离压缩css </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/Webpack">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Webpack/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 Webpack
             </a>
         </span>
         
+
         
     </div>
-    <div id="archives">
-        
+
+    <div class="content" v-pre>
+        <h3 id="Webpack之抽离压缩css"><a href="#Webpack之抽离压缩css" class="headerlink" title="Webpack之抽离压缩css"></a>Webpack之抽离压缩css</h3><p>使用 <code>mini-css-extract-plugin</code> 插件的内置loader 替换 <code>style-loader</code></p>
+<p>使用 <code>terser-webpack-plugin</code> 插件压缩js代码</p>
+<p>使用 <code>optimize-css-assets-webpack-plugin</code> 插件压缩css代码</p>
+<h4 id="Webpack-配置"><a href="#Webpack-配置" class="headerlink" title="Webpack 配置"></a>Webpack 配置</h4><pre><code class="js">    const MiniCSSExtractPlugin = require(&#39;mini-css-extract-plugin&#39;);
+ 
+   
+    const TerserPlugin = require(&#39;terser-webpack-plugin&#39;);  // 压缩js插件
+    const OptimizeCssAssetsWebpackPlugin = require(&#39;optimize-css-assets-webpack-plugin&#39;);  // 压缩css插件
+    
+    module.exports = &#123;
+        // ...
+        module: &#123;
+            rules: [
+                &#123;
+                    test: /\.css/,
+                    loader: [
+                        MiniCSSExtractPlugin.loader, // 替换 style-loader
+                        &#39;css-loader&#39;,
+                        &#39;postcss-loader&#39;,  // autoprefixer
+                    ],
+                &#125;
+            ]
+        &#125;,
+        plugins: [
+            new MiniCSSExtractPlugin(&#123;
+                filename: &#39;css/main.[contentHash:8].css&#39;
+            &#125;)
+        ],
+        // 优化配置
+        optimization: &#123;
+            minimizer: &#123;
+                // 压缩js
+                new TerserPlugin(),
+                // 压缩css
+                new OptimizeCssAssetsWebpackPlugin()
+            &#125;
+        &#125;  
+    &#125;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

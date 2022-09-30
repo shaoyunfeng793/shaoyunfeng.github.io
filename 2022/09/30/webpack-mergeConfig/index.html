@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | Webpack之拆分/合并配置</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,69 +135,83 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>Webpack之拆分/合并配置 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#03a9f4>
+        <span class="category">
+            <a href="/categories/Webpack">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Webpack/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 Webpack
             </a>
         </span>
         
+
         
     </div>
-    <div id="archives">
-        
+
+    <div class="content" v-pre>
+        <h3 id="Webpack之拆分-x2F-合并配置"><a href="#Webpack之拆分-x2F-合并配置" class="headerlink" title="Webpack之拆分&#x2F;合并配置"></a>Webpack之拆分&#x2F;合并配置</h3><p>使用 <code>webpack-merge</code> 合并配置；</p>
+<p>对应script为：<br>build:dev webpack –config webpack.dev.config.js；<br>build:prod webpack –config webpack.prod.config.js；</p>
+<h4 id="webpack-base-config-js"><a href="#webpack-base-config-js" class="headerlink" title="webpack.base.config.js"></a>webpack.base.config.js</h4><p>提取公共配置</p>
+<pre><code class="js">    const path = requrie(&#39;path&#39;);
+    const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
+    
+    module.exports = &#123;
+        entry: &#123;
+            main: &#39;./src/index.js&#39;
+        &#125;,
+        output: &#123;
+            filename: &#39;[name].js&#39;,
+            path: path.resolve(__dirname, &#39;dist&#39;)
+        &#125;,
+        plugins: [
+            new HtmlWebpackPlugin(&#123;
+                template: &#39;./src/index.html&#39;
+            &#125;)
+        ],
+        // ...
+    &#125;
+</code></pre>
+<h4 id="webpack-dev-config-js"><a href="#webpack-dev-config-js" class="headerlink" title="webpack.dev.config.js"></a>webpack.dev.config.js</h4><p>开发环境配置</p>
+<pre><code class="js">    const baseConfig = require(&#39;./weback.base.config.js&#39;);
+    const &#123; smart: merge &#125; = require(&#39;webpack-merge&#39;);
+    
+    const devConfig = &#123;
+        mode: &#39;development&#39;
+        // 开发环境配置....
+    &#125;
+    
+    module.export = merge(baseConfig, devConfig);
+</code></pre>
+<h4 id="webpack-prod-config-js"><a href="#webpack-prod-config-js" class="headerlink" title="webpack.prod.config.js"></a>webpack.prod.config.js</h4><p>生产环境配置</p>
+<pre><code class="js">    const baseConfig = require(&#39;./weback.base.config.js&#39;);
+    const &#123; smart: merge &#125; = require(&#39;webpack-merge&#39;);
+    
+    const devConfig = &#123;
+        mode: &#39;development&#39;
+        // 开发环境配置....
+    &#125;
+    
+    module.export = merge(baseConfig, devConfig);
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

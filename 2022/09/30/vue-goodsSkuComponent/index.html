@@ -1,0 +1,538 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN ">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>杨红蓝 | ElementUI二开商品规格组件</title>
+    <meta name="author" content="Yanghonglan">
+    <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
+    <meta name="keywords" content=" ">
+    <link rel="icon" href="/images/avatar.png">
+    <link rel="stylesheet" href="/css/antd.min.css">
+    
+    <link rel="stylesheet" href="/css/full-theme.css">
+    
+    <script src="/js/vue.js"></script>
+    <script src="/js/antd.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+
+    <div id="loading"
+        style="height: 100vh; width: 100%; position: fixed;display: flex;z-index: 200; justify-content: space-between;">
+        <div id="loadleft" style="width: 50%;background-color: #ffffff;transition: width 0.6s ease-out;"></div>
+        <div id="loadright" style="width: 50%;background-color: #ffffff;transition: width 0.6s ease-out;"></div>
+        <div
+            style="position: fixed; height: 100vh; width: 100%;display: flex;justify-content: center;align-items: center;">
+            <div id="loadcontent"
+                style="width:400px;height:400px;padding:50px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:solid 10px#a3ddfb; text-align:center;opacity:1;transition:opacity 0.3s ease-out;">
+                <div>
+                    <h2>LOADING...</h2>
+                    <p>加载过慢请开启缓存(浏览器默认开启)</p>
+                    <div>
+                        <img src="/images/dancingkitty.gif" alt="loading">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="layout">
+        <transition name="into">
+            <div v-show="show_page" style="display: none;">
+                <div id="menu_show">
+                    
+    <nav id="menu">
+        <div class="desktop-menu">
+            <span class="title">
+                杨红蓝's Blog
+            </span>
+            
+                <a href="/">
+                    <span>
+                        <a-icon type="home" theme="filled" />
+                    </span>
+                    <span>
+                        主页
+                    </span>
+                </a>
+                
+                <a href="/archives">
+                    <span>
+                        <a-icon type="read" theme="filled" />
+                    </span>
+                    <span>
+                        文章
+                    </span>
+                </a>
+                
+                <a href="/categories">
+                    <span>
+                        <a-icon type="book" theme="filled" />
+                    </span>
+                    <span>
+                        分类
+                    </span>
+                </a>
+                
+        </div>
+
+        <div :class="'phone-menu ' + menu_show" id="phone-menu">
+            <div :class="'title'" @click="menu_show=!menu_show">
+                <span style="margin-right: 10px;">
+                    <a-icon type="appstore" theme="filled" />
+                </span>
+                <span>
+                    杨红蓝
+                </span>
+            </div>
+            <div class="items" v-show="menu_show">
+                
+                    <a href="/">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="home"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                主页
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="/archives">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="read"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                文章
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="/categories">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="book"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                分类
+                            </div>
+                        </div>
+                    </a>
+                    
+            </div>
+            <div class="curtain" v-show="menu_show"></div>
+        </div>
+
+    </nav>
+                </div>
+
+                <div id="main">
+                     
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>ElementUI二开商品规格组件 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+        
+        <span class="category">
+            <a href="/categories/Vue">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" />
+                </span>
+                Vue
+            </a>
+        </span>
+        
+
+        
+    </div>
+
+    <div class="content" v-pre>
+        <h3 id="ElementUI二开商品规格组件"><a href="#ElementUI二开商品规格组件" class="headerlink" title="ElementUI二开商品规格组件"></a>ElementUI二开商品规格组件</h3><p>使用到<code>element-ui</code>进行二次开发的组件</p>
+<p>电商后台需求-商品规格组件，参数是我们业务上需要的，不过八九不离十</p>
+<p>组件中的上传图片使用了oss-upload组件（详见另一文：<em><strong>ElementUI二开Alioss上传组件</strong></em>）</p>
+<p><img src="/images/goodsSku.png" alt="效果图"></p>
+<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><pre><code class="vue">&lt;template&gt;
+  &lt;div class=&quot;sku-list&quot;&gt;
+    &lt;template v-if=&quot;!disabled&quot;&gt;
+      &lt;div class=&quot;sku-list-head&quot;&gt;
+        &lt;el-button type=&quot;primary&quot; size=&quot;mini&quot; @click=&quot;addSkuRow&quot;
+          &gt;添加规格&lt;/el-button
+        &gt;
+      &lt;/div&gt;
+      &lt;div
+        class=&quot;sku-list-item&quot;
+        v-for=&quot;(item, index) in skuData.attrList&quot;
+        :key=&quot;index&quot;
+      &gt;
+        &lt;div class=&quot;sku-list-item-main&quot;&gt;
+          &lt;div class=&quot;sku-list-item__layout&quot;&gt;
+            &lt;span class=&quot;span&quot;&gt;规格名&lt;/span&gt;
+            &lt;el-input
+              size=&quot;small&quot;
+              v-model=&quot;item.attrName&quot;
+              class=&quot;input&quot;
+            &gt;&lt;/el-input&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;sku-list-item__layout&quot;&gt;
+            &lt;span class=&quot;span&quot;&gt;规格值&lt;/span&gt;
+            &lt;div class=&quot;sku-list-item-tags&quot;&gt;
+              &lt;el-tag
+                class=&quot;sku-list-item-tag&quot;
+                closable
+                @close=&quot;removeSkuAttr(index)&quot;
+                v-for=&quot;(subitem, i) in item.attrValue&quot;
+                :key=&quot;i&quot;
+                &gt;&#123;&#123; subitem.attrValue &#125;&#125;&lt;/el-tag
+              &gt;
+              &lt;el-button
+                size=&quot;small&quot;
+                icon=&quot;el-icon-plus&quot;
+                @click=&quot;addSkuAttr(index)&quot;
+                &gt;添加&lt;/el-button
+              &gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;el-button
+          type=&quot;text&quot;
+          size=&quot;small&quot;
+          class=&quot;sku-list-item-removeBtn&quot;
+          @click=&quot;removeSkuRow(index)&quot;
+          &gt;删除规格&lt;/el-button
+        &gt;
+      &lt;/div&gt;
+    &lt;/template&gt;
+    &lt;el-table border :data=&quot;skuData.skuList&quot;&gt;
+      &lt;el-table-column label=&quot;图片&quot; align=&quot;center&quot; width=&quot;120&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;oss-upload
+            :disabled=&quot;disabled&quot;
+            :on-success=&quot;
+              (res, file) =&gt; onUploadImgSuccess(res, file, scope.row)
+            &quot;
+            dir=&quot;erp/goods&quot;
+          &gt;
+            &lt;img
+              v-if=&quot;scope.row.icon&quot;
+              :src=&quot;scope.row.icon&quot;
+              class=&quot;goods-img&quot;
+            /&gt;
+            &lt;el-button v-else-if=&quot;!disabled&quot; type=&quot;text&quot; size=&quot;small&quot;
+              &gt;上传图片&lt;/el-button
+            &gt;
+          &lt;/oss-upload&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column
+        label=&quot;规格&quot;
+        align=&quot;center&quot;
+        prop=&quot;attrPath&quot;
+      &gt;&lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;供货价格&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;el-input
+            :readonly=&quot;disabled&quot;
+            v-model=&quot;scope.row.priceCost&quot;
+          &gt;&lt;/el-input&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;销售价格&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;el-input
+            :readonly=&quot;disabled&quot;
+            v-model=&quot;scope.row.priceCash&quot;
+          &gt;&lt;/el-input&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;划线价格&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;el-input
+            :readonly=&quot;disabled&quot;
+            v-model=&quot;scope.row.priceOriginal&quot;
+          &gt;&lt;/el-input&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;商品库存&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;el-input :readonly=&quot;disabled&quot; v-model=&quot;scope.row.stock&quot;&gt;&lt;/el-input&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;!-- &lt;el-table-column label=&quot;商品预警值&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;el-input :readonly=&quot;disabled&quot; v-model=&quot;scope.row.stock&quot;&gt;&lt;/el-input&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt; --&gt;
+      &lt;!-- &lt;el-table-column v-if=&quot;!disabled&quot; label=&quot;操作&quot; align=&quot;center&quot;&gt;
+        &lt;template&gt;
+          &lt;el-button type=&quot;text&quot; size=&quot;small&quot;&gt;删除&lt;/el-button&gt;
+          &lt;el-button type=&quot;text&quot; size=&quot;small&quot;&gt;上移&lt;/el-button&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt; --&gt;
+    &lt;/el-table&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default &#123;
+  model: &#123;
+    prop: &quot;skuData&quot;,
+    event: &quot;change&quot;,
+  &#125;,
+  props: &#123;
+    skuData: &#123;
+      type: Object,
+      default: () =&gt; (&#123;&#125;),
+    &#125;,
+    disabled: &#123;
+      type: Boolean,
+      default: false,
+    &#125;,
+  &#125;,
+  data() &#123;
+    return &#123;&#125;;
+  &#125;,
+  watch: &#123;
+    &quot;skuData.attrList&quot;: &#123;
+      handler() &#123;
+        if (!this.disabled) &#123;
+          this.$set(this.skuData, &quot;skuList&quot;, this.getTable());
+        &#125;
+      &#125;,
+      deep: true,
+      immediate: true,
+    &#125;,
+  &#125;,
+  methods: &#123;
+    // 添加规格行
+    addSkuRow(i) &#123;
+      this.skuData.attrList.push(&#123;
+        attrName: &quot;&quot;,
+        attrValue: [],
+      &#125;);
+      this.$emit(&quot;change&quot;, this.skuData);
+    &#125;,
+
+    // 删除规格行
+    removeSkuRow(i) &#123;
+      this.skuData.attrList.splice(i, 1);
+      this.$emit(&quot;change&quot;, this.skuData);
+    &#125;,
+    // 删除规格属性值
+    removeSkuAttr(a, b) &#123;
+      this.skuData.attrList[a].attrValue.splice(b, 1);
+      this.$emit(&quot;change&quot;, this.skuData);
+    &#125;,
+    // 添加规格属性值
+    addSkuAttr(i) &#123;
+      this.$prompt(&quot;请输入规格值&quot;, &quot;添加规格值&quot;, &#123;
+        confirmButtonText: &quot;确定&quot;,
+        cancelButtonText: &quot;取消&quot;,
+        inputPattern: /\S+/,
+        inputErrorMessage: &quot;规格值不能为空&quot;,
+        closeOnClickModal: false,
+      &#125;).then((&#123; value &#125;) =&gt; &#123;
+        this.skuData.attrList[i].attrValue.push(&#123;
+          attrValue: value,
+        &#125;);
+        this.$emit(&quot;change&quot;, this.skuData);
+      &#125;);
+    &#125;,
+    onUploadImgSuccess(res, file, row) &#123;
+      if (!file) &#123;
+        return;
+      &#125;
+      row.icon = file;
+      this.$emit(&quot;change&quot;, this.skuData);
+    &#125;,
+    getTable() &#123;
+      const table = [];
+      const attrValueAry = [];
+      const arr = [];
+      const tmpSkuData = (this.skuData.attrList || []).filter(
+        (d) =&gt; d.attrName != &quot;&quot; &amp;&amp; d.attrValue.length &gt; 0
+      );
+      if (!tmpSkuData || tmpSkuData.length == 0) &#123;
+        return [];
+      &#125;
+
+      tmpSkuData.forEach((item) =&gt; &#123;
+        attrValueAry.push(item.attrValue);
+      &#125;);
+
+      function func(skuarr = [], i) &#123;
+        for (let j = 0; j &lt; attrValueAry[i].length; j++) &#123;
+          if (i &lt; attrValueAry.length - 1) &#123;
+            skuarr[i] = attrValueAry[i][j];
+            func(skuarr, i + 1);
+          &#125; else &#123;
+            arr.push([...skuarr, attrValueAry[i][j]]);
+          &#125;
+        &#125;
+      &#125;
+      func([], 0);
+      arr.forEach((item) =&gt; &#123;
+        let attrPath = &quot;&quot;,
+          findItem,
+          tableItem;
+        item.forEach((d, idx) =&gt; &#123;
+          attrPath += `$&#123;tmpSkuData[idx].attrName&#125;:$&#123;d.attrValue&#125;;`;
+        &#125;);
+        findItem =
+          this.skuData.initSkulist.find((item) =&gt; &#123;
+            return attrPath.includes(item.attrPath);
+          &#125;) || &#123;&#125;;
+
+        tableItem = Object.assign(
+          &#123;
+            priceCost: 0,
+            priceCash: 0,
+            priceOriginal: 0,
+            stock: 0,
+            icon: null,
+          &#125;,
+          findItem,
+          &#123;
+            attrPath,
+          &#125;
+        );
+        table.push(tableItem);
+      &#125;);
+      return table;
+    &#125;,
+  &#125;,
+&#125;;
+&lt;/script&gt;
+
+&lt;style lang=&quot;scss&quot; scoped&gt;
+.sku-list &#123;
+  &amp;-head &#123;
+    margin-bottom: 10px;
+  &#125;
+  &amp;-item &#123;
+    display: flex;
+    align-items: center;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 20px 50px;
+
+    &amp;-main &#123;
+      flex: 1;
+    &#125;
+    &amp;-removeBtn &#123;
+      margin-left: 20px;
+      color: #f56c6c;
+    &#125;
+    &amp;__layout &#123;
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      &amp;:last-child &#123;
+        margin-bottom: 0;
+      &#125;
+      .input &#123;
+        width: 240px;
+      &#125;
+      .span &#123;
+        font-size: 13px;
+        font-weight: bold;
+        margin-right: 10px;
+      &#125;
+    &#125;
+    &amp;-tags &#123;
+      flex: 1;
+    &#125;
+    &amp;-tag &#123;
+      margin-bottom: 10px;
+      margin-right: 10px;
+    &#125;
+  &#125;
+&#125;
+&lt;/style&gt;
+</code></pre>
+
+    </div>
+
+    
+</div>
+                     
+<footer id="footer">
+    <div class="footer-wrap">
+        <div>
+            © 杨红蓝
+            <span class="footer-icon">
+                <a-icon type="flag" theme="filled" /></span>
+            @Yanghonglan
+        </div>
+        
+    </div>
+
+</footer>
+
+<script src="/js/highlight.min.js"></script>
+<script src="/js/particle.js"></script>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+    <script>
+    new Vue({
+        el: "#layout",
+        data: {
+            show_page: false,
+            onload_menu: false,
+            menu_show: false,
+            card_top: 100
+        },
+        created: function () {
+            var that = this
+            window.onload = function () {
+                that.show_page = true
+                document.getElementById("loadcontent").style.opacity = 0
+                setTimeout(function () {
+                    document.getElementById("loadleft").style.width = 0
+                    document.getElementById("loadright").style.width = 0
+                }, 300)
+                setTimeout(function () {
+                    document.getElementById("loading").style = "display:none"
+                }, 600)
+            }
+        },
+        mounted: function () {
+            var that = this
+            window.addEventListener('scroll', function (e) {
+                that.menu_show = false
+            })
+        },
+        methods: {
+            home_click: function () {
+                window.scrollTo({
+                    top: window.innerHeight - 80,
+                    behavior: "smooth",
+                });
+            }
+        }
+    })
+</script>
+
+</body>
+
+</html>

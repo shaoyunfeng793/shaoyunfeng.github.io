@@ -198,31 +198,38 @@
             
             
             <h3 id="vue项目小优化配置"><a href="#vue项目小优化配置" class="headerlink" title="vue项目小优化配置"></a>vue项目小优化配置</h3><p><strong>ps:</strong> <em>部署到线上的时候网页加载很慢…，领导叫我去优化下，于是就直接用<code>gzip</code>压缩大法，但是需要后端配合开启gzip，嗯…速度飞起…</em></p>
-<h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">  chainWebpack(config)&#123;
-    // ...
-    config
-        .when(process.env.NODE_ENV !== &#39;development&#39;,
-            config =&gt; &#123;
-                /* 开启gzip压缩，需要后端配合 */
-                config
-                    .plugin(&#39;compressionWebpackPlugin&#39;)
-                    .use(&#39;compression-webpack-plugin&#39;, [&#123;
-                        filename: &#39;[path].gz[query]&#39;,
-                        algorithm: &#39;gzip&#39;,
-                        test: new RegExp(&quot;\\.(&quot; + productionGzipExtensions.join(&quot;|&quot;) + &quot;)$&quot;),
-                        threshold: 10240,
-                        minRatio: 0.8,
-                        deleteOriginalAssets: false
-                    &#125;])
-                /* 配置打包后删除console.log和debugger */
-                config.optimization.minimizer(&#39;terser&#39;).tap((args) =&gt; &#123;
-                    args[0].terserOptions.compress.drop_debugger = true
-                    args[0].terserOptions.compress.pure_funcs = [&#39;console.log&#39;]
-                    return args
-                &#125;)
-            &#125;
-        )
-&#125;
+<h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">    const BundleAnalyzerPlugin = require(&#39;webpack-bundle-analyzer&#39;).BundleAnalyzerPlugin;
+    chainWebpack(config)&#123;
+        // ...
+        config
+            .when(process.env.NODE_ENV !== &#39;development&#39;,
+                config =&gt; &#123;
+
+                    /* 打包分析插件 */
+                    config
+                        .plugin(&#39;webpackBundleAnalyzer&#39;)
+                        .use(BundleAnalyzerPlugin)
+
+                    /* 开启gzip压缩，需要后端配合 */
+                    config
+                        .plugin(&#39;compressionWebpackPlugin&#39;)
+                        .use(&#39;compression-webpack-plugin&#39;, [&#123;
+                            filename: &#39;[path].gz[query]&#39;,
+                            algorithm: &#39;gzip&#39;,
+                            test: new RegExp(&quot;\\.(&quot; + productionGzipExtensions.join(&quot;|&quot;) + &quot;)$&quot;),
+                            threshold: 10240,
+                            minRatio: 0.8,
+                            deleteOriginalAssets: false
+                        &#125;])
+                    /* 配置打包后删除console.log和debugger */
+                    config.optimization.minimizer(&#39;terser&#39;).tap((args) =&gt; &#123;
+                        args[0].terserOptions.compress.drop_debugger = true
+                        args[0].terserOptions.compress.pure_funcs = [&#39;console.log&#39;]
+                        return args
+                    &#125;)
+                &#125;
+            )
+    &#125;
 </code></pre>
 
             

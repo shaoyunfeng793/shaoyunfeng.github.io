@@ -165,6 +165,7 @@
 
     <div class="content" v-pre>
         <h3 id="vue项目小优化配置"><a href="#vue项目小优化配置" class="headerlink" title="vue项目小优化配置"></a>vue项目小优化配置</h3><p><strong>ps:</strong> <em>部署到线上的时候网页加载很慢…，领导叫我去优化下，于是就直接用<code>gzip</code>压缩大法，但是需要后端配合开启gzip，嗯…速度飞起…</em></p>
+<p><code>webpack-bundle-analyzer</code>可以帮我们进行打包分析，避免重复打包，以及合理代码分割</p>
 <h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">    const BundleAnalyzerPlugin = require(&#39;webpack-bundle-analyzer&#39;).BundleAnalyzerPlugin;
     chainWebpack(config)&#123;
         // ...
@@ -194,6 +195,33 @@
                         args[0].terserOptions.compress.pure_funcs = [&#39;console.log&#39;]
                         return args
                     &#125;)
+
+                    /* 代码分割 */
+                    config
+                        .optimization.splitChunks(&#123;
+                            chunks: &#39;all&#39;, // all-同步异步都分割,inital-对同步分割,async-对异步分割
+                            cacheGroups: &#123;
+                                libs: &#123;
+                                    name: &#39;chunk-libs&#39;, // 组名
+                                    test: /[\\/]node_modules[\\/]/,
+                                    priority: 10, // 优先级
+                                    /* minSize: 5 * 1024 // 达到5kb才分割 */
+                                    /* minChunks: 1 // 引用1次就单独打包 */
+                                &#125;,
+                                elementUI: &#123;
+                                    name: &#39;chunk-elementUI&#39;, 
+                                    priority: 20, 
+                                    test: /[\\/]node_modules[\\/]_?element-ui(.*)/ 
+                                &#125;,
+                                commons: &#123;
+                                    name: &#39;chunk-commons&#39;,
+                                    test: resolve(&#39;src/components&#39;), 
+                                    minChunks: 3,
+                                    priority: 5,
+                                    reuseExistingChunk: true
+                                &#125;
+                            &#125;
+                        &#125;)
                 &#125;
             )
     &#125;

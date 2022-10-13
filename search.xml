@@ -4,6 +4,44 @@
   
     
     <entry>
+      <title>一些可能用到的工具网站</title>
+      <link href="/2022/10/13/utils-webSite/"/>
+      <url>/2022/10/13/utils-webSite/</url>
+      
+        <content type="html"><![CDATA[<h3 id="一些可能用到的工具网站"><a href="#一些可能用到的工具网站" class="headerlink" title="一些可能用到的工具网站"></a>一些可能用到的工具网站</h3><h4 id="1-去除多余CSS"><a href="#1-去除多余CSS" class="headerlink" title="1.去除多余CSS"></a>1.去除多余CSS</h4><p>注入html代码和css完成去除多余css<br>地址： <a href="https://uncss-online.com/">https://uncss-online.com/</a></p><h4 id="2-CSS-sprite图"><a href="#2-CSS-sprite图" class="headerlink" title="2.CSS sprite图"></a>2.CSS sprite图</h4><p>上传若干图片，帮你生成雪碧图，还可以帮助你直接定位到相应图标的css样式<br>地址： <a href="https://www.toptal.com/developers/css/sprite-generator">https://www.toptal.com/developers/css/sprite-generator</a></p><h4 id="3-图片压缩TinyPng"><a href="#3-图片压缩TinyPng" class="headerlink" title="3.图片压缩TinyPng"></a>3.图片压缩TinyPng</h4><p>一个很强大且免费的压缩网站<br>地址： <a href="https://tinypng.com/">https://tinypng.com</a></p><h4 id="4-css动画"><a href="#4-css动画" class="headerlink" title="4.css动画"></a>4.css动画</h4><p>有很多css动画样式，可以直接查看效果<br>地址： <a href="https://animate.style/">https://animate.style/</a></p><h4 id="5-css渐变颜色"><a href="#5-css渐变颜色" class="headerlink" title="5.css渐变颜色"></a>5.css渐变颜色</h4><p>有很多好看的渐变颜色<br>地址： <a href="https://webkul.github.io/coolhue/">https://webkul.github.io/coolhue/</a></p><h4 id="6-删除背景"><a href="#6-删除背景" class="headerlink" title="6.删除背景"></a>6.删除背景</h4><p>一个扣除背景的网站<br>地址： <a href="https://www.remove.bg/">https://www.remove.bg/</a></p><h4 id="7-转换文件格式"><a href="#7-转换文件格式" class="headerlink" title="7.转换文件格式"></a>7.转换文件格式</h4><p>一个可以免费转换文件格式的网站，（有限制）<br>地址： <a href="https://convertio.co/zh/">https://convertio.co/zh/</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Utils </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>CSS技巧之DIV保持长宽比</title>
+      <link href="/2022/10/13/css-aspectRatioDiv/"/>
+      <url>/2022/10/13/css-aspectRatioDiv/</url>
+      
+        <content type="html"><![CDATA[<h3 id="CSS技巧之DIV保持长宽比"><a href="#CSS技巧之DIV保持长宽比" class="headerlink" title="CSS技巧之DIV保持长宽比"></a>CSS技巧之DIV保持长宽比</h3><p><strong>ps:</strong> <em>我们都知道在前端开发中经常遇到需要保持一个元素的长宽比，最常见的就是我们的Img元素，但是除了img、vidoe这种可替换元素元素具有长宽比的特性，那么其它元素如果保持长宽比呢，这给我们的开发带来了许多不便利…</em></p><h4 id="方式1-padding-top-hack"><a href="#方式1-padding-top-hack" class="headerlink" title="方式1 padding-top-hack"></a>方式1 padding-top-hack</h4><pre><code class="html">&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;    &lt;meta charset=&quot;UTF-8&quot;&gt;    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;    &lt;style&gt;        *&#123;            padding: 0;            margin: 0;        &#125;        .outer &#123;            position: relative;            height: 0;            padding-top: 56.25%;        &#125;        .inner &#123;            background-color: skyblue;            position: absolute;            top: 0;            right: 0;            bottom: 0;            left: 0;        &#125;    &lt;/style&gt;&lt;/head&gt;&lt;body&gt;    &lt;div class=&quot;outer&quot;&gt;        &lt;div class=&quot;inner&quot;&gt;&lt;/div&gt;    &lt;/div&gt; &lt;/body&gt;&lt;/html&gt;</code></pre><h4 id="方式2-aspect-ratio"><a href="#方式2-aspect-ratio" class="headerlink" title="方式2 aspect-ratio"></a>方式2 aspect-ratio</h4><p><em>该方式存在兼容性问题，想要知道兼容性可在<strong>Can i use</strong>上查看</em></p><pre><code class="html">&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;    &lt;meta charset=&quot;UTF-8&quot;&gt;    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;    &lt;style&gt;        *&#123;            padding: 0;            margin: 0;        &#125;        .inner &#123;            background-color: skyblue;            width: 50%;            aspect-ratio: auto 2 / 1; /* 只需这一行 */        &#125;    &lt;/style&gt;&lt;/head&gt;&lt;body&gt;    &lt;div class=&quot;inner&quot;&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> CSS </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>移动端H5开发技巧</title>
       <link href="/2022/10/06/html-mobileH5/"/>
       <url>/2022/10/06/html-mobileH5/</url>
@@ -198,7 +236,7 @@
       <link href="/2022/09/30/vue-optimization/"/>
       <url>/2022/09/30/vue-optimization/</url>
       
-        <content type="html"><![CDATA[<h3 id="vue项目小优化配置"><a href="#vue项目小优化配置" class="headerlink" title="vue项目小优化配置"></a>vue项目小优化配置</h3><p><strong>ps:</strong> <em>部署到线上的时候网页加载很慢…，领导叫我去优化下，于是就直接用<code>gzip</code>压缩大法，但是需要后端配合开启gzip，嗯…速度飞起…</em></p><h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">    const BundleAnalyzerPlugin = require(&#39;webpack-bundle-analyzer&#39;).BundleAnalyzerPlugin;    chainWebpack(config)&#123;        // ...        config            .when(process.env.NODE_ENV !== &#39;development&#39;,                config =&gt; &#123;                    /* 打包分析插件 */                    config                        .plugin(&#39;webpackBundleAnalyzer&#39;)                        .use(BundleAnalyzerPlugin)                    /* 开启gzip压缩，需要后端配合 */                    config                        .plugin(&#39;compressionWebpackPlugin&#39;)                        .use(&#39;compression-webpack-plugin&#39;, [&#123;                            filename: &#39;[path].gz[query]&#39;,                            algorithm: &#39;gzip&#39;,                            test: new RegExp(&quot;\\.(&quot; + productionGzipExtensions.join(&quot;|&quot;) + &quot;)$&quot;),                            threshold: 10240,                            minRatio: 0.8,                            deleteOriginalAssets: false                        &#125;])                    /* 配置打包后删除console.log和debugger */                    config.optimization.minimizer(&#39;terser&#39;).tap((args) =&gt; &#123;                        args[0].terserOptions.compress.drop_debugger = true                        args[0].terserOptions.compress.pure_funcs = [&#39;console.log&#39;]                        return args                    &#125;)                &#125;            )    &#125;</code></pre>]]></content>
+        <content type="html"><![CDATA[<h3 id="vue项目小优化配置"><a href="#vue项目小优化配置" class="headerlink" title="vue项目小优化配置"></a>vue项目小优化配置</h3><p><strong>ps:</strong> <em>部署到线上的时候网页加载很慢…，领导叫我去优化下，于是就直接用<code>gzip</code>压缩大法，但是需要后端配合开启gzip，嗯…速度飞起…</em></p><p><code>webpack-bundle-analyzer</code>可以帮我们进行打包分析，避免重复打包，以及合理代码分割</p><h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">    const BundleAnalyzerPlugin = require(&#39;webpack-bundle-analyzer&#39;).BundleAnalyzerPlugin;    chainWebpack(config)&#123;        // ...        config            .when(process.env.NODE_ENV !== &#39;development&#39;,                config =&gt; &#123;                    /* 打包分析插件 */                    config                        .plugin(&#39;webpackBundleAnalyzer&#39;)                        .use(BundleAnalyzerPlugin)                    /* 开启gzip压缩，需要后端配合 */                    config                        .plugin(&#39;compressionWebpackPlugin&#39;)                        .use(&#39;compression-webpack-plugin&#39;, [&#123;                            filename: &#39;[path].gz[query]&#39;,                            algorithm: &#39;gzip&#39;,                            test: new RegExp(&quot;\\.(&quot; + productionGzipExtensions.join(&quot;|&quot;) + &quot;)$&quot;),                            threshold: 10240,                            minRatio: 0.8,                            deleteOriginalAssets: false                        &#125;])                    /* 配置打包后删除console.log和debugger */                    config.optimization.minimizer(&#39;terser&#39;).tap((args) =&gt; &#123;                        args[0].terserOptions.compress.drop_debugger = true                        args[0].terserOptions.compress.pure_funcs = [&#39;console.log&#39;]                        return args                    &#125;)                    /* 代码分割 */                    config                        .optimization.splitChunks(&#123;                            chunks: &#39;all&#39;, // all-同步异步都分割,inital-对同步分割,async-对异步分割                            cacheGroups: &#123;                                libs: &#123;                                    name: &#39;chunk-libs&#39;, // 组名                                    test: /[\\/]node_modules[\\/]/,                                    priority: 10, // 优先级                                    /* minSize: 5 * 1024 // 达到5kb才分割 */                                    /* minChunks: 1 // 引用1次就单独打包 */                                &#125;,                                elementUI: &#123;                                    name: &#39;chunk-elementUI&#39;,                                     priority: 20,                                     test: /[\\/]node_modules[\\/]_?element-ui(.*)/                                 &#125;,                                commons: &#123;                                    name: &#39;chunk-commons&#39;,                                    test: resolve(&#39;src/components&#39;),                                     minChunks: 3,                                    priority: 5,                                    reuseExistingChunk: true                                &#125;                            &#125;                        &#125;)                &#125;            )    &#125;</code></pre>]]></content>
       
       
       <categories>

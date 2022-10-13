@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | Webpack</title>
+    <title>杨红蓝 | CSS技巧之DIV保持长宽比</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,164 +135,100 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>CSS技巧之DIV保持长宽比 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/10/13
+        </span>
+
         
-        
-        <span>
-            <a href="/categories/CSS/" style=background:#00a596>
+        <span class="category">
+            <a href="/categories/CSS">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 CSS
             </a>
         </span>
         
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Utils/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Utils
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#ffa2c4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Webpack/" style='background:linear-gradient(120deg, #9abbf7 0%, #ffbbf4 100%)'>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Webpack
-            </a>
-        </span>
-        
+
         
     </div>
-    <div id="archives">
-        
-        <a-timeline>
-            <a-timeline-item timestamp="2022/9/30" placement="top" color="#a5c2f5">
-                <a-card hoverable>
-                    <div class="item-time">2022/9/30</div>
-                    <a href="/2022/09/30/webpack-mergeConfig/">
-                        <h3>Webpack之拆分/合并配置</h3>
-                    </a>
-                    <div class="info">
-                        
-                        <span class="category">
-                            <a href="/categories/Webpack">
-                                <span class="icon">
-                                    <a-icon type="book" theme="filled" />
-                                </span>
-                                Webpack
-                            </a>
-                        </span>
-                        
 
-                        
-                    </div>
-                </a-card>
-            </a-timeline-item>
-        </a-timeline>
-        
-        <a-timeline>
-            <a-timeline-item timestamp="2022/9/30" placement="top" color="#a5c2f5">
-                <a-card hoverable>
-                    <div class="item-time">2022/9/30</div>
-                    <a href="/2022/09/30/webpack-multiInput/">
-                        <h3>Webpack之多入口&amp;三种hash</h3>
-                    </a>
-                    <div class="info">
-                        
-                        <span class="category">
-                            <a href="/categories/Webpack">
-                                <span class="icon">
-                                    <a-icon type="book" theme="filled" />
-                                </span>
-                                Webpack
-                            </a>
-                        </span>
-                        
+    <div class="content" v-pre>
+        <h3 id="CSS技巧之DIV保持长宽比"><a href="#CSS技巧之DIV保持长宽比" class="headerlink" title="CSS技巧之DIV保持长宽比"></a>CSS技巧之DIV保持长宽比</h3><p><strong>ps:</strong> <em>我们都知道在前端开发中经常遇到需要保持一个元素的长宽比，最常见的就是我们的Img元素，但是除了img、vidoe这种可替换元素元素具有长宽比的特性，那么其它元素如果保持长宽比呢，这给我们的开发带来了许多不便利…</em></p>
+<h4 id="方式1-padding-top-hack"><a href="#方式1-padding-top-hack" class="headerlink" title="方式1 padding-top-hack"></a>方式1 padding-top-hack</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;style&gt;
+        *&#123;
+            padding: 0;
+            margin: 0;
+        &#125;
+        .outer &#123;
+            position: relative;
+            height: 0;
+            padding-top: 56.25%;
+        &#125;
 
-                        
-                    </div>
-                </a-card>
-            </a-timeline-item>
-        </a-timeline>
-        
-        <a-timeline>
-            <a-timeline-item timestamp="2022/9/30" placement="top" color="#a5c2f5">
-                <a-card hoverable>
-                    <div class="item-time">2022/9/30</div>
-                    <a href="/2022/09/30/webpack-optimization/">
-                        <h3>Webpack之抽离压缩css</h3>
-                    </a>
-                    <div class="info">
-                        
-                        <span class="category">
-                            <a href="/categories/Webpack">
-                                <span class="icon">
-                                    <a-icon type="book" theme="filled" />
-                                </span>
-                                Webpack
-                            </a>
-                        </span>
-                        
+        .inner &#123;
+            background-color: skyblue;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        &#125;
+    &lt;/style&gt;
+&lt;/head&gt;
 
-                        
-                    </div>
-                </a-card>
-            </a-timeline-item>
-        </a-timeline>
-        
+&lt;body&gt;
+    &lt;div class=&quot;outer&quot;&gt;
+        &lt;div class=&quot;inner&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt; 
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h4 id="方式2-aspect-ratio"><a href="#方式2-aspect-ratio" class="headerlink" title="方式2 aspect-ratio"></a>方式2 aspect-ratio</h4><p><em>该方式存在兼容性问题，想要知道兼容性可在<strong>Can i use</strong>上查看</em></p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;style&gt;
+        *&#123;
+            padding: 0;
+            margin: 0;
+        &#125;
+        .inner &#123;
+            background-color: skyblue;
+            width: 50%;
+            aspect-ratio: auto 2 / 1; /* 只需这一行 */
+        &#125;
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;inner&quot;&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

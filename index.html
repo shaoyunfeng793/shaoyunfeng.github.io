@@ -363,7 +363,7 @@ app.use(router).mount(&#39;#app&#39;)
 
     &lt;yf-splitline /&gt;
 
-    &lt;yf-switch&gt;&lt;/yf-switch&gt;
+    &lt;yf-switch v-model=&quot;checkValue&quot;&gt;&lt;/yf-switch&gt;
   &lt;/div&gt;
 &lt;/template&gt;
 
@@ -371,7 +371,7 @@ app.use(router).mount(&#39;#app&#39;)
 export default &#123;
   data() &#123;
     return &#123;
-      
+      checkValue: false
     &#125;;
   &#125;,
   methods: &#123;

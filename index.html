@@ -166,6 +166,387 @@
 
 <div class="post">
 
+    <a href="/2022/10/18/canvas-diaoWawa/">
+        <h2>
+            Canvas之钓娃娃GameDemo
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/canvas">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                canvas
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/10/18
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Canvas之钓娃娃GameDemo"><a href="#Canvas之钓娃娃GameDemo" class="headerlink" title="Canvas之钓娃娃GameDemo"></a>Canvas之钓娃娃GameDemo</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>整个Demo，其实只是实现基本游戏逻辑，有些细节可继续优化，但是没有那么多空余时间了…</p>
+<p>可谓是简版中的简版之黄金矿工 hhh…</p>
+<p>先上个预览gif，再贴个代码…</p>
+<p>可以上码云上看看: <a target="_blank" rel="noopener" href="https://gitee.com/shaoyunfeng793/diao-wawa">https://gitee.com/shaoyunfeng793/diao-wawa</a></p>
+<h4 id="效果预览"><a href="#效果预览" class="headerlink" title="效果预览"></a>效果预览</h4><p><img src="/images/diaowawa.gif" alt="效果预览"></p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Canvas之钓娃娃GameDemo&lt;/title&gt;
+    &lt;style&gt;
+        * &#123;
+            margin: 0;
+            padding: 0;
+        &#125;
+
+        .container &#123;
+            width: 100vw;
+            height: 100vh;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        &#125;
+
+        #canvas &#123;
+            display: block;
+            background-color: bisque;
+        &#125;
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;canvas id=&quot;canvas&quot; width=&quot;300&quot; height=&quot;500&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;script src=&quot;./game.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;./wawa.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;./gouzi.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+    var game = new Game(&#123;
+        dom: &#39;#canvas&#39;,
+        onClick: function () &#123;
+            if (game.gouzi.status == &#39;pending&#39;) &#123;
+                game.gouzi.status = &#39;down&#39;;
+            &#125;
+        &#125;
+    &#125;);
+&lt;/script&gt;
+
+&lt;/html&gt;
+</code></pre>
+<h4 id="Game-js"><a href="#Game-js" class="headerlink" title="Game.js"></a>Game.js</h4><pre><code class="js">!(function () &#123;
+    var Game = window.Game = function (&#123;
+        dom,
+        onClick = function () &#123; &#125;,
+    &#125;) &#123;
+        this.canvas = document.querySelector(dom);
+        this.ctx = this.canvas.getContext(&quot;2d&quot;);
+        // 资源管理器
+        this.R = &#123;&#125;;
+        // 渲染定时器
+        this.renderTimer = null;
+        // 娃娃数组
+        this.wawaArr = [];
+        // 钩子实例
+        this.gouzi = null;
+        // 安全域
+        this.safeTopHeight = 200;
+        // 宽高
+        this.canvasWidth = this.canvas.width;
+        this.canvasHeight = this.canvas.height;
+        // 游戏初始化
+        this.init();
+
+        // 监听点击
+        this.canvas.addEventListener(&quot;click&quot;, onClick)
+
+    &#125;
+    Game.prototype.init = function () &#123;
+        console.log(&quot;游戏初始化&quot;);
+        let xhr = new XMLHttpRequest();
+        let self = this;
+        let loadCount = 0;
+        xhr.onreadystatechange = function () &#123;
+            if (xhr.readyState == 4 &amp;&amp; xhr.status == 200) &#123;
+                let data = JSON.parse(xhr.responseText);
+                for (let i = 0; i &lt; data.length; i++) &#123;
+                    self.R[data[i].name] = new Image();
+                    self.R[data[i].name].src = data[i].img;
+                    self.R[data[i].name].onload = function () &#123;
+                        loadCount++;
+                        self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
+                        self.ctx.save()
+                        self.ctx.font = &quot;20px 微软雅黑&quot;;
+                        self.ctx.textAlign = &quot;center&quot;;
+                        self.ctx.fillText(`正在加载资源($&#123;loadCount&#125;/$&#123;data.length&#125;)...`, self.canvas.width * 0.5, self.canvas.height * 0.5);
+                        self.ctx.restore()
+                        if (loadCount == data.length) &#123;
+                            setTimeout(() =&gt; &#123;
+                                // 创建钩子
+                                new Gouzi();
+                                // 创建娃娃
+                                new Array(5).fill(1).forEach(() =&gt; &#123;
+                                    new Wawa();
+                                &#125;);
+                                self.start();
+                            &#125;, 1000)
+                        &#125;
+                    &#125;
+                &#125;
+            &#125;
+        &#125;
+        xhr.open(&quot;get&quot;, &quot;R.json&quot;, true);
+        xhr.send();
+
+    &#125;
+
+    Game.prototype.start = function () &#123;
+        let frame = 0;
+        this.renderTimer = setInterval(() =&gt; &#123;
+            frame++;
+            // 清屏
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // 画帧数
+            this.ctx.font = &quot;10px 微软雅黑&quot;;
+            this.ctx.fillStyle = &quot;red&quot;;
+            this.ctx.fillText(`Frame:$&#123;frame&#125;`, 10, 20);
+
+            // 画勾子
+            if (this.gouzi &amp;&amp; this.gouzi.constructor === Gouzi) &#123;
+                this.gouzi.render();
+                this.gouzi.update();
+            &#125;
+
+            // 画娃娃
+            this.wawaArr.forEach(function (wawa) &#123;
+                wawa.render();
+                wawa.update();
+            &#125;)
+
+
+        &#125;, 1000 / 60)
+    &#125;
+
+    Game.prototype.end = function () &#123;
+        clearInterval(this.renderTimer);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.font = &quot;30px bold 微软雅黑&quot;;
+        this.ctx.textAlign = &quot;center&quot;;
+        this.ctx.fillStyle = &quot;red&quot;;
+        this.ctx.fillText(`You Win！`, this.canvas.width / 2, this.canvas.height / 2);
+    &#125;
+
+
+&#125;)()
+</code></pre>
+<h4 id="Gouzi-js"><a href="#Gouzi-js" class="headerlink" title="Gouzi.js"></a>Gouzi.js</h4><pre><code class="js">!(function () &#123;
+    const DEG = Math.PI / 180;
+    var Gouzi = window.Gouzi = function () &#123;
+        if (game.gouzi) &#123;
+            return game.gouzi
+        &#125;
+        // 钩子状态: pending：等待； down: 出钩 up: 收钩
+        this.status = &#39;pending&#39;;
+
+        // 钩子初始长度
+        this.rotateDegMax = 80;
+        this.gouziLong = 60;
+
+        // 钩子起始点，相当于圆心
+        this.startX = game.canvasWidth / 2;
+        this.startY = 30;
+
+        // 钩子初始旋转角度值，即默认左边开始荡
+        this.rotateDeg = -this.rotateDegMax;
+
+        // 钩子方向值的控制 +1 -1代表不同的方向，每达到80或-80的时候转变方向
+        this.rotateZhengfu = -1;
+
+        // 钩子终点位置
+        this.endX = 0; // endX一直都是不变的，因为钩子的荡漾动作是旋转得到的 
+        this.endY = this.gouziLong;
+
+        // 钩子图片参数
+        this.gouziW = 36;
+        this.gouziH = 28;
+
+        // 托管到game上
+        game.gouzi = this;
+    &#125;
+
+    Gouzi.prototype.render = function () &#123;
+        game.ctx.save();
+        game.ctx.beginPath();
+        game.ctx.lineWidth = 4;
+        game.ctx.lineCap = &#39;round&#39;;
+        game.ctx.translate(this.startX, this.startY);
+        game.ctx.rotate(this.rotateDeg * -DEG); // -DEG表示逆时针旋转
+        game.ctx.moveTo(0, 0);
+        game.ctx.lineTo(this.endX, this.endY);
+        game.ctx.stroke();
+        game.ctx.drawImage(game.R.zhuazi, 0, 0, 45, 35, this.endX - this.gouziW / 2, this.endY, this.gouziW, this.gouziH);
+        game.ctx.restore();
+    &#125;
+
+    Gouzi.prototype.update = function () &#123;
+        let endX;
+        switch (this.status) &#123;
+            case &#39;pending&#39;:
+                if (Math.abs(this.rotateDeg) == this.rotateDegMax) &#123;
+                    this.rotateZhengfu = -this.rotateZhengfu;
+                &#125;
+                this.rotateDeg += 1 * this.rotateZhengfu;
+                break;
+            case &#39;down&#39;:
+                // 如何判断该不该收钩子呢？
+                // 第1种是钩子抓到了就收钩子（通过endY + rotateDeg + sin公式计算出endX）
+                this.endY += 3;
+                endX = this.startX + (this.endY * Math.sin(this.rotateDeg * DEG));
+                let wawaIndex = game.wawaArr.findIndex(d =&gt; (d.y - d.h) &lt; this.endY &amp;&amp; this.endY &lt; d.y &amp;&amp; d.x &lt; endX &amp;&amp; endX &lt; (d.x + d.w));
+                if (wawaIndex != -1) &#123;
+                    // 移除娃娃
+                    game.wawaArr.splice(wawaIndex, 1);
+                    // 如果全被抓光了就end游戏
+                    if (game.wawaArr.length == 0) &#123;
+                        game.end();
+                    &#125;
+                    this.status = &#39;up&#39;;
+                &#125;
+                // 第2种是钩子长到最长距离然后开始收钩子
+                else if (this.endY &gt;= game.canvasHeight - this.startY - this.gouziH) &#123;
+                    this.status = &#39;up&#39;;
+                &#125;
+
+                break;
+            case &#39;up&#39;:
+                this.endY -= 3;
+                if (this.endY &lt;= this.gouziLong) &#123;
+                    this.endY = this.gouziLong;
+                    this.status = &#39;pending&#39;;
+                &#125;
+                break;
+            default:
+                return;
+        &#125;
+    &#125;
+
+&#125;)()
+</code></pre>
+<h4 id="Wawa-js"><a href="#Wawa-js" class="headerlink" title="Wawa.js"></a>Wawa.js</h4><pre><code class="js">!(function () &#123;
+    // 借助工具http://www.spritecow.com/来获得定位，需要微调一下
+    var WawaImagePositionMap = [
+        &#123;
+            x: 0,
+            y: 96
+        &#125;,
+        &#123;
+            x: 2,
+            y: 129
+        &#125;,
+        &#123;
+            x: 3,
+            y: 168
+        &#125;,
+        &#123;
+            x: 33,
+            y: 96
+        &#125;,
+        &#123;
+            x: 36,
+            y: 132
+        &#125;,
+        &#123;
+            x: 37,
+            y: 168
+        &#125;,
+        &#123;
+            x: 65,
+            y: 98
+        &#125;,
+        &#123;
+            x: 100,
+            y: 97
+        &#125;,
+    ];
+    var Wawa = window.Wawa = function () &#123;
+        // 宽高
+        this.w = 32;
+        this.h = 32;
+
+        // 娃娃图片
+        let randomImage = WawaImagePositionMap[parseInt(Math.random() * WawaImagePositionMap.length)];
+        this.imageX = randomImage.x;
+        this.imageY = randomImage.y;
+
+        // 随机出现位置
+        this.x = Math.random() * game.canvasWidth;
+        this.y = Math.random() * (game.canvasHeight - game.safeTopHeight - this.h) + game.safeTopHeight;
+
+        // 托管到game上
+        game.wawaArr.push(this);
+    &#125;
+
+    Wawa.prototype.render = function () &#123;
+        game.ctx.drawImage(game.R.wawa, this.imageX, this.imageY, this.w, this.h, this.x, this.y, this.w, this.h);
+    &#125;
+
+    Wawa.prototype.update = function () &#123;
+        this.x += 0.5;
+        if (this.x &gt; game.canvasWidth) &#123;
+            this.x = -this.w;
+        &#125;
+    &#125;
+
+&#125;)()
+</code></pre>
+<h4 id="R-json"><a href="#R-json" class="headerlink" title="R.json"></a>R.json</h4><pre><code class="json">[
+    &#123;
+        &quot;name&quot;: &quot;wawa&quot;,
+        &quot;img&quot;: &quot;./images/wawa.png&quot;
+    &#125;,
+    &#123;
+        &quot;name&quot;: &quot;zhuazi&quot;,
+        &quot;img&quot;: &quot;./images/zhuazi.png&quot;
+    &#125;
+]
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/10/18/canvas-diaoWawa/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/10/15/vue-myselfCpns/">
         <h2>
             Vue之优雅的构建自己的组件库
@@ -441,7 +822,7 @@ export default &#123;
             
             
             <h3 id="一些可能用到的工具网站"><a href="#一些可能用到的工具网站" class="headerlink" title="一些可能用到的工具网站"></a>一些可能用到的工具网站</h3><h4 id="1-去除多余CSS"><a href="#1-去除多余CSS" class="headerlink" title="1.去除多余CSS"></a>1.去除多余CSS</h4><p>注入html代码和css完成去除多余css<br>地址： <a target="_blank" rel="noopener" href="https://uncss-online.com/">https://uncss-online.com/</a></p>
-<h4 id="2-CSS-sprite图"><a href="#2-CSS-sprite图" class="headerlink" title="2.CSS sprite图"></a>2.CSS sprite图</h4><p>上传若干图片，帮你生成雪碧图，还可以帮助你直接定位到相应图标的css样式<br>地址： <a target="_blank" rel="noopener" href="https://www.toptal.com/developers/css/sprite-generator">https://www.toptal.com/developers/css/sprite-generator</a></p>
+<h4 id="2-CSS-sprite图"><a href="#2-CSS-sprite图" class="headerlink" title="2.CSS sprite图"></a>2.CSS sprite图</h4><p>上传若干图片，帮你生成雪碧图，还可以帮助你直接定位到相应图标的css样式<br>地址： <a target="_blank" rel="noopener" href="https://www.toptal.com/developers/css/sprite-generator">https://www.toptal.com/developers/css/sprite-generator</a>; <a target="_blank" rel="noopener" href="http://www.spritecow.com/">http://www.spritecow.com/</a>;</p>
 <h4 id="3-图片压缩TinyPng"><a href="#3-图片压缩TinyPng" class="headerlink" title="3.图片压缩TinyPng"></a>3.图片压缩TinyPng</h4><p>一个很强大且免费的压缩网站<br>地址： <a target="_blank" rel="noopener" href="https://tinypng.com/">https://tinypng.com</a></p>
 <h4 id="4-css动画"><a href="#4-css动画" class="headerlink" title="4.css动画"></a>4.css动画</h4><p>有很多css动画样式，可以直接查看效果<br>地址： <a target="_blank" rel="noopener" href="https://animate.style/">https://animate.style/</a></p>
 <h4 id="5-css渐变颜色"><a href="#5-css渐变颜色" class="headerlink" title="5.css渐变颜色"></a>5.css渐变颜色</h4><p>有很多好看的渐变颜色<br>地址： <a target="_blank" rel="noopener" href="https://webkul.github.io/coolhue/">https://webkul.github.io/coolhue/</a></p>
@@ -1520,312 +1901,6 @@ function render() &#123;
     </div>
 
     <a href="/2022/09/30/js-aliOssUpload/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/30/vue-ossUploadComponent/">
-        <h2>
-            ElementUI二开Alioss上传组件
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Vue">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/30
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="ElementUI二开Alioss上传组件"><a href="#ElementUI二开Alioss上传组件" class="headerlink" title="ElementUI二开Alioss上传组件"></a>ElementUI二开Alioss上传组件</h3><p>本文代码只是vue前端组件代码，还需要依赖<code>vuedraggable</code>组件库（支持拖拽排序）；还需要<strong>ossUpload.js</strong>工具函数（详见另外一文：<em><strong>阿里oss上传工具函数</strong></em>）</p>
-<p>该组件写的时候大部分都是参照elementUI的上传组件（其实是本来的业务代码都是通过后端上传，后面领导说要用oss，所以就写了这个组件），所以使用到了elementUI的部分组件</p>
-<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><pre><code class="vue">&lt;template&gt;
-  &lt;div&gt;
-    &lt;div class=&quot;flex-wrap&quot;&gt;
-      &lt;div class=&quot;oss-upload&quot;&gt;
-        &lt;slot&gt;&lt;/slot&gt;
-        &lt;label v-if=&quot;!disabled&quot; class=&quot;hand&quot;&gt;
-          &lt;input
-            :multiple=&quot;multiple&quot;
-            type=&quot;file&quot;
-            class=&quot;hidden&quot;
-            @change=&quot;change&quot;
-          /&gt;
-        &lt;/label&gt;
-      &lt;/div&gt;
-
-      &lt;el-button
-        v-if=&quot;!disabled &amp;&amp; onDelete &amp;&amp; value&quot;
-        @click=&quot;handleDelete&quot;
-        type=&quot;text&quot;
-        size=&quot;small&quot;
-        &gt;删除&lt;/el-button
-      &gt;
-
-      &lt;slot name=&quot;tips&quot;&gt;
-        &lt;span class=&quot;tips&quot;&gt;&#123;&#123; tips &#125;&#125;&lt;/span&gt;
-      &lt;/slot&gt;
-    &lt;/div&gt;
-    &lt;draggable
-      class=&quot;drag-list&quot;
-      v-if=&quot;!disabled &amp;&amp; showFileList &amp;&amp; filelist.length &gt; 0&quot;
-      v-model=&quot;filelist&quot;
-      @change=&quot;drag&quot;
-    &gt;
-      &lt;div class=&quot;drag-item&quot; v-for=&quot;(item, idx) in filelist&quot; :key=&quot;idx&quot;&gt;
-        &lt;img class=&quot;drag-item-img&quot; :src=&quot;item&quot; /&gt;
-        &lt;i class=&quot;el-icon-error&quot; @click=&quot;remove(idx)&quot;&gt;&lt;/i&gt;
-      &lt;/div&gt;
-    &lt;/draggable&gt;
-    &lt;template v-else-if=&quot;showFileList &amp;&amp; filelist.length &gt; 0&quot;&gt;
-      &lt;div class=&quot;drag-list&quot;&gt;
-        &lt;div class=&quot;drag-item&quot; v-for=&quot;(item, idx) in filelist&quot; :key=&quot;idx&quot;&gt;
-          &lt;img class=&quot;drag-item-img&quot; :src=&quot;item&quot; /&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/template&gt;
-  &lt;/div&gt;
-&lt;/template&gt;
-
-&lt;script&gt;
-import draggable from &quot;vuedraggable&quot;;
-import &#123; uploadOSS, defaultLimit &#125; from &quot;@/utils/ossUpload&quot;;
-export default &#123;
-  components: &#123;
-    draggable,
-  &#125;,
-  props: &#123;
-    value: String,
-    limit: [String, Number],
-    maxCount: [String, Number],
-    tips: String,
-    disabled: &#123;
-      type: Boolean,
-      default: false,
-    &#125;,
-    compress: &#123;
-      type: Boolean,
-      default: false,
-    &#125;,
-    showUploadResult: &#123;
-      type: Boolean,
-      default: true,
-    &#125;,
-    multiple: &#123;
-      type: Boolean,
-      default: false,
-    &#125;,
-    showFileList: &#123;
-      type: Boolean,
-      default: false,
-    &#125;,
-    fileList: &#123;
-      type: Array,
-      default: () =&gt; [],
-    &#125;,
-    onBeforeUpload: &#123;
-      type: Function,
-      default: () =&gt; &#123;&#125;,
-    &#125;,
-    onSuccess: &#123;
-      type: Function,
-      default: () =&gt; &#123;&#125;,
-    &#125;,
-    onError: &#123;
-      type: Function,
-      default: () =&gt; &#123;&#125;,
-    &#125;,
-    onChange: &#123;
-      type: Function,
-      default: () =&gt; &#123;&#125;,
-    &#125;,
-    onDelete: &#123;
-      type: Function,
-      default: null,
-    &#125;,
-    dir: &#123;
-      type: String,
-      default: &quot;file&quot;,
-    &#125;,
-  &#125;,
-  watch: &#123;
-    fileList: &#123;
-      handler(val) &#123;
-        this.filelist = val || [];
-      &#125;,
-      immediate: true,
-    &#125;,
-  &#125;,
-  data() &#123;
-    return &#123;
-      filelist: [],
-    &#125;;
-  &#125;,
-  methods: &#123;
-    clearFileList() &#123;
-      this.filelist = [];
-    &#125;,
-    handleDelete() &#123;
-      this.onDelete &amp;&amp; this.onDelete();
-    &#125;,
-    remove(index) &#123;
-      this.filelist = this.filelist.filter((item, idx) =&gt; idx !== index);
-      this.onChange(this.filelist);
-    &#125;,
-    drag() &#123;
-      this.onChange(this.filelist);
-    &#125;,
-    change(e) &#123;
-      const files = Array.from(e.target.files);
-      const limit = Number(this.limit);
-      const maxCount = Number(this.maxCount);
-      if (maxCount === maxCount) &#123;
-        // maxCount值有效，则限制数量
-        if (this.filelist.length + files.length &gt; maxCount) &#123;
-          this.$message.warning(`最多上传$&#123;maxCount&#125;张图片`);
-          return;
-        &#125;
-      &#125;
-      // 限制图片类型
-      const _files = files.filter((d) =&gt; &#123;
-        if (d.type == &quot;image/png&quot; || d.type == &quot;image/jpeg&quot;) &#123;
-          return true;
-        &#125; else &#123;
-          return false;
-        &#125;
-      &#125;);
-      e.target.value = null;
-
-      // 存在不符合的图片类型
-      if (_files.length !== files.length) &#123;
-        this.$message.warning(&quot;图片类型不是png或者jpeg&quot;);
-      &#125;
-      // 没有有效的图片直接返回
-      if (_files.length === 0) &#123;
-        return;
-      &#125;
-      this.onBeforeUpload(); // 上传前钩子
-      uploadOSS(_files, this.dir, &#123;
-        limitSize: isNaN(limit) ? defaultLimit : limit,
-        compress: this.compress,
-      &#125;)
-        .then((&#123; result, code, msg &#125;) =&gt; &#123;
-          this.showUploadResult &amp;&amp;
-            this.$message(&#123;
-              type: code == 1 ? &quot;success&quot; : &quot;warning&quot;,
-              message: msg,
-            &#125;);
-          result.forEach((res) =&gt; &#123;
-            this.filelist.push(res.url);
-          &#125;);
-
-          if (this.multiple || this.filelist[this.filelist.length - 1]) &#123;
-            this.onSuccess(
-              result,
-              this.multiple
-                ? this.filelist
-                : this.filelist[this.filelist.length - 1]
-            );
-          &#125;
-        &#125;)
-        .catch((err) =&gt; &#123;
-          console.error(err);
-          this.onError(err);
-        &#125;);
-    &#125;,
-  &#125;,
-&#125;;
-&lt;/script&gt;
-
-&lt;style scoped&gt;
-.oss-upload img &#123;
-  display: block;
-&#125;
-.flex-wrap &#123;
-  display: inline-flex;
-  align-items: center;
-&#125;
-.oss-upload &#123;
-  display: inline-block;
-  position: relative;
-  margin-right: 10px;
-&#125;
-.hand &#123;
-  z-index: 99;
-  cursor: pointer;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-&#125;
-.hidden &#123;
-  display: none;
-&#125;
-
-.el-icon-error &#123;
-  position: absolute;
-  right: -7px;
-  top: -7px;
-  font-size: 18px;
-  cursor: pointer;
-  color: #f56c6c;
-&#125;
-.drag-list &#123;
-  display: flex;
-  flex-wrap: wrap;
-  padding: 20px 0;
-&#125;
-.drag-item &#123;
-  position: relative;
-  margin-right: 10px;
-&#125;
-
-.drag-item-img &#123;
-  object-fit: contain;
-  width: 100px;
-  height: 100px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-&#125;
-
-.tips &#123;
-  font-size: 12px;
-  color: #999;
-&#125;
-&lt;/style&gt;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/30/vue-ossUploadComponent/ " class="go-post">
         阅读全文
     </a>
 </div>

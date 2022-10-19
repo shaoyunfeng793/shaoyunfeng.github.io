@@ -868,6 +868,7 @@ footer .footer-icon {
   background-repeat: no-repeat;
   background-size: cover;
   background-image: url("/images/home.jpg");
+  background-position: center top;
 }
 .article {
   margin: auto;

@@ -166,6 +166,621 @@
 
 <div class="post">
 
+    <a href="/2022/09/28/html-imgLazyLoad/">
+        <h2>
+            实现图片懒加载
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/HTML">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                HTML
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/28
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="实现图片懒加载"><a href="#实现图片懒加载" class="headerlink" title="实现图片懒加载"></a>实现图片懒加载</h3><p><strong>ps:</strong> <em>简单探索下<code>IntersectionObserver</code>这个api，可以监听元素是否出现在可视窗口，利用这个特性以及dataset实现图片懒加载,简易Demo如下</em></p>
+<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+    &lt;head&gt;
+        &lt;title&gt;&lt;/title&gt;
+        &lt;meta charset=&quot;UTF-8&quot;&gt;
+        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+        &lt;style&gt;
+            ul&#123;
+                list-style: none;
+            &#125;
+            img&#123;
+                width: 200px;
+                height: 200px;
+                background: #ddd;
+            &#125;
+        &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+    &lt;ul&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2943125063,3292210397&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2024373923,2140139723&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097108640&amp;di=85ad12ff7eb7f9572016612de1135925&amp;imgtype=0&amp;src=http%3A%2F%2Fa-ssl.duitang.com%2Fuploads%2Fitem%2F201407%2F18%2F20140718063817_s3Gnz.gif&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097122497&amp;di=1dff2a1a87c795199973d6f351ab88c6&amp;imgtype=0&amp;src=http%3A%2F%2Fimg2.imgtn.bdimg.com%2Fit%2Fu%3D1120712552%2C1362700559%26fm%3D214%26gp%3D0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097135282&amp;di=bbb17f186fa620e910ad079e5f998711&amp;imgtype=0&amp;src=http%3A%2F%2Fimg4.imgtn.bdimg.com%2Fit%2Fu%3D2230676464%2C2378994766%26fm%3D214%26gp%3D0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097163421&amp;di=8cd014f555709f796fe643adde44afc3&amp;imgtype=0&amp;src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fa044ad345982b2b7014e90fe33adcbef76099b33.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097184425&amp;di=4dbac84b3f735da758433becd9d4e9ee&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.duitang.com%2Fuploads%2Fitem%2F201407%2F13%2F20140713000933_dC2z3.thumb.700_0.gif&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097216523&amp;di=e3393b6449183d29f689e10783c9694b&amp;imgtype=0&amp;src=http%3A%2F%2Fimgsrc.baidu.com%2Fforum%2Fw%253d580%2Fsign%3D2b04e747fd1f4134e0370576151e95c1%2F05460b2442a7d933458f9ed7ad4bd11372f00167.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=149701518,1608548313&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2692023635,939588326&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=268907504,1715864470&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1603097268873&amp;di=0ec97e5a4185af04869e5f150a1bf18d&amp;imgtype=0&amp;src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20171129%2Ff510b6d293264e0cba3072353e5eb067.gif&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=366871761,2360018043&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3251940718,1404860427&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2476878483,4014399276&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2055680573,3089421073&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+       &lt;li&gt;&lt;img data-src=&quot;https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3926221861,1230045557&amp;fm=26&amp;gp=0.jpg&quot; &gt;&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">  var imglist = document.querySelectorAll(&#39;img&#39;)
+  var observer = new IntersectionObserver(entries=&gt;&#123;
+      entries.forEach(entry=&gt;&#123;
+
+          if(entry.intersectionRatio&gt;0)&#123;
+              entry.target.src = entry.target.dataset.src
+              observer.unobserve(entry.target)
+          &#125;
+      &#125;)
+  &#125;)
+  imglist.forEach(imgitem=&gt;&#123;
+      observer.observe(imgitem)
+  &#125;)
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/28/html-imgLazyLoad/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/09/28/vue-exploreDrag/">
+        <h2>
+            深入浅出之拖拽事件
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Vue">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Vue
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/28
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="深入浅出之拖拽事件"><a href="#深入浅出之拖拽事件" class="headerlink" title="深入浅出之拖拽事件"></a>深入浅出之拖拽事件</h3><p><strong>ps:</strong> <em>简单探索下drag事件，把一些元素拉到目标区域，还可从目标区域拉回原来区域，简易Demo如下</em></p>
+<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><pre><code class="vue">&lt;template&gt;
+  &lt;div class=&quot;app-container&quot;&gt;
+    &lt;div class=&quot;table-container&quot;&gt;
+      &lt;el-row :gutter=&quot;20&quot;&gt;
+        &lt;el-col :span=&quot;4&quot;&gt;
+          &lt;div class=&quot;drag-from-zone&quot;&gt;
+            &lt;div
+              class=&quot;drag-item&quot;
+              v-for=&quot;(item, idx) in list&quot;
+              :key=&quot;idx&quot;
+              draggable=&quot;true&quot;
+              @dragstart=&quot;dragstart($event, item, idx)&quot;
+              @dragend=&quot;dragend($event)&quot;
+            &gt;
+              &#123;&#123; item.name &#125;&#125;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/el-col&gt;
+        &lt;el-col :span=&quot;20&quot;&gt;
+          &lt;div
+            id=&quot;target&quot;
+            @dragover=&quot;dragover($event)&quot;
+            @drop=&quot;drop($event)&quot;
+            class=&quot;drag-target-zone&quot;
+          &gt;
+            &lt;div
+              class=&quot;drag-item&quot;
+              v-for=&quot;(item, idx) in targetList&quot;
+              :key=&quot;idx&quot;
+              @dragstart=&quot;dragstart($event, item)&quot;
+              @dragend=&quot;dragend($event)&quot;
+            &gt;
+              &#123;&#123; item.name &#125;&#125;
+              &lt;i class=&quot;el-icon-close&quot; @click=&quot;removeItem(item)&quot;&gt;&lt;/i&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/el-col&gt;
+      &lt;/el-row&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+var tmpData;
+export default &#123;
+  data() &#123;
+    return &#123;
+      list: [
+        &#123; id: 1, name: &quot;元素1&quot; &#125;,
+        &#123; id: 2, name: &quot;元素2&quot; &#125;,
+        &#123; id: 3, name: &quot;元素3&quot; &#125;,
+        &#123; id: 4, name: &quot;元素4&quot; &#125;,
+        &#123; id: 5, name: &quot;元素5&quot; &#125;,
+        &#123; id: 6, name: &quot;元素6&quot; &#125;,
+        &#123; id: 7, name: &quot;元素7&quot; &#125;,
+        &#123; id: 8, name: &quot;元素8&quot; &#125;,
+        &#123; id: 9, name: &quot;元素9&quot; &#125;,
+        &#123; id: 10, name: &quot;元素10&quot; &#125;,
+      ],
+      targetList: [],
+    &#125;;
+  &#125;,
+  methods: &#123;
+    dragstart(e, item) &#123;
+      //拖拽开始时将item存入vuex
+      console.log(&quot;拖拽开始 =&gt;&quot;, item);
+      tmpData = item;
+    &#125;,
+    dragend(e) &#123;
+      //拖拽结束执行的事件
+      console.log(&quot;拖拽结束 =&gt;&quot;, e);
+    &#125;,
+    dragover(e) &#123;
+      //拖拽在这个div里面拖拽时执行的事件
+      //一定要执行preventDefault(),否则drop事件不会被触发
+      e.preventDefault();
+    &#125;,
+    drop(e) &#123;
+      //在div里拖拽停止时执行的事件
+      this.list = this.list.filter((item) =&gt; item.id !== tmpData.id);
+      this.targetList.push(tmpData);
+    &#125;,
+    removeItem(data)&#123;
+      this.targetList = this.targetList.filter((item) =&gt; item.id !== data.id);
+      this.list.push(data);
+    &#125;,
+  &#125;,
+&#125;;
+&lt;/script&gt;
+
+&lt;style scoped&gt;
+.drag-from-zone &#123;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+&#125;
+.drag-item &#123;
+  display: inline-block;
+  padding: 10px 5px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+&#125;
+.drag-target-zone &#123;
+  height: 500px;
+  border: 1px solid #ccc;
+&#125;
+&lt;/style&gt;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/28/vue-exploreDrag/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/09/28/html-flutterAnimation/">
+        <h2>
+            实现Demo之滚动信息展示/弹幕
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/HTML">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                HTML
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/28
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="弹幕飘屏-amp-一个横框内的滚动信息展示"><a href="#弹幕飘屏-amp-一个横框内的滚动信息展示" class="headerlink" title="弹幕飘屏&amp;一个横框内的滚动信息展示"></a>弹幕飘屏&amp;一个横框内的滚动信息展示</h3><p><strong>ps:</strong> <em>实现一个展示给用户信息的横幅条，比如xxx购买了xxx产品真种滚屏信息或者弹幕效果，简易Demo如下</em></p>
+<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Demo之滚动信息展示/弹幕&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;!-- 把选择器传入到下面的js函数中即可 --&gt;
+    &lt;div id=&quot;walk&quot;&gt;&lt;/div&gt; 
+    &lt;div id=&quot;danmaku&quot;&gt;&lt;/div&gt; 
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h4 id="js-Code-For-竖向滚动信息条"><a href="#js-Code-For-竖向滚动信息条" class="headerlink" title="js Code For 竖向滚动信息条"></a>js Code For 竖向滚动信息条</h4><pre><code class="js">    function Walk(&#123;
+    selector,
+    speed = 1,
+    data = [],
+    danweiLucheng,
+
+&#125;) &#123;
+    this.dom = document.querySelector(selector);
+    this.data = data;
+    this.speed = speed;
+    this.danweiLucheng = danweiLucheng;
+    this.timer = null;
+    this.init();
+    this.render();
+&#125;;
+Walk.prototype.render = function () &#123;
+    let htmlStr = &#39;&#39;;
+    this.data.concat(this.data[0]).forEach(d =&gt; &#123;
+        htmlStr += `&lt;div class=&quot;walking-item&quot;&gt;
+                        &lt;div class=&quot;walking-text&quot;&gt;$&#123;d.message&#125;&lt;/div&gt;
+                        &lt;img class=&quot;walking-img&quot;
+                            src=&quot;$&#123;d.icon&#125;&quot;&gt;
+                    &lt;/div&gt;`;
+    &#125;);
+    this.dom.innerHTML = htmlStr;
+&#125;;
+Walk.prototype.init = function () &#123;
+    this.index = 0;
+    this.lucheng = 0;
+    this.storeLucheng = 0;
+&#125;;
+Walk.prototype.playFrame = function () &#123;
+    setTimeout(() =&gt; &#123;
+
+        this.lucheng = this.storeLucheng;
+        this.timer = setInterval(() =&gt; &#123;
+            this.lucheng += this.speed;
+            this.dom.style.transform = `translate3d(0, -$&#123;this.lucheng&#125;px, 0)`;
+            if (this.lucheng - this.storeLucheng &gt;= this.danweiLucheng) &#123;
+                this.index++; //第一个动画结束，index下标下移
+                this.storeLucheng = this.lucheng;
+                if (this.index &gt;= this.data.length) &#123;
+                    this.dom.style.transform = &#39;translate3d(0, 0, 0)&#39;;
+                    this.init();
+                &#125;
+                clearInterval(this.timer);
+                this.playFrame();
+            &#125;
+
+        &#125;, 20)
+    &#125;, 1500)
+&#125;;
+</code></pre>
+<h4 id="js-Code-For-弹幕"><a href="#js-Code-For-弹幕" class="headerlink" title="js Code For 弹幕"></a>js Code For 弹幕</h4><pre><code class="js">; (function () &#123;
+    var Danmaku = window.Danmaku = function (&#123;
+        selector,
+        data = [],
+        speed = 1,
+        itemWidth = 180,
+        itemHeigth = 30,
+        spaceWidth = 50,
+    &#125;) &#123;
+        this.dom = document.querySelector(selector);
+        this.data = data;
+        this.speed = speed;
+        this.itemWidth = itemWidth;
+        this.itemHeigth = itemHeigth;
+        this.offsetWidth = this.data.length * this.itemWidth + (this.data.length - 1) * spaceWidth;
+        this.currentOffset = this.initOffset = window.innerWidth;
+        this.spaceWidth = spaceWidth;
+        this.init();
+        this.render();
+    &#125;
+    Danmaku.prototype.init = function () &#123;
+        this.currentOffset = this.initOffset;
+        this.dom.style.cssText = `width:$&#123;this.offsetWidth&#125;px;display:flex;background:transparent;transform:translate3d($&#123;this.initOffset&#125;px,0,0)`;
+    &#125;
+    Danmaku.prototype.render = function () &#123;
+        let htmlStr = &#39;&#39;;
+        let styleDom = document.createElement(&#39;style&#39;);
+        styleDom.innerHTML = `
+            .danmaku-item&#123;
+                width:$&#123;this.itemWidth&#125;px;
+                line-height:$&#123;this.itemHeigth&#125;px;
+                display:flex;
+                font-size: 12px;
+                color: #fff;
+                background: rgba(0, 0, 0, 0.7);
+                border-radius: $&#123;this.itemHeigth / 2&#125;px;
+                align-items: center;
+                margin-right: $&#123;this.spaceWidth&#125;px;
+                padding: 0 10px;
+            &#125;
+            .danmaku-item:nth-child(odd)&#123;
+                transform:translate3d(0,$&#123;this.itemHeigth / 3&#125;px,0);
+            &#125;
+            .danmaku-item:nth-child(even)&#123;
+                transform:translate3d(0,-$&#123;this.itemHeigth / 3&#125;px,0);
+            &#125;
+            .danmaku-text&#123;
+                flex: 1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                word-break: break-all;
+            &#125;
+            .danmaku-img&#123;
+                width: 26px;
+                height: 26px;
+                border-radius: 13px;
+                object-fit: contain;
+                margin-right: 10px;
+            &#125;
+            `;
+        document.head.appendChild(styleDom);
+        this.data.forEach(d =&gt; &#123;
+            htmlStr += `&lt;div class=&quot;danmaku-item&quot;&gt;
+                            &lt;img class=&quot;danmaku-img&quot; src=&quot;$&#123;d.icon&#125;&quot;&gt;
+                            &lt;div class=&quot;danmaku-text&quot;&gt;$&#123;d.time&#125; 获得了星耀款&lt;/div&gt;
+                        &lt;/div&gt;`;
+        &#125;);
+        this.dom.innerHTML = htmlStr;
+    &#125;;
+    Danmaku.prototype.playFrame = function () &#123;
+        this.currentOffset -= this.speed;
+        this.dom.style.transform = `translate3d($&#123;this.currentOffset&#125;px,0,0)`;
+        if (this.currentOffset &lt;= -this.offsetWidth) &#123;
+            this.init();
+        &#125;
+        requestAnimationFrame(() =&gt; &#123;
+            this.playFrame();
+        &#125;)
+    &#125;
+
+&#125;)();
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/28/html-flutterAnimation/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/09/28/html-autoCarouselWithHand/">
+        <h2>
+            实现Demo之自动轮播加手势滑动偏移
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/HTML">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                HTML
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/28
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="自动轮播加手势滑动偏移"><a href="#自动轮播加手势滑动偏移" class="headerlink" title="自动轮播加手势滑动偏移"></a>自动轮播加手势滑动偏移</h3><p><strong>ps:</strong> <em>实现一个商品展示自动循环轮播，且用户可以通过手势来控制左右滑动，简易Demo如下</em></p>
+<h4 id="css-Code"><a href="#css-Code" class="headerlink" title="css Code"></a>css Code</h4><pre><code class="css">    * &#123;
+        padding: 0;
+        margin: 0;
+    &#125;
+
+    html,
+    body &#123;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    &#125;
+
+    .container &#123;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    &#125;
+
+    .awrad_outer &#123;
+        width: 300px;
+        overflow: hidden;
+    &#125;
+
+    .awrad_list &#123;
+        width: 900px;
+        overflow: hidden;
+    &#125;
+
+    .award_list_item &#123;
+        float: left;
+        background-color: skyblue;
+        width: 100px;
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+    &#125;
+</code></pre>
+<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Demo之自动轮播加手势滑动偏移&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;div class=&quot;awrad_outer&quot;&gt;
+            &lt;div class=&quot;awrad_list&quot;&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;1&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;2&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;3&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;4&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;5&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;6&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;7&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;8&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;9&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    var awrad_outer = document.querySelector(&#39;.awrad_outer&#39;);
+    var awrad_list = document.querySelector(&#39;.awrad_list&#39;);
+    var offsetVal = 0;
+    var downX = null;
+    function move() &#123;
+        if (downX != null) &#123;
+            return;
+        &#125;
+        offsetVal--;
+        if (offsetVal &lt;= -600) &#123;
+            offsetVal = 0;
+        &#125;
+        awrad_list.style.transform = `translateX($&#123;offsetVal&#125;px)`;
+        requestAnimationFrame(move)
+    &#125;
+    move();
+    awrad_outer.addEventListener(&#39;touchstart&#39;, function (e) &#123;
+        downX = e.targetTouches[0].clientX;
+    &#125;)
+    awrad_outer.addEventListener(&#39;touchmove&#39;, function (e) &#123;
+        let clientX = e.targetTouches[0].clientX;
+        offsetVal += clientX - downX;
+        downX = clientX; // 修正参照值
+        if (offsetVal &gt; 0) &#123;
+            offsetVal = 0;
+        &#125; else if (offsetVal &lt; -600) &#123;
+            offsetVal = -600;
+        &#125;
+        awrad_list.style.transform = `translateX($&#123;offsetVal&#125;px)`;
+    &#125;)
+    awrad_outer.addEventListener(&#39;touchend&#39;, function (e) &#123;
+        downX = null;
+        move();
+    &#125;)
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/28/html-autoCarouselWithHand/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/09/27/html-lotteryThreeCount/">
         <h2>
             实现Demo之大转盘三连中

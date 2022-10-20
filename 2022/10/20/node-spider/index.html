@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | Canvas之全屏气泡</title>
+    <title>杨红蓝 | Node：爬取某网图片</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -139,23 +139,23 @@
 <div class="articlebg"></div>
 <div class="article">
     <div>
-        <h1>Canvas之全屏气泡 </h1>
+        <h1>Node：爬取某网图片 </h1>
     </div>
     <div class="info">
         <span class="date">
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
             </span>
-            2022/10/19
+            2022/10/20
         </span>
 
         
         <span class="category">
-            <a href="/categories/Canvas">
+            <a href="/categories/Node">
                 <span class="icon">
                     <a-icon type="book" theme="filled" />
                 </span>
-                Canvas
+                Node
             </a>
         </span>
         
@@ -164,121 +164,105 @@
     </div>
 
     <div class="content" v-pre>
-        <h3 id="Canvas之全屏气泡"><a href="#Canvas之全屏气泡" class="headerlink" title="Canvas之全屏气泡"></a>Canvas之全屏气泡</h3><h4 id="效果预览"><a href="#效果预览" class="headerlink" title="效果预览"></a>效果预览</h4><p><a target="_blank" rel="noopener" href="https://postimg.cc/LqtCKYqQ"><img src="https://i.postimg.cc/6QSDZCBK/qipao-xiaoguo.gif" alt="qipao-xiaoguo.gif"></a></p>
-<pre><code class="html">&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;zh&quot;&gt;
+        <h3 id="Node：爬取某网图片"><a href="#Node：爬取某网图片" class="headerlink" title="Node：爬取某网图片"></a>Node：爬取某网图片</h3><h4 id="一些依赖"><a href="#一些依赖" class="headerlink" title="一些依赖"></a>一些依赖</h4><pre><code class="bash"> npm install cheerio download async superagent superagent-charset mkdirp
+</code></pre>
+<p><code>superagent</code> ajax请求库</p>
+<p><code>cheerio</code> node版的jquery，获取dom节点</p>
+<p><code>download</code> 下载文件库</p>
+<p><code>superagent-charset</code> 设置字符集，不然获取到的htmlDoc会有中文乱码</p>
+<p><code>async</code> mapLimit控制请求并发数，第一个回调是linkArr每个item项都执行的函数，处理完想要的数据后并return，第二个回调是linkArr每项都执行完后执行，返回一个err，和results，results就是包裹着第一个函数return值的数组（有点像promise.all）</p>
+<p>码云地址：<a target="_blank" rel="noopener" href="https://gitee.com/shaoyunfeng793/nodespider">https://gitee.com/shaoyunfeng793/nodespider</a></p>
+<h4 id="爬取结果"><a href="#爬取结果" class="headerlink" title="爬取结果"></a>爬取结果</h4><p><a target="_blank" rel="noopener" href="https://postimg.cc/2V2YCVLy"><img src="https://i.postimg.cc/13Z3cF9G/spider-mulu.png" alt="spider-mulu.png"></a><br><a target="_blank" rel="noopener" href="https://postimg.cc/GHsPCs5J"><img src="https://i.postimg.cc/pXssKfQ7/spider-imgs.png" alt="spider-imgs.png"></a></p>
+<h4 id="Nodejs-Code"><a href="#Nodejs-Code" class="headerlink" title="Nodejs Code"></a>Nodejs Code</h4><pre><code class="js">const request = require(&#39;superagent&#39;)
+require(&#39;superagent-charset&#39;)(request)
+const cheerio = require(&#39;cheerio&#39;)
+const download = require(&#39;download&#39;)
+const mkdirp = require(&#39;mkdirp&#39;)
+const async = require(&#39;async&#39;)
 
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;title&gt;全屏气泡&lt;/title&gt;
-    &lt;style&gt;
-        * &#123;
-            margin: 0;
-            padding: 0;
+var linkArr = [],
+    domain = &#39;https://www.tupianzj.com&#39;,
+    saveImgPath = &#39;./img/&#39;;
+
+let config = &#123;&#125;;
+    config.num = 3;
+
+request(&#39;GET&#39;, `https://www.tupianzj.com/meinv/xiezhen/list_179_$&#123;config.num&#125;.html`) 
+  .end(function(err, res)&#123;
+    if (!err) &#123;
+
+        let $ = cheerio.load(res.text);
+
+        let links = $(&#39;.list_con_box_ul li&gt;a&#39;);
+
+        for (let i = 0; i &lt; links.length; i++) &#123;
+            linkArr.push(domain + $(links[i]).attr(&#39;href&#39;))
         &#125;
-
-        html,
-        body &#123;
-            height: 100%;
-        &#125;
-    &lt;/style&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-    &lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
-&lt;/body&gt;
-&lt;script&gt;
-    if (canvas.getContext) &#123;
-        canvas.width = document.documentElement.clientWidth
-        canvas.height = document.documentElement.clientHeight
-        canvas.style.backgroundColor = &#39;white&#39;
-        const ctx = canvas.getContext(&#39;2d&#39;)
-        // 声明变量
-        let radius = 20,
-            r,
-            g,
-            b,
-            a,
-            x,
-            y,
-            arr = [],
-            temp = [];
         
-        // 先画5个气泡
-        for (let i = 0; i &lt; 5; i++) &#123;
-            createPop()
-        &#125;
+        async.mapLimit(linkArr,1,async function(url) &#123;
 
-        // 监听点击事件
-        canvas.addEventListener(&#39;click&#39;, event =&gt; &#123;
-            console.log(&quot;点击了canvas：&quot;, event);
-            x = event.offsetX
-            y = event.offsetY
-            radius = 5
-            createPop(x, y, radius)
-        &#125;)
+            let &#123; text &#125; = await request(url).charset(&#39;gbk&#39;),
+                $ = cheerio.load(text),
+                $pages = $(&#39;.pages li&gt;a&#39;),
+                page_num = $pages.first().text().replace(/\D/g,&#39;&#39;),
+                item_link = $pages.eq(-2).attr(&#39;href&#39;),
+                itemLinkArr = [],
+                itemDomain = url.replace(/\d+\.html/,&#39;&#39;),
+                dirname = saveImgPath + $(&#39;.list_con&gt;h1&#39;).text();
+            //创建目录
+            mkdirp(dirname);
+            for (let i = 1; i &lt;= page_num; i++) &#123;
 
-        // 定时刷新canvas
-        setInterval(() =&gt; &#123;
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
-            arr.forEach((item, index) =&gt; &#123;
-                if (item.a &lt;= 0) &#123;
-                    temp.push(index)
-                &#125; else &#123;
-                    item.radius += 0.5
-                    item.a -= 0.005
-                &#125;
-                drawPop(item.radius, item.r, item.g, item.b, item.a, item.x, item.y)
-            &#125;)
-            arr = arr.filter(item =&gt; &#123;
-                return item.a &gt; 0
-            &#125;)
-        &#125;, 1000 / 60);
-
-        // 定时添加新的气泡
-        setInterval(() =&gt; &#123;
-            createPop()
-        &#125;, 500);
-
-        // 画气泡
-        function drawPop(radius, r, g, b, a, x, y) &#123;
-            ctx.beginPath()
-            ctx.arc(x, y, radius, 0, 2 * Math.PI)
-            ctx.fillStyle = `rgba($&#123;r&#125;,$&#123;g&#125;,$&#123;b&#125;,$&#123;a&#125;)`
-            ctx.fill()
-        &#125;
-
-        // 气泡数据
-        function createPop(x, y, radius) &#123;
-            r = arcRandomColor()
-            g = arcRandomColor()
-            b = arcRandomColor()
-            radius = radius || Math.ceil(Math.random() * 10)
-            x = x || Math.ceil(Math.random() * canvas.width)
-            y = y || Math.ceil(Math.random() * canvas.height)
-            a = 1
-            const temp = &#123;
-                r,
-                g,
-                b,
-                a,
-                x,
-                y,
-                radius
+                let sign = i === 1 ? &#39;&#39; : &#39;_&#39;+i;
+                let link = itemDomain + item_link.replace(/_\d+/,sign);
+                itemLinkArr.push(link);
             &#125;
-            arr.push(temp)
-        &#125;
 
-        // 随机数据
-        function arcRandomColor() &#123;
-            return Math.ceil(Math.random() * 254)
+            return &#123;itemLinkArr,dirname&#125;;
+            
+        &#125;,(err, results) =&gt; &#123;
+
+            if (err) throw err
+
+            let allLinkArr = [],allCount,
+                index = 0,
+                count = 0,
+                indexManager = &#123;&#125;;
+            for (let i = 0; i &lt; results.length; i++) &#123;
+                index += results[i].itemLinkArr.length;
+                allLinkArr = allLinkArr.concat(results[i].itemLinkArr);
+                indexManager[index] = results[i].dirname;
+                
+            &#125;
+            allCount = allLinkArr.length;
+            async.mapLimit(allLinkArr,1,async function(url)&#123;
+    
+                let dirIndex = getDirIndex(++count,indexManager);
+                let &#123; text &#125; = await request(url);
+                let $ = cheerio.load(text);
+                let img_src = $(&#39;#bigpic img&#39;).attr(&#39;src&#39;);
+                await download( img_src, indexManager[dirIndex]); 
+                console.log(`图片下载:$&#123;count&#125;/$&#123;allCount&#125;`)
+            &#125;,(err,results) =&gt; &#123;
+                if (err) throw err
+            &#125;)
+                
+
+        &#125;)
+        
+    &#125;else&#123;
+        console.log(err)
+    &#125;
+&#125;);
+
+function getDirIndex(count,obj)&#123;
+    for (let key in obj) &#123;
+
+        if(count &lt;= key)&#123;
+            return key;
         &#125;
     &#125;
-&lt;/script&gt;
-
-&lt;/html&gt;
+&#125;
 </code></pre>
 
     </div>

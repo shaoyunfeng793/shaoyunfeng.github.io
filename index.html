@@ -166,6 +166,1066 @@
 
 <div class="post">
 
+    <a href="/2022/10/20/canvas-diaoWawa copy/">
+        <h2>
+            Canvas之马赛克
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Canvas">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Canvas
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/10/20
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Canvas之马赛克"><a href="#Canvas之马赛克" class="headerlink" title="Canvas之马赛克"></a>Canvas之马赛克</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>整个Demo，其实只是实现基本游戏逻辑，有些细节可继续优化，但是没有那么多空余时间了…</p>
+<p>可谓是简版中的简版之黄金矿工 hhh…</p>
+<p>先上个预览gif，再贴个代码…</p>
+<p>可以上码云上看看: <a target="_blank" rel="noopener" href="https://gitee.com/shaoyunfeng793/diao-wawa">https://gitee.com/shaoyunfeng793/diao-wawa</a></p>
+<h4 id="效果预览"><a href="#效果预览" class="headerlink" title="效果预览"></a>效果预览</h4><p><a target="_blank" rel="noopener" href="https://postimg.cc/SJ0fr04G"><img src="https://i.postimg.cc/yYxp7Br2/diaowawa.gif" alt="diaowawa.gif"></a></p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Canvas之钓娃娃GameDemo&lt;/title&gt;
+    &lt;style&gt;
+        * &#123;
+            margin: 0;
+            padding: 0;
+        &#125;
+
+        .container &#123;
+            width: 100vw;
+            height: 100vh;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        &#125;
+
+        #canvas &#123;
+            display: block;
+            background-color: bisque;
+        &#125;
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;canvas id=&quot;canvas&quot; width=&quot;300&quot; height=&quot;500&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;script src=&quot;./game.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;./wawa.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;./gouzi.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+    var game = new Game(&#123;
+        dom: &#39;#canvas&#39;,
+        onClick: function () &#123;
+            if (game.gouzi.status == &#39;pending&#39;) &#123;
+                game.gouzi.status = &#39;down&#39;;
+            &#125;
+        &#125;
+    &#125;);
+&lt;/script&gt;
+
+&lt;/html&gt;
+</code></pre>
+<h4 id="Game-js"><a href="#Game-js" class="headerlink" title="Game.js"></a>Game.js</h4><pre><code class="js">!(function () &#123;
+    var Game = window.Game = function (&#123;
+        dom,
+        onClick = function () &#123; &#125;,
+    &#125;) &#123;
+        this.canvas = document.querySelector(dom);
+        this.ctx = this.canvas.getContext(&quot;2d&quot;);
+        // 资源管理器
+        this.R = &#123;&#125;;
+        // 渲染定时器
+        this.renderTimer = null;
+        // 娃娃数组
+        this.wawaArr = [];
+        // 钩子实例
+        this.gouzi = null;
+        // 安全域
+        this.safeTopHeight = 200;
+        // 宽高
+        this.canvasWidth = this.canvas.width;
+        this.canvasHeight = this.canvas.height;
+        // 游戏初始化
+        this.init();
+
+        // 监听点击
+        this.canvas.addEventListener(&quot;click&quot;, onClick)
+
+    &#125;
+    Game.prototype.init = function () &#123;
+        console.log(&quot;游戏初始化&quot;);
+        let xhr = new XMLHttpRequest();
+        let self = this;
+        let loadCount = 0;
+        xhr.onreadystatechange = function () &#123;
+            if (xhr.readyState == 4 &amp;&amp; xhr.status == 200) &#123;
+                let data = JSON.parse(xhr.responseText);
+                for (let i = 0; i &lt; data.length; i++) &#123;
+                    self.R[data[i].name] = new Image();
+                    self.R[data[i].name].src = data[i].img;
+                    self.R[data[i].name].onload = function () &#123;
+                        loadCount++;
+                        self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
+                        self.ctx.save()
+                        self.ctx.font = &quot;20px 微软雅黑&quot;;
+                        self.ctx.textAlign = &quot;center&quot;;
+                        self.ctx.fillText(`正在加载资源($&#123;loadCount&#125;/$&#123;data.length&#125;)...`, self.canvas.width * 0.5, self.canvas.height * 0.5);
+                        self.ctx.restore()
+                        if (loadCount == data.length) &#123;
+                            setTimeout(() =&gt; &#123;
+                                // 创建钩子
+                                new Gouzi();
+                                // 创建娃娃
+                                new Array(5).fill(1).forEach(() =&gt; &#123;
+                                    new Wawa();
+                                &#125;);
+                                self.start();
+                            &#125;, 1000)
+                        &#125;
+                    &#125;
+                &#125;
+            &#125;
+        &#125;
+        xhr.open(&quot;get&quot;, &quot;R.json&quot;, true);
+        xhr.send();
+
+    &#125;
+
+    Game.prototype.start = function () &#123;
+        let frame = 0;
+        this.renderTimer = setInterval(() =&gt; &#123;
+            frame++;
+            // 清屏
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // 画帧数
+            this.ctx.font = &quot;10px 微软雅黑&quot;;
+            this.ctx.fillStyle = &quot;red&quot;;
+            this.ctx.fillText(`Frame:$&#123;frame&#125;`, 10, 20);
+
+            // 画勾子
+            if (this.gouzi &amp;&amp; this.gouzi.constructor === Gouzi) &#123;
+                this.gouzi.render();
+                this.gouzi.update();
+            &#125;
+
+            // 画娃娃
+            this.wawaArr.forEach(function (wawa) &#123;
+                wawa.render();
+                wawa.update();
+            &#125;)
+
+
+        &#125;, 1000 / 60)
+    &#125;
+
+    Game.prototype.end = function () &#123;
+        clearInterval(this.renderTimer);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.font = &quot;30px bold 微软雅黑&quot;;
+        this.ctx.textAlign = &quot;center&quot;;
+        this.ctx.fillStyle = &quot;red&quot;;
+        this.ctx.fillText(`You Win！`, this.canvas.width / 2, this.canvas.height / 2);
+    &#125;
+
+
+&#125;)()
+</code></pre>
+<h4 id="Gouzi-js"><a href="#Gouzi-js" class="headerlink" title="Gouzi.js"></a>Gouzi.js</h4><pre><code class="js">!(function () &#123;
+    const DEG = Math.PI / 180;
+    var Gouzi = window.Gouzi = function () &#123;
+        if (game.gouzi) &#123;
+            return game.gouzi
+        &#125;
+        // 钩子状态: pending：等待； down: 出钩 up: 收钩
+        this.status = &#39;pending&#39;;
+
+        // 钩子初始长度
+        this.rotateDegMax = 80;
+        this.gouziLong = 60;
+
+        // 钩子起始点，相当于圆心
+        this.startX = game.canvasWidth / 2;
+        this.startY = 30;
+
+        // 钩子初始旋转角度值，即默认左边开始荡
+        this.rotateDeg = -this.rotateDegMax;
+
+        // 钩子方向值的控制 +1 -1代表不同的方向，每达到80或-80的时候转变方向
+        this.rotateZhengfu = -1;
+
+        // 钩子终点位置
+        this.endX = 0; // endX一直都是不变的，因为钩子的荡漾动作是旋转得到的 
+        this.endY = this.gouziLong;
+
+        // 钩子图片参数
+        this.gouziW = 36;
+        this.gouziH = 28;
+
+        // 托管到game上
+        game.gouzi = this;
+    &#125;
+
+    Gouzi.prototype.render = function () &#123;
+        game.ctx.save();
+        game.ctx.beginPath();
+        game.ctx.lineWidth = 4;
+        game.ctx.lineCap = &#39;round&#39;;
+        game.ctx.translate(this.startX, this.startY);
+        game.ctx.rotate(this.rotateDeg * -DEG); // -DEG表示逆时针旋转
+        game.ctx.moveTo(0, 0);
+        game.ctx.lineTo(this.endX, this.endY);
+        game.ctx.stroke();
+        game.ctx.drawImage(game.R.zhuazi, 0, 0, 45, 35, this.endX - this.gouziW / 2, this.endY, this.gouziW, this.gouziH);
+        game.ctx.restore();
+    &#125;
+
+    Gouzi.prototype.update = function () &#123;
+        let endX;
+        switch (this.status) &#123;
+            case &#39;pending&#39;:
+                if (Math.abs(this.rotateDeg) == this.rotateDegMax) &#123;
+                    this.rotateZhengfu = -this.rotateZhengfu;
+                &#125;
+                this.rotateDeg += 1 * this.rotateZhengfu;
+                break;
+            case &#39;down&#39;:
+                // 如何判断该不该收钩子呢？
+                // 第1种是钩子抓到了就收钩子（通过endY + rotateDeg + sin公式计算出endX）
+                this.endY += 3;
+                endX = this.startX + (this.endY * Math.sin(this.rotateDeg * DEG));
+                let wawaIndex = game.wawaArr.findIndex(d =&gt; (d.y - d.h) &lt; this.endY &amp;&amp; this.endY &lt; d.y &amp;&amp; d.x &lt; endX &amp;&amp; endX &lt; (d.x + d.w));
+                if (wawaIndex != -1) &#123;
+                    // 移除娃娃
+                    game.wawaArr.splice(wawaIndex, 1);
+                    // 如果全被抓光了就end游戏
+                    if (game.wawaArr.length == 0) &#123;
+                        game.end();
+                    &#125;
+                    this.status = &#39;up&#39;;
+                &#125;
+                // 第2种是钩子长到最长距离然后开始收钩子
+                else if (this.endY &gt;= game.canvasHeight - this.startY - this.gouziH) &#123;
+                    this.status = &#39;up&#39;;
+                &#125;
+
+                break;
+            case &#39;up&#39;:
+                this.endY -= 3;
+                if (this.endY &lt;= this.gouziLong) &#123;
+                    this.endY = this.gouziLong;
+                    this.status = &#39;pending&#39;;
+                &#125;
+                break;
+            default:
+                return;
+        &#125;
+    &#125;
+
+&#125;)()
+</code></pre>
+<h4 id="Wawa-js"><a href="#Wawa-js" class="headerlink" title="Wawa.js"></a>Wawa.js</h4><pre><code class="js">!(function () &#123;
+    // 借助工具http://www.spritecow.com/来获得定位，需要微调一下
+    var WawaImagePositionMap = [
+        &#123;
+            x: 0,
+            y: 96
+        &#125;,
+        &#123;
+            x: 2,
+            y: 129
+        &#125;,
+        &#123;
+            x: 3,
+            y: 168
+        &#125;,
+        &#123;
+            x: 33,
+            y: 96
+        &#125;,
+        &#123;
+            x: 36,
+            y: 132
+        &#125;,
+        &#123;
+            x: 37,
+            y: 168
+        &#125;,
+        &#123;
+            x: 65,
+            y: 98
+        &#125;,
+        &#123;
+            x: 100,
+            y: 97
+        &#125;,
+    ];
+    var Wawa = window.Wawa = function () &#123;
+        // 宽高
+        this.w = 32;
+        this.h = 32;
+
+        // 娃娃图片
+        let randomImage = WawaImagePositionMap[parseInt(Math.random() * WawaImagePositionMap.length)];
+        this.imageX = randomImage.x;
+        this.imageY = randomImage.y;
+
+        // 随机出现位置
+        this.x = Math.random() * game.canvasWidth;
+        this.y = Math.random() * (game.canvasHeight - game.safeTopHeight - this.h) + game.safeTopHeight;
+
+        // 托管到game上
+        game.wawaArr.push(this);
+    &#125;
+
+    Wawa.prototype.render = function () &#123;
+        game.ctx.drawImage(game.R.wawa, this.imageX, this.imageY, this.w, this.h, this.x, this.y, this.w, this.h);
+    &#125;
+
+    Wawa.prototype.update = function () &#123;
+        this.x += 0.5;
+        if (this.x &gt; game.canvasWidth) &#123;
+            this.x = -this.w;
+        &#125;
+    &#125;
+
+&#125;)()
+</code></pre>
+<h4 id="R-json"><a href="#R-json" class="headerlink" title="R.json"></a>R.json</h4><pre><code class="json">[
+    &#123;
+        &quot;name&quot;: &quot;wawa&quot;,
+        &quot;img&quot;: &quot;./images/wawa.png&quot;
+    &#125;,
+    &#123;
+        &quot;name&quot;: &quot;zhuazi&quot;,
+        &quot;img&quot;: &quot;./images/zhuazi.png&quot;
+    &#125;
+]
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/10/20/canvas-diaoWawa copy/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/10/20/bom-router/">
+        <h2>
+            BOM：history的那些事
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/BOM">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                BOM
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/10/20
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="BOM：history的那些事"><a href="#BOM：history的那些事" class="headerlink" title="BOM：history的那些事"></a>BOM：history的那些事</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>现在前端框架都有路由组件，路由包括2种模式：<code>hash</code>、<code>history</code></p>
+<p>而前端路由实现的原理好像和Bom对象里的<strong>history</strong>有点联系…</p>
+<p>Emm…瞎搞一下…</p>
+<h4 id="一、Hash模式"><a href="#一、Hash模式" class="headerlink" title="一、Hash模式"></a>一、Hash模式</h4><p>hash模式下，通过<code>location</code>来跳转，才会触发<code>hashchange</code>监听事件， 再通过<code>lcoation.hash</code>不同的<em>hash值</em>来决定渲染的组件, 路由的<em>hash模式</em>其工作方式类似</p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;hash模式&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;button onclick=&quot;turn(&#39;/#/abc&#39;)&quot;&gt;跳转到：/#/abc&lt;/button&gt;
+    &lt;div id=&quot;view&quot;&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;script&gt;
+    function turn(url) &#123;
+        
+        let state = &#123;
+            a: 1,
+            b: 2
+        &#125;
+        // hash模式下，通过locaiton来跳转
+        location.href = url;
+        // history.pushState(state, &#39;/abc&#39;, url) // 该方式不会触发hashchange
+    &#125;
+    // 监听url的hash变化
+    window.addEventListener(&#39;hashchange&#39;, function (e) &#123;
+        console.log(&#39;旧链接：&#39; + e.oldURL)
+        console.log(&#39;新链接：&#39; + e.newURL)
+        console.log(location.hash); // =&gt; #/abc
+        document.getElementById(&#39;view&#39;).innerHtml = `&lt;div&gt;$&#123;location.hash&#125;组件&lt;/div&gt;`
+    &#125;)
+    // pushState replaceState都不会触发,用户前进后退或者location方式才触发
+    window.addEventListener(&#39;popstate&#39;, function (e)&#123;
+        console.log(e)
+    &#125;)
+&lt;/script&gt;
+
+&lt;/html&gt;
+</code></pre>
+<h4 id="二、History模式"><a href="#二、History模式" class="headerlink" title="二、History模式"></a>二、History模式</h4><p><code>pushState</code>只会改变url,不是真正的去跳转, 以下代码中跳转到 &#x2F;abc ,如果使用<code>location</code>会404,因为没有对应的资源</p>
+<p>但是<code>pushState</code>没有相应的<code>onhistorychange</code>事件可以监听,那就只能自己写一个<code>push</code>,还有<code>historychange事件</code></p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;history模式&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;button onclick=&quot;turn(&#39;/abc&#39;)&quot;&gt;跳转到：/abc&lt;/button&gt;
+    &lt;div id=&quot;view&quot;&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;script&gt;
+    // 当然路由也不是这么样子的, 因为懒
+    var router = new Router([
+        &#123;
+            name: &#39;abc&#39;,
+            path: &#39;/abc&#39;,
+            component: &#39;abc组件(假装是个组件)&#39;,
+        &#125;
+    ]);
+    function turn(url) &#123;
+
+        router.push(url)
+    &#125;
+    function Router(routes) &#123;
+        this.routes = routes || [];
+
+        window.addEventListener(&#39;historychange&#39;, function (e) &#123;
+            let route = e.detail;
+            console.log(&#39;改变了, 拿到的路由对象是:&#39;, route)
+            // 渲染路由组件
+            document.getElementById(&#39;view&#39;).innerHTML = route.component;
+        &#125;)
+    &#125;
+    Router.prototype.push = function (url) &#123;
+        // 这么不严谨的代码,只是因为太懒
+        const findRoute = this.routes.find(d =&gt; d.path === url);
+
+        if (findRoute) &#123;
+            const ev = new CustomEvent(&#39;historychange&#39;, &#123; detail: findRoute &#125;);
+
+            // history模式下，通过pushState来跳转
+            history.pushState(&#123;&#125;, null, url);
+            // location.href = url; // 该方式不行，会404
+            window.dispatchEvent(ev);
+        &#125; else &#123;
+            throw(&#39;该路由不存在&#39;)
+        &#125;
+    &#125;
+&lt;/script&gt;
+
+&lt;/html&gt;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/10/20/bom-router/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/10/20/node-spider/">
+        <h2>
+            Node：爬取某网图片
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Node">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Node
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/10/20
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Node：爬取某网图片"><a href="#Node：爬取某网图片" class="headerlink" title="Node：爬取某网图片"></a>Node：爬取某网图片</h3><h4 id="一些依赖"><a href="#一些依赖" class="headerlink" title="一些依赖"></a>一些依赖</h4><pre><code class="bash"> npm install cheerio download async superagent superagent-charset mkdirp
+</code></pre>
+<p><code>superagent</code> ajax请求库</p>
+<p><code>cheerio</code> node版的jquery，获取dom节点</p>
+<p><code>download</code> 下载文件库</p>
+<p><code>superagent-charset</code> 设置字符集，不然获取到的htmlDoc会有中文乱码</p>
+<p><code>async</code> mapLimit控制请求并发数，第一个回调是linkArr每个item项都执行的函数，处理完想要的数据后并return，第二个回调是linkArr每项都执行完后执行，返回一个err，和results，results就是包裹着第一个函数return值的数组（有点像promise.all）</p>
+<p>码云地址：<a target="_blank" rel="noopener" href="https://gitee.com/shaoyunfeng793/nodespider">https://gitee.com/shaoyunfeng793/nodespider</a></p>
+<h4 id="爬取结果"><a href="#爬取结果" class="headerlink" title="爬取结果"></a>爬取结果</h4><p><a target="_blank" rel="noopener" href="https://postimg.cc/2V2YCVLy"><img src="https://i.postimg.cc/13Z3cF9G/spider-mulu.png" alt="spider-mulu.png"></a><br><a target="_blank" rel="noopener" href="https://postimg.cc/GHsPCs5J"><img src="https://i.postimg.cc/pXssKfQ7/spider-imgs.png" alt="spider-imgs.png"></a></p>
+<h4 id="Nodejs-Code"><a href="#Nodejs-Code" class="headerlink" title="Nodejs Code"></a>Nodejs Code</h4><pre><code class="js">const request = require(&#39;superagent&#39;)
+require(&#39;superagent-charset&#39;)(request)
+const cheerio = require(&#39;cheerio&#39;)
+const download = require(&#39;download&#39;)
+const mkdirp = require(&#39;mkdirp&#39;)
+const async = require(&#39;async&#39;)
+
+var linkArr = [],
+    domain = &#39;https://www.tupianzj.com&#39;,
+    saveImgPath = &#39;./img/&#39;;
+
+let config = &#123;&#125;;
+    config.num = 3;
+
+request(&#39;GET&#39;, `https://www.tupianzj.com/meinv/xiezhen/list_179_$&#123;config.num&#125;.html`) 
+  .end(function(err, res)&#123;
+    if (!err) &#123;
+
+        let $ = cheerio.load(res.text);
+
+        let links = $(&#39;.list_con_box_ul li&gt;a&#39;);
+
+        for (let i = 0; i &lt; links.length; i++) &#123;
+            linkArr.push(domain + $(links[i]).attr(&#39;href&#39;))
+        &#125;
+        
+        async.mapLimit(linkArr,1,async function(url) &#123;
+
+            let &#123; text &#125; = await request(url).charset(&#39;gbk&#39;),
+                $ = cheerio.load(text),
+                $pages = $(&#39;.pages li&gt;a&#39;),
+                page_num = $pages.first().text().replace(/\D/g,&#39;&#39;),
+                item_link = $pages.eq(-2).attr(&#39;href&#39;),
+                itemLinkArr = [],
+                itemDomain = url.replace(/\d+\.html/,&#39;&#39;),
+                dirname = saveImgPath + $(&#39;.list_con&gt;h1&#39;).text();
+            //创建目录
+            mkdirp(dirname);
+            for (let i = 1; i &lt;= page_num; i++) &#123;
+
+                let sign = i === 1 ? &#39;&#39; : &#39;_&#39;+i;
+                let link = itemDomain + item_link.replace(/_\d+/,sign);
+                itemLinkArr.push(link);
+            &#125;
+
+            return &#123;itemLinkArr,dirname&#125;;
+            
+        &#125;,(err, results) =&gt; &#123;
+
+            if (err) throw err
+
+            let allLinkArr = [],allCount,
+                index = 0,
+                count = 0,
+                indexManager = &#123;&#125;;
+            for (let i = 0; i &lt; results.length; i++) &#123;
+                index += results[i].itemLinkArr.length;
+                allLinkArr = allLinkArr.concat(results[i].itemLinkArr);
+                indexManager[index] = results[i].dirname;
+                
+            &#125;
+            allCount = allLinkArr.length;
+            async.mapLimit(allLinkArr,1,async function(url)&#123;
+    
+                let dirIndex = getDirIndex(++count,indexManager);
+                let &#123; text &#125; = await request(url);
+                let $ = cheerio.load(text);
+                let img_src = $(&#39;#bigpic img&#39;).attr(&#39;src&#39;);
+                await download( img_src, indexManager[dirIndex]); 
+                console.log(`图片下载:$&#123;count&#125;/$&#123;allCount&#125;`)
+            &#125;,(err,results) =&gt; &#123;
+                if (err) throw err
+            &#125;)
+                
+
+        &#125;)
+        
+    &#125;else&#123;
+        console.log(err)
+    &#125;
+&#125;);
+
+function getDirIndex(count,obj)&#123;
+    for (let key in obj) &#123;
+
+        if(count &lt;= key)&#123;
+            return key;
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/10/20/node-spider/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2022/10/20/canvas-diaoWawa copy 2/">
+        <h2>
+            Canvas之刮刮卡
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Canvas">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Canvas
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/10/20
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Canvas之刮刮卡"><a href="#Canvas之刮刮卡" class="headerlink" title="Canvas之刮刮卡"></a>Canvas之刮刮卡</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>整个Demo，其实只是实现基本游戏逻辑，有些细节可继续优化，但是没有那么多空余时间了…</p>
+<p>可谓是简版中的简版之黄金矿工 hhh…</p>
+<p>先上个预览gif，再贴个代码…</p>
+<p>可以上码云上看看: <a target="_blank" rel="noopener" href="https://gitee.com/shaoyunfeng793/diao-wawa">https://gitee.com/shaoyunfeng793/diao-wawa</a></p>
+<h4 id="效果预览"><a href="#效果预览" class="headerlink" title="效果预览"></a>效果预览</h4><p><a target="_blank" rel="noopener" href="https://postimg.cc/SJ0fr04G"><img src="https://i.postimg.cc/yYxp7Br2/diaowawa.gif" alt="diaowawa.gif"></a></p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Canvas之钓娃娃GameDemo&lt;/title&gt;
+    &lt;style&gt;
+        * &#123;
+            margin: 0;
+            padding: 0;
+        &#125;
+
+        .container &#123;
+            width: 100vw;
+            height: 100vh;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        &#125;
+
+        #canvas &#123;
+            display: block;
+            background-color: bisque;
+        &#125;
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;canvas id=&quot;canvas&quot; width=&quot;300&quot; height=&quot;500&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;script src=&quot;./game.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;./wawa.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;./gouzi.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+    var game = new Game(&#123;
+        dom: &#39;#canvas&#39;,
+        onClick: function () &#123;
+            if (game.gouzi.status == &#39;pending&#39;) &#123;
+                game.gouzi.status = &#39;down&#39;;
+            &#125;
+        &#125;
+    &#125;);
+&lt;/script&gt;
+
+&lt;/html&gt;
+</code></pre>
+<h4 id="Game-js"><a href="#Game-js" class="headerlink" title="Game.js"></a>Game.js</h4><pre><code class="js">!(function () &#123;
+    var Game = window.Game = function (&#123;
+        dom,
+        onClick = function () &#123; &#125;,
+    &#125;) &#123;
+        this.canvas = document.querySelector(dom);
+        this.ctx = this.canvas.getContext(&quot;2d&quot;);
+        // 资源管理器
+        this.R = &#123;&#125;;
+        // 渲染定时器
+        this.renderTimer = null;
+        // 娃娃数组
+        this.wawaArr = [];
+        // 钩子实例
+        this.gouzi = null;
+        // 安全域
+        this.safeTopHeight = 200;
+        // 宽高
+        this.canvasWidth = this.canvas.width;
+        this.canvasHeight = this.canvas.height;
+        // 游戏初始化
+        this.init();
+
+        // 监听点击
+        this.canvas.addEventListener(&quot;click&quot;, onClick)
+
+    &#125;
+    Game.prototype.init = function () &#123;
+        console.log(&quot;游戏初始化&quot;);
+        let xhr = new XMLHttpRequest();
+        let self = this;
+        let loadCount = 0;
+        xhr.onreadystatechange = function () &#123;
+            if (xhr.readyState == 4 &amp;&amp; xhr.status == 200) &#123;
+                let data = JSON.parse(xhr.responseText);
+                for (let i = 0; i &lt; data.length; i++) &#123;
+                    self.R[data[i].name] = new Image();
+                    self.R[data[i].name].src = data[i].img;
+                    self.R[data[i].name].onload = function () &#123;
+                        loadCount++;
+                        self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
+                        self.ctx.save()
+                        self.ctx.font = &quot;20px 微软雅黑&quot;;
+                        self.ctx.textAlign = &quot;center&quot;;
+                        self.ctx.fillText(`正在加载资源($&#123;loadCount&#125;/$&#123;data.length&#125;)...`, self.canvas.width * 0.5, self.canvas.height * 0.5);
+                        self.ctx.restore()
+                        if (loadCount == data.length) &#123;
+                            setTimeout(() =&gt; &#123;
+                                // 创建钩子
+                                new Gouzi();
+                                // 创建娃娃
+                                new Array(5).fill(1).forEach(() =&gt; &#123;
+                                    new Wawa();
+                                &#125;);
+                                self.start();
+                            &#125;, 1000)
+                        &#125;
+                    &#125;
+                &#125;
+            &#125;
+        &#125;
+        xhr.open(&quot;get&quot;, &quot;R.json&quot;, true);
+        xhr.send();
+
+    &#125;
+
+    Game.prototype.start = function () &#123;
+        let frame = 0;
+        this.renderTimer = setInterval(() =&gt; &#123;
+            frame++;
+            // 清屏
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // 画帧数
+            this.ctx.font = &quot;10px 微软雅黑&quot;;
+            this.ctx.fillStyle = &quot;red&quot;;
+            this.ctx.fillText(`Frame:$&#123;frame&#125;`, 10, 20);
+
+            // 画勾子
+            if (this.gouzi &amp;&amp; this.gouzi.constructor === Gouzi) &#123;
+                this.gouzi.render();
+                this.gouzi.update();
+            &#125;
+
+            // 画娃娃
+            this.wawaArr.forEach(function (wawa) &#123;
+                wawa.render();
+                wawa.update();
+            &#125;)
+
+
+        &#125;, 1000 / 60)
+    &#125;
+
+    Game.prototype.end = function () &#123;
+        clearInterval(this.renderTimer);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.font = &quot;30px bold 微软雅黑&quot;;
+        this.ctx.textAlign = &quot;center&quot;;
+        this.ctx.fillStyle = &quot;red&quot;;
+        this.ctx.fillText(`You Win！`, this.canvas.width / 2, this.canvas.height / 2);
+    &#125;
+
+
+&#125;)()
+</code></pre>
+<h4 id="Gouzi-js"><a href="#Gouzi-js" class="headerlink" title="Gouzi.js"></a>Gouzi.js</h4><pre><code class="js">!(function () &#123;
+    const DEG = Math.PI / 180;
+    var Gouzi = window.Gouzi = function () &#123;
+        if (game.gouzi) &#123;
+            return game.gouzi
+        &#125;
+        // 钩子状态: pending：等待； down: 出钩 up: 收钩
+        this.status = &#39;pending&#39;;
+
+        // 钩子初始长度
+        this.rotateDegMax = 80;
+        this.gouziLong = 60;
+
+        // 钩子起始点，相当于圆心
+        this.startX = game.canvasWidth / 2;
+        this.startY = 30;
+
+        // 钩子初始旋转角度值，即默认左边开始荡
+        this.rotateDeg = -this.rotateDegMax;
+
+        // 钩子方向值的控制 +1 -1代表不同的方向，每达到80或-80的时候转变方向
+        this.rotateZhengfu = -1;
+
+        // 钩子终点位置
+        this.endX = 0; // endX一直都是不变的，因为钩子的荡漾动作是旋转得到的 
+        this.endY = this.gouziLong;
+
+        // 钩子图片参数
+        this.gouziW = 36;
+        this.gouziH = 28;
+
+        // 托管到game上
+        game.gouzi = this;
+    &#125;
+
+    Gouzi.prototype.render = function () &#123;
+        game.ctx.save();
+        game.ctx.beginPath();
+        game.ctx.lineWidth = 4;
+        game.ctx.lineCap = &#39;round&#39;;
+        game.ctx.translate(this.startX, this.startY);
+        game.ctx.rotate(this.rotateDeg * -DEG); // -DEG表示逆时针旋转
+        game.ctx.moveTo(0, 0);
+        game.ctx.lineTo(this.endX, this.endY);
+        game.ctx.stroke();
+        game.ctx.drawImage(game.R.zhuazi, 0, 0, 45, 35, this.endX - this.gouziW / 2, this.endY, this.gouziW, this.gouziH);
+        game.ctx.restore();
+    &#125;
+
+    Gouzi.prototype.update = function () &#123;
+        let endX;
+        switch (this.status) &#123;
+            case &#39;pending&#39;:
+                if (Math.abs(this.rotateDeg) == this.rotateDegMax) &#123;
+                    this.rotateZhengfu = -this.rotateZhengfu;
+                &#125;
+                this.rotateDeg += 1 * this.rotateZhengfu;
+                break;
+            case &#39;down&#39;:
+                // 如何判断该不该收钩子呢？
+                // 第1种是钩子抓到了就收钩子（通过endY + rotateDeg + sin公式计算出endX）
+                this.endY += 3;
+                endX = this.startX + (this.endY * Math.sin(this.rotateDeg * DEG));
+                let wawaIndex = game.wawaArr.findIndex(d =&gt; (d.y - d.h) &lt; this.endY &amp;&amp; this.endY &lt; d.y &amp;&amp; d.x &lt; endX &amp;&amp; endX &lt; (d.x + d.w));
+                if (wawaIndex != -1) &#123;
+                    // 移除娃娃
+                    game.wawaArr.splice(wawaIndex, 1);
+                    // 如果全被抓光了就end游戏
+                    if (game.wawaArr.length == 0) &#123;
+                        game.end();
+                    &#125;
+                    this.status = &#39;up&#39;;
+                &#125;
+                // 第2种是钩子长到最长距离然后开始收钩子
+                else if (this.endY &gt;= game.canvasHeight - this.startY - this.gouziH) &#123;
+                    this.status = &#39;up&#39;;
+                &#125;
+
+                break;
+            case &#39;up&#39;:
+                this.endY -= 3;
+                if (this.endY &lt;= this.gouziLong) &#123;
+                    this.endY = this.gouziLong;
+                    this.status = &#39;pending&#39;;
+                &#125;
+                break;
+            default:
+                return;
+        &#125;
+    &#125;
+
+&#125;)()
+</code></pre>
+<h4 id="Wawa-js"><a href="#Wawa-js" class="headerlink" title="Wawa.js"></a>Wawa.js</h4><pre><code class="js">!(function () &#123;
+    // 借助工具http://www.spritecow.com/来获得定位，需要微调一下
+    var WawaImagePositionMap = [
+        &#123;
+            x: 0,
+            y: 96
+        &#125;,
+        &#123;
+            x: 2,
+            y: 129
+        &#125;,
+        &#123;
+            x: 3,
+            y: 168
+        &#125;,
+        &#123;
+            x: 33,
+            y: 96
+        &#125;,
+        &#123;
+            x: 36,
+            y: 132
+        &#125;,
+        &#123;
+            x: 37,
+            y: 168
+        &#125;,
+        &#123;
+            x: 65,
+            y: 98
+        &#125;,
+        &#123;
+            x: 100,
+            y: 97
+        &#125;,
+    ];
+    var Wawa = window.Wawa = function () &#123;
+        // 宽高
+        this.w = 32;
+        this.h = 32;
+
+        // 娃娃图片
+        let randomImage = WawaImagePositionMap[parseInt(Math.random() * WawaImagePositionMap.length)];
+        this.imageX = randomImage.x;
+        this.imageY = randomImage.y;
+
+        // 随机出现位置
+        this.x = Math.random() * game.canvasWidth;
+        this.y = Math.random() * (game.canvasHeight - game.safeTopHeight - this.h) + game.safeTopHeight;
+
+        // 托管到game上
+        game.wawaArr.push(this);
+    &#125;
+
+    Wawa.prototype.render = function () &#123;
+        game.ctx.drawImage(game.R.wawa, this.imageX, this.imageY, this.w, this.h, this.x, this.y, this.w, this.h);
+    &#125;
+
+    Wawa.prototype.update = function () &#123;
+        this.x += 0.5;
+        if (this.x &gt; game.canvasWidth) &#123;
+            this.x = -this.w;
+        &#125;
+    &#125;
+
+&#125;)()
+</code></pre>
+<h4 id="R-json"><a href="#R-json" class="headerlink" title="R.json"></a>R.json</h4><pre><code class="json">[
+    &#123;
+        &quot;name&quot;: &quot;wawa&quot;,
+        &quot;img&quot;: &quot;./images/wawa.png&quot;
+    &#125;,
+    &#123;
+        &quot;name&quot;: &quot;zhuazi&quot;,
+        &quot;img&quot;: &quot;./images/zhuazi.png&quot;
+    &#125;
+]
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/10/20/canvas-diaoWawa copy 2/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/10/19/canvas-qipao/">
         <h2>
             Canvas之全屏气泡
@@ -176,10 +1236,10 @@
 
         
         <span class="category">
-            <a href="/categories/canvas">
+            <a href="/categories/Canvas">
                 <span class="icon">
                     <a-icon type="book" theme="filled" /></span>
-                canvas
+                Canvas
             </a>
         </span>
         
@@ -340,10 +1400,10 @@
 
         
         <span class="category">
-            <a href="/categories/canvas">
+            <a href="/categories/Canvas">
                 <span class="icon">
                     <a-icon type="book" theme="filled" /></span>
-                canvas
+                Canvas
             </a>
         </span>
         
@@ -1446,459 +2506,6 @@ export default &#123;
     </div>
 
     <a href="/2022/10/06/html-mobileH5/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/10/06/vue-optimizationCode/">
-        <h2>
-            Vue性能优化方式
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Vue">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/10/6
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="Vue性能优化方式"><a href="#Vue性能优化方式" class="headerlink" title="Vue性能优化方式"></a>Vue性能优化方式</h3><p><strong>ps:</strong> <em>我们在使用 Vue 或其他框架的日常开发中，或多或少的都会遇到一些性能问题，尽管 Vue 内部已经帮助我们做了许多优化，但是还是有些问题是需要我们主动去避免的。我在我的日常开中，以及网上各种大佬的文章中总结了一些容易产生性能问题的场景以及针对这些问题优化的技巧，这篇文章就来探讨下，希望对你有所帮助。</em></p>
-<h4 id="一、使用v-slot-slotName"><a href="#一、使用v-slot-slotName" class="headerlink" title="一、使用v-slot:slotName"></a>一、使用v-slot:slotName</h4><p><code>v-slot</code>是 2.6 新增的语法，具体可查看:Vue2.6，2.6 发布已经是快两年前的事情了，但是现在仍然有不少人仍然在使用<code>slot=&quot;slotName&quot;</code>这个语法。虽然这两个语法都能达到相同的效果，但是内部的逻辑确实不一样的，下面来看下这两种方式有什么不同之处。</p>
-<p>我们先来看下这两种语法分别会被编译成什么：</p>
-<h5 id="v-slot-slotName编译"><a href="#v-slot-slotName编译" class="headerlink" title="v-slot:slotName编译"></a>v-slot:slotName编译</h5><pre><code>    //编译前 
-    &lt;child&gt;
-        &lt;template v-slot:name&gt;&#123;&#123;name&#125;&#125;&lt;/template&gt;
-    &lt;/child&gt;
-
-    // 编译后
-    function render() &#123;
-        with (this) &#123;
-            return _c(&#39;child&#39;, &#123;
-            scopedSlots: _u([
-                &#123;
-                key: &#39;name&#39;,
-                fn: function () &#123;
-                    return [_v(_s(name))]
-                &#125;,
-                proxy: true
-                &#125;
-            ])
-            &#125;)
-        &#125;
-    &#125;
-</code></pre>
-<h5 id="slot-x3D-”slotName”编译"><a href="#slot-x3D-”slotName”编译" class="headerlink" title="slot&#x3D;”slotName”编译"></a>slot&#x3D;”slotName”编译</h5><pre><code>    //编译前 
-    &lt;child&gt;
-        &lt;template v-slot:name&gt;&#123;&#123;name&#125;&#125;&lt;/template&gt;
-    &lt;/child&gt;
-
-    // 编译后
-    function render() &#123;
-        with (this) &#123;
-            return _c(
-            &#39;child&#39;,
-            [
-                _c(
-                &#39;template&#39;,
-                &#123;
-                    slot: &#39;name&#39;
-                &#125;,
-                [_v(_s(name))]
-                )
-            ],
-            )
-        &#125;
-    &#125;
-</code></pre>
-<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>通过编译后的代码可以发现，<strong>旧的写法是将插槽内容作为 children 渲染的，会在父组件的渲染函数中创建，插槽内容的依赖会被父组件收集（name 的 dep 收集到父组件的渲染 watcher），而新的写法将插槽内容放在了 scopedSlots 中，会在子组件的渲染函数中调用，插槽内容的依赖会被子组件收集（name 的 dep 收集到子组件的渲染 watcher），</strong>最终导致的结果就是：当我们修改 name 这个属性时，旧的写法是调用父组件的更新（调用父组件的渲染 watcher），然后在父组件更新过程中调用子组件更新（prePatch &#x3D;&gt; updateChildComponent），而新的写法则是直接调用子组件的更新（调用子组件的渲染 watcher）。这样一来，旧的写法在更新时就多了一个父组件更新的过程，而新的写法由于直接更新子组件，就会更加高效，性能更好，所以推荐始终使用<code>v-slot:slotName</code>语法。</p>
-<h4 id="二、使用函数式组件"><a href="#二、使用函数式组件" class="headerlink" title="二、使用函数式组件"></a>二、使用函数式组件</h4><p>对于某些组件，如果我们只是用来显示一些数据，不需要管理状态，监听数据等，那么就可以用函数式组件。函数式组件是无状态的，无实例的，在初始化时不需要初始化状态，不需要创建实例，也不需要去处理生命周期等，相比有状态组件，会更加轻量，同时性能也更好。</p>
-<pre><code class="vue">    &lt;template functional&gt;
-        &lt;div class=&quot;user-profile&quot;&gt;&#123;&#123; name &#125;&#125;&lt;/div&gt;
-    &lt;/template&gt;
-
-    &lt;script&gt;
-        export default &#123;
-            // or functional: true
-            props: [&#39;name&#39;],
-        &#125;
-    &lt;/script&gt;
-</code></pre>
-<h4 id="三、结合场景使用-v-show-和-v-if"><a href="#三、结合场景使用-v-show-和-v-if" class="headerlink" title="三、结合场景使用 v-show 和 v-if"></a>三、结合场景使用 v-show 和 v-if</h4><pre><code>// v-if 编译前
-&lt;template&gt;
-  &lt;div&gt;
-    &lt;UserProfile :user=&quot;user1&quot; v-if=&quot;visible&quot; /&gt;
-    &lt;button @click=&quot;visible = !visible&quot;&gt;toggle&lt;/button&gt;
-  &lt;/div&gt;
-&lt;/template&gt;
-
-// 编译后
-function render() &#123;
-  with (this) &#123;
-    return _c(
-      &#39;div&#39;,
-      [
-        visible
-          ? _c(&#39;UserProfile&#39;, &#123;
-              attrs: &#123;
-                user: user1
-              &#125;
-            &#125;)
-          : _e(),
-        _c(
-          &#39;button&#39;,
-          &#123;
-            on: &#123;
-              click: function ($event) &#123;
-                visible = !visible
-              &#125;
-            &#125;
-          &#125;,
-          [_v(&#39;toggle&#39;)]
-        )
-      ],
-    )
-  &#125;
-&#125;
-</code></pre>
-<pre><code>// v-show 编译前
-&lt;template&gt;
-  &lt;div&gt;
-    &lt;UserProfile :user=&quot;user1&quot; v-show=&quot;visible&quot; /&gt;
-    &lt;button @click=&quot;visible = !visible&quot;&gt;toggle&lt;/button&gt;
-  &lt;/div&gt;
-&lt;/template&gt;
-
-function render() &#123;
-  with (this) &#123;
-    return _c(
-      &#39;div&#39;,
-      [
-        _c(&#39;UserProfile&#39;, &#123;
-          directives: [
-            &#123;
-              name: &#39;show&#39;,
-              rawName: &#39;v-show&#39;,
-              value: visible,
-              expression: &#39;visible&#39;
-            &#125;
-          ],
-          attrs: &#123;
-            user: user1
-          &#125;
-        &#125;),
-        _c(
-          &#39;button&#39;,
-          &#123;
-            on: &#123;
-              click: function ($event) &#123;
-                visible = !visible
-              &#125;
-            &#125;
-          &#125;,
-          [_v(&#39;toggle&#39;)]
-        )
-      ],
-    )
-  &#125;
-&#125;
-</code></pre>
-<h5 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h5><p><code>v-show</code> 和 <code>v-if</code> 相比，不需要在 patch 阶段创建 &#x2F; 移除节点，只是根据v-show上绑定的值来控制 DOM 元素的<code>style.display</code>属性，在频繁切换的场景下就可以节省很多性能。</p>
-<p>但是并不是说<code>v-show</code>可以在任何情况下都替换<code>v-if</code>，如果初始值是false时，<code>v-if</code>并不会创建隐藏的节点，但是<code>v-show</code>会创建，并通过设置<code>style.display=&#39;none&#39;</code>来隐藏，虽然外表看上去这个 DOM 都是被隐藏的，但是<code>v-show</code>已经完整的走了一遍创建的流程，造成了性能的浪费。所以，<code>v-if</code>的优势体现在初始化时，<code>v-show</code>体现在更新时，当然并不是要求你绝对按照这个方式来，比如某些组件初始化时会请求数据，而你想先隐藏组件，然后在显示时能立刻看到数据，这时候就可以用<code>v-show</code>，又或者你想每次显示这个组件时都是最新的数据，那么你就可以用<code>v-if</code>，所以我们要结合具体业务场景去选一个合适的方式。</p>
-<h4 id="四、避免-v-for-和-v-if-同时使用"><a href="#四、避免-v-for-和-v-if-同时使用" class="headerlink" title="四、避免 v-for 和 v-if 同时使用"></a>四、避免 v-for 和 v-if 同时使用</h4><p>2.x 当 <code>v-if</code> 与 <code>v-for</code> 一起使用时，<code>v-for</code> 具有比 <code>v-if</code> 更高的优先级。<br>3.x 当 <code>v-if</code> 与 <code>v-for</code> 一起使用时，<code>v-if</code> 具有比 <code>v-for</code> 更高的优先级。</p>
-<p>如果同时出现，每次渲染都会先执行循环在判断条件，无论如何循环都不可避免，浪费了性能,要避免出现这种情况，在外层嵌套<code>template</code>，在这一层进行v-if判断，然后在内部进行<code>v-for</code>循环。</p>
-<h4 id="五、始终为-v-for-添加-key，并且不要将-index-作为的-key"><a href="#五、始终为-v-for-添加-key，并且不要将-index-作为的-key" class="headerlink" title="五、始终为 v-for 添加 key，并且不要将 index 作为的 key"></a>五、始终为 v-for 添加 key，并且不要将 index 作为的 key</h4><p>1.key的作用主要是为了高效的更新虚拟DOM，其原理是vue在patch过程中通过key可以精准的判断两个节点是否是同一个，从而避免频繁更新不同元素，使得整个patch过程更加高效，减少了dom的操作量，提高性能。</p>
-<p>2.如果不设置key可能在列表更新时引发一些隐藏的bug 比如说更新和不更新看不出来。</p>
-<p>3.vue中在使用相同标签名元素的过渡切换是，也会用到key属性，其目的也是为了让vue可以区分他们，否则vue只会替换其内部属性而不会触发过渡效果。需要用key来作为唯一性的判断。</p>
-<p>当用<code>index</code>作为<code>key</code>时，因为diff算法会就地更新，会复用key:0的这个节点，比对的时候，key:0的节点存在，则比对key:1，也存在，而多出了key:2, 则会将其删除。</p>
-<h4 id="六、使用Object-freeze"><a href="#六、使用Object-freeze" class="headerlink" title="六、使用Object.freeze()"></a>六、使用Object.freeze()</h4><p>在 Vue 组件初始化数据时，会递归遍历在 data 中定义的每一条数据，通过Object.defineProperty将数据改成响应式，这就意味着如果 data 中的数据量很大的话，在初始化时将会使用很长的时间去执行Object.defineProperty, 也就会带来性能问题，这个时候我们可以强制使数据变为非响应式，从而节省时间。</p>
-<p>对某一对象使用<code>Object.freeze()</code>后，将不能向这个对象添加新的属性，不能删除已有属性，不能修改该对象已有属性的可枚举性、可配置性、可写性，以及不能修改已有属性的值。在vue源码中判断条件中有一个<code>Object.isExtensible(value)</code>，这个方法是判断一个对象是否是可扩展的，由于我们使用了<code>Object.freeze()</code>，这里肯定就返回了false，所以就跳过了下面的数据响应绑定过程，自然就省了很多时间。</p>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/10/06/vue-optimizationCode/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/30/webpack-multiInput/">
-        <h2>
-            Webpack之多入口&三种hash
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Webpack">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Webpack
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/30
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="Webpack之多入口-amp-三种hash"><a href="#Webpack之多入口-amp-三种hash" class="headerlink" title="Webpack之多入口&amp;三种hash"></a>Webpack之多入口&amp;三种hash</h3><p>webpack三种hash</p>
-<p>1.全局hash: <code>hash</code> 修改一个地方所有文件hash都改变</p>
-<p>2.内容hash: <code>contentHash</code>  根据自身文件修改了才会变hash</p>
-<p>3.分组hash: <code>chunkHash</code>  根据多入口文件分组 不同组之间hash值不相影响， 组内文件修改，该组hash改变</p>
-<h4 id="Webpack-配置"><a href="#Webpack-配置" class="headerlink" title="Webpack 配置"></a>Webpack 配置</h4><pre><code class="js">    module.exports = &#123;
-        entry: &#123;
-            main: &#39;./js/main.js&#39;,
-            other: &#39;./js/other.js&#39;
-        &#125;,
-        output: &#123;
-            filename: &#39;[name].[hash/contentHash/chunkHash].js&#39;,
-            path: path.resolve(__dirname, &#39;dist&#39;)
-        &#125;,
-        plugins: [
-            new HtmlWebpackPlugin(&#123;
-                filename: &#39;index.html&#39;,
-                template: &#39;./src/index.html&#39;,
-                chunks: [&#39;main&#39;]
-            &#125;),
-            new HtmlWebpackPlugin(&#123;
-                filename: &#39;other.html&#39;,
-                template: &#39;./src/other.html&#39;,
-                chunks: [&#39;other&#39;]
-            &#125;),
-        ]
-        // ...
-    &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/30/webpack-multiInput/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/30/webpack-optimization/">
-        <h2>
-            Webpack之抽离压缩css
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Webpack">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Webpack
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/30
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="Webpack之抽离压缩css"><a href="#Webpack之抽离压缩css" class="headerlink" title="Webpack之抽离压缩css"></a>Webpack之抽离压缩css</h3><p>使用 <code>mini-css-extract-plugin</code> 插件的内置loader 替换 <code>style-loader</code></p>
-<p>使用 <code>terser-webpack-plugin</code> 插件压缩js代码</p>
-<p>使用 <code>optimize-css-assets-webpack-plugin</code> 插件压缩css代码</p>
-<h4 id="Webpack-配置"><a href="#Webpack-配置" class="headerlink" title="Webpack 配置"></a>Webpack 配置</h4><pre><code class="js">    const MiniCSSExtractPlugin = require(&#39;mini-css-extract-plugin&#39;);
- 
-   
-    const TerserPlugin = require(&#39;terser-webpack-plugin&#39;);  // 压缩js插件
-    const OptimizeCssAssetsWebpackPlugin = require(&#39;optimize-css-assets-webpack-plugin&#39;);  // 压缩css插件
-    
-    module.exports = &#123;
-        // ...
-        module: &#123;
-            rules: [
-                &#123;
-                    test: /\.css/,
-                    loader: [
-                        MiniCSSExtractPlugin.loader, // 替换 style-loader
-                        &#39;css-loader&#39;,
-                        &#39;postcss-loader&#39;,  // autoprefixer
-                    ],
-                &#125;
-            ]
-        &#125;,
-        plugins: [
-            new MiniCSSExtractPlugin(&#123;
-                filename: &#39;css/main.[contentHash:8].css&#39;
-            &#125;)
-        ],
-        // 优化配置
-        optimization: &#123;
-            minimizer: &#123;
-                // 压缩js
-                new TerserPlugin(),
-                // 压缩css
-                new OptimizeCssAssetsWebpackPlugin()
-            &#125;
-        &#125;  
-    &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/30/webpack-optimization/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/30/webpack-mergeConfig/">
-        <h2>
-            Webpack之拆分/合并配置
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Webpack">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Webpack
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/30
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="Webpack之拆分-x2F-合并配置"><a href="#Webpack之拆分-x2F-合并配置" class="headerlink" title="Webpack之拆分&#x2F;合并配置"></a>Webpack之拆分&#x2F;合并配置</h3><p>使用 <code>webpack-merge</code> 合并配置；</p>
-<p>对应script为：<br>build:dev webpack –config webpack.dev.config.js；<br>build:prod webpack –config webpack.prod.config.js；</p>
-<h4 id="webpack-base-config-js"><a href="#webpack-base-config-js" class="headerlink" title="webpack.base.config.js"></a>webpack.base.config.js</h4><p>提取公共配置</p>
-<pre><code class="js">    const path = requrie(&#39;path&#39;);
-    const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
-    
-    module.exports = &#123;
-        entry: &#123;
-            main: &#39;./src/index.js&#39;
-        &#125;,
-        output: &#123;
-            filename: &#39;[name].js&#39;,
-            path: path.resolve(__dirname, &#39;dist&#39;)
-        &#125;,
-        plugins: [
-            new HtmlWebpackPlugin(&#123;
-                template: &#39;./src/index.html&#39;
-            &#125;)
-        ],
-        // ...
-    &#125;
-</code></pre>
-<h4 id="webpack-dev-config-js"><a href="#webpack-dev-config-js" class="headerlink" title="webpack.dev.config.js"></a>webpack.dev.config.js</h4><p>开发环境配置</p>
-<pre><code class="js">    const baseConfig = require(&#39;./weback.base.config.js&#39;);
-    const &#123; smart: merge &#125; = require(&#39;webpack-merge&#39;);
-    
-    const devConfig = &#123;
-        mode: &#39;development&#39;
-        // 开发环境配置....
-    &#125;
-    
-    module.export = merge(baseConfig, devConfig);
-</code></pre>
-<h4 id="webpack-prod-config-js"><a href="#webpack-prod-config-js" class="headerlink" title="webpack.prod.config.js"></a>webpack.prod.config.js</h4><p>生产环境配置</p>
-<pre><code class="js">    const baseConfig = require(&#39;./weback.base.config.js&#39;);
-    const &#123; smart: merge &#125; = require(&#39;webpack-merge&#39;);
-    
-    const devConfig = &#123;
-        mode: &#39;development&#39;
-        // 开发环境配置....
-    &#125;
-    
-    module.export = merge(baseConfig, devConfig);
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/30/webpack-mergeConfig/ " class="go-post">
         阅读全文
     </a>
 </div>

@@ -166,6 +166,254 @@
 
 <div class="post">
 
+    <a href="/2022/09/28/html-lottery/">
+        <h2>
+            实现Demo之H5幸运大转盘
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/HTML">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                HTML
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/28
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="H5幸运大转盘"><a href="#H5幸运大转盘" class="headerlink" title="H5幸运大转盘"></a>H5幸运大转盘</h3><h4 id="css-Code"><a href="#css-Code" class="headerlink" title="css Code"></a>css Code</h4><pre><code class="css">    * &#123;
+        margin: 0;
+        padding: 0;
+    &#125;
+
+    .container &#123;
+        background-image: url(./wheel-bodybg.png);
+        background-size: 100% 100%;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    &#125;
+
+    .wheel &#123;
+        width: 800px;
+        height: 800px;
+        position: relative;
+        background-image: url(./wheel-bg.png);
+        background-size: 100% 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    &#125;
+
+    .wheel-light &#123;
+        background-image: url(./wheel-bg2.png) !important;
+    &#125;
+
+    #wheelCanvas &#123;
+        width: 700px;
+        height: 700px;
+
+    &#125;
+
+    .transition &#123;
+        transition: all 2s;
+    &#125;
+
+    .pointer &#123;
+        display: block;
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background-color: transparent;
+        background-image: url(./wheel-pointer.png);
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+        border: none;
+        outline: none;
+    &#125;
+
+    .pointer-animation &#123;
+        animation: scale 1s infinite linear alternate;
+    &#125;
+
+    @keyframes scale &#123;
+        0% &#123;
+            transform: scale(1);
+        &#125;
+
+        100% &#123;
+            transform: scale(1.1);
+        &#125;
+    &#125;
+</code></pre>
+<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;title&gt;幸运大转盘&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;div class=&quot;wheel&quot;&gt;
+            &lt;canvas id=&quot;wheelCanvas&quot; width=&quot;600px&quot; height=&quot;600px&quot;&gt;&lt;/canvas&gt;
+            &lt;button class=&quot;pointer pointer-animation&quot; id=&quot;getAward&quot;&gt;&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    //抽奖转盘
+    var turnWheel = &#123;
+        reaward: [
+            &#123; name: &#39;380元优惠券&#39;, icon: &#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/signAward/1649132281714_4Y5c6zXd.png&#39; &#125;,
+            &#123; name: &#39;谢谢参与&#39;, icon: &#39;&#39; &#125;,
+            &#123; name: &#39;30积分&#39;, icon: &#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/signAward/1649132281714_4Y5c6zXd.png&#39; &#125;,
+            &#123; name: &#39;谢谢参与&#39;, icon: &#39;&#39; &#125;,
+            &#123; name: &#39;10积分&#39;, icon: &#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/signAward/1649132281714_4Y5c6zXd.png&#39; &#125;,
+            &#123; name: &#39;谢谢参与&#39;, icon: &#39;&#39; &#125;,
+        ], //转盘奖品
+        colors: [], //转盘奖品区块对应背景颜色
+        fontColor: &#39;#f00&#39;, //转盘奖品字体颜色
+        radius: 300, //转盘半径
+        textRadius: 320, //转盘奖品位置距离圆心的距离
+    &#125;;
+
+    var timer = null;
+    var turning = false;
+    var wheelCanvas = document.getElementById(&quot;wheelCanvas&quot;);
+
+    turnWheel.reaward = turnWheel.reaward.map(d =&gt; &#123;
+        let img = new Image();
+        img.src = d.icon;
+        d.icon = img
+        return d
+    &#125;)
+    turnWheel.colors = [
+        &quot;#eecffe&quot;,
+        &quot;#FFFFFF&quot;,
+        &quot;#eecffe&quot;,
+        &quot;#FFFFFF&quot;,
+        &quot;#eecffe&quot;,
+        &quot;#FFFFFF&quot;,
+    ];
+    window.onload = function () &#123;
+
+        drawWheelCanvas(&#39;wheelCanvas&#39;, turnWheel);
+        var getAward = document.getElementById(&quot;getAward&quot;);
+        var index = 0; // 中奖将品的数组下标
+        getAward.addEventListener(&quot;click&quot;, function () &#123;
+            if (turning) &#123;
+                return;
+            &#125;
+            turning = true;
+            index = Math.floor(Math.random() * turnWheel.reaward.length);
+            wheelCanvas.classList.add(&quot;transition&quot;);
+            twinkle(() =&gt; &#123;
+                alert(&#39;中奖奖品下标：&#39; + index);
+            &#125;);
+            rotateWheel(index, turnWheel.reaward.length)
+        &#125;)
+    &#125;;
+
+    // 转盘灯闪烁 callback为抽奖结果后执行函数
+    function twinkle(callback) &#123;
+        let wheel = document.querySelector(&#39;.wheel&#39;);
+        let pointer = document.querySelector(&#39;.pointer&#39;);
+
+        pointer.classList.remove(&#39;pointer-animation&#39;);
+        timer = setInterval(() =&gt; &#123;
+            wheel.classList.toggle(&#39;wheel-light&#39;);
+        &#125;, 200);
+        setTimeout(() =&gt; &#123;
+            turning = false;
+            wheelCanvas.classList.remove(&#39;transition&#39;);
+            wheel.classList.remove(&#39;wheel-light&#39;);
+            pointer.classList.add(&#39;pointer-animation&#39;);
+            wheelCanvas.style.transform = &#39;rotate(0deg)&#39;;
+            timer &amp;&amp; clearInterval(timer);
+
+            typeof callback === &#39;function&#39; &amp;&amp; callback();
+
+        &#125;, 2000);
+    &#125;
+    // 旋转转盘 (index:中奖将品的数组下标)
+    function rotateWheel(awardIndex, awardCount) &#123;
+        let baseAngle = 360 / awardCount;
+        let rotateRound = 360 * 5; // 每次旋转5圈
+        wheelCanvas.style.transform = &#39;rotate(&#39; + ((270 - ((baseAngle / 2) + baseAngle * awardIndex)) + rotateRound) + &#39;deg)&#39;;
+    &#125;
+    // 绘制转盘
+    function drawWheelCanvas(canvasId, turnWheel) &#123;
+        let canvas = document.getElementById(canvasId);
+        let baseAngle = Math.PI * 2 / (turnWheel.reaward.length);
+        let ctx = canvas.getContext(&quot;2d&quot;);
+        let canvasW = canvas.width; // 画板的高度
+        let canvasH = canvas.height; // 画板的宽度
+        ctx.fillStyle = &quot;#fff000&quot;;
+        ctx.clearRect(0, 0, canvasW, canvasH);//去掉背景默认的黑色
+        ctx.font = &#39;26px Microsoft YaHei&#39;;
+        for (let index = 0; index &lt; turnWheel.reaward.length; index++) &#123;
+            let angle = index * baseAngle;
+            let rewardName = turnWheel.reaward[index].name;
+            let translateX = canvasW * 0.5 + Math.cos(angle + baseAngle / 2) * turnWheel.textRadius;
+            let translateY = canvasH * 0.5 + Math.sin(angle + baseAngle / 2) * turnWheel.textRadius;
+            ctx.fillStyle = turnWheel.colors[index];
+            ctx.beginPath();
+            ctx.arc(canvasW * 0.5, canvasH * 0.5, turnWheel.radius, angle, angle + baseAngle, false);
+            ctx.lineTo(canvasW * 0.5, canvasH * 0.5);
+            ctx.fill();
+            ctx.save();
+            ctx.fillStyle = turnWheel.fontColor;
+            ctx.translate(translateX, translateY);
+            ctx.rotate(angle + baseAngle / 2 + Math.PI / 2);
+            ctx.fillText(rewardName, -ctx.measureText(rewardName).width / 2, 100);
+            //添加对应图标
+            if (turnWheel.reaward[index] &amp;&amp; turnWheel.reaward[index].icon) &#123;
+
+                ctx.drawImage(turnWheel.reaward[index].icon, -40, 140, 80, 80);
+            &#125;
+
+            ctx.restore(); //很关键
+        &#125;
+    &#125;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/28/html-lottery/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/09/28/html-imgLazyLoad/">
         <h2>
             实现图片懒加载

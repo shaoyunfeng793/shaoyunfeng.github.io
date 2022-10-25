@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>Javascript防扒</title>
+      <link href="/2022/10/25/js-fangba/"/>
+      <url>/2022/10/25/js-fangba/</url>
+      
+        <content type="html"><![CDATA[<h3 id="Javascript防扒"><a href="#Javascript防扒" class="headerlink" title="Javascript防扒"></a>Javascript防扒</h3><p><strong>ps:</strong> <em>为了防止他人乱扒你的代码，或者分析你的接口，所以利用打开开发工具就会触发<code>debugger</code>的特性，来防扒</em></p><h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">((function() &#123;    var callbacks = [],        timeLimit = 50,        open = false;    setInterval(loop, 1);    return &#123;        addListener: function(fn) &#123;            callbacks.push(fn);        &#125;,        cancleListenr: function(fn) &#123;            callbacks = callbacks.filter(function(v) &#123;                return v !== fn;            &#125;);        &#125;    &#125;    function loop() &#123;        var startTime = new Date();        debugger;        if (new Date() - startTime &gt; timeLimit) &#123;            if (!open) &#123;                callbacks.forEach(function(fn) &#123;                    fn.call(null);                &#125;);            &#125;            open = true;            window.stop();            alert(&#39;不要扒我了&#39;);            window.location.reload();        &#125; else &#123;            open = false;        &#125;    &#125;&#125;)()).addListener(function() &#123;    window.location.reload();&#125;);</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> Js </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>BOM：history的那些事</title>
       <link href="/2022/10/20/bom-router/"/>
       <url>/2022/10/20/bom-router/</url>

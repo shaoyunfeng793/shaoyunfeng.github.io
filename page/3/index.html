@@ -166,6 +166,81 @@
 
 <div class="post">
 
+    <a href="/2022/09/30/vue-waterMark/">
+        <h2>
+            vue项目页面增加水印
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Vue">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Vue
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="vue项目页面增加水印"><a href="#vue项目页面增加水印" class="headerlink" title="vue项目页面增加水印"></a>vue项目页面增加水印</h3><p><strong>ps:</strong> <em>领导说要在后台上面添加带上用户名字的水印，嗯…加个指令…，还有就是可能需要使用<code>pointer-event: none;</code>来让这个水印层不会影响到页面的事件操作</em></p>
+<h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">    Vue.directive(&#39;watermark&#39;, (el,binding) =&gt; &#123;
+        let text = binding.value.text;
+        let font = binding.value.font || &quot;16px Microsoft JhengHei&quot;;
+        let textColor = binding.value.textColor || &quot;rgba(215, 215, 215, 0.2)&quot;;
+        let width = binding.value.width || 400;
+        let height = binding.value.height || 200;
+        let textRotate = binding.value.textRotate||-20;
+        
+        function addWaterMarker(parentNode) &#123;
+            var can = document.createElement(&#39;canvas&#39;);
+            var cans = can.getContext(&#39;2d&#39;);
+            parentNode.appendChild(can);
+            can.width = width;
+            can.height = height;
+            can.style.display = &#39;none&#39;;
+            cans.rotate(textRotate * Math.PI / 180);
+            cans.font = font;
+            cans.fillStyle = textColor ;
+            cans.textAlign = &#39;left&#39;;
+            cans.textBaseline = &#39;Middle&#39;;
+            cans.fillText(text, 0,  can.height);
+            parentNode.style.backgroundImage = &quot;url(&quot; + can.toDataURL(&quot;image/png&quot;) + &quot;)&quot;;
+        &#125;
+        addWaterMarker(el)
+    &#125;)
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/30/vue-waterMark/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/09/30/vue-optimization/">
         <h2>
             vue项目小优化配置
@@ -270,146 +345,6 @@
     </div>
 
     <a href="/2022/09/30/vue-optimization/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/30/vue-dataReactive/">
-        <h2>
-            Vue源码之数据响应原理
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Vue">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/30
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="Vue源码之数据响应原理"><a href="#Vue源码之数据响应原理" class="headerlink" title="Vue源码之数据响应原理"></a>Vue源码之数据响应原理</h3><p><strong>ps:</strong> <em>简单了解一下vue数据响应的原理，vue2通过es5的<code>defineProperty</code>来劫持数据，所以不兼容ie8及以下版本，vue3通过<code>Proxy</code>来进行数据劫持…</em></p>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">// 监听数据
-function observe(value) &#123;
-    if (typeof value != &#39;object&#39;) &#123;
-        return
-    &#125;
-    let ob;
-    if (value.__ob__ !== undefined) &#123;
-        ob = value.__ob__;
-    &#125; else &#123;
-        ob = new Observer(value);
-    &#125;
-    return ob;
-&#125;
-// 数据劫持
-function defineReactive(data, key, val) &#123;
-    if (arguments.length == 2) &#123;
-        val = data[key];
-    &#125;
-    // 递归监听子数据
-    observe(val)
-    //  也可使用proxy reflect方式来劫持 会更为便捷
-    Object.defineProperty(data, key, &#123;
-        get() &#123;
-            return val;
-        &#125;,
-        set(newVal) &#123;
-            console.log(&#39;触发视图更新--修改了属性:&#39; + key + &#39;;&#39;)
-            val = newVal;
-            observe(newVal);
-        &#125;
-    &#125;)
-&#125;
-
-// 数据观察器
-class Observer &#123;
-    constructor(val) &#123;
-        Object.defineProperty(val, &#39;__ob__&#39;, &#123;
-            value: this,
-            enumerable: false
-        &#125;);
-        if (Array.isArray(val)) &#123;
-            val.__proto__ = ArrayMethod.prototype;
-            this.observeArray(val)
-        &#125; else &#123;
-            this.walk(val);
-        &#125;
-
-    &#125;
-
-    walk(value) &#123;
-        for (let k in value) &#123;
-            defineReactive(value, k)
-        &#125;
-    &#125;
-
-    observeArray(value) &#123;
-        for (let key in value) &#123;
-            observe(value[key])
-        &#125;
-    &#125;
-&#125;
-
-// 改写数组方法
-function ArrayMethod() &#123;
-
-&#125;
-
-ArrayMethod.prototype.push = function (...args) &#123;
-    console.log(&#39;触发视图更新--改变了数组&#39;)
-    const res = Array.prototype.push.apply(this, args)
-    // 新增的数据这些也需要去观察
-    this.__ob__.observeArray(args);
-    return res
-&#125;
-
-// 测试
-var obj = &#123;
-    a: 1,
-    b: &#123;
-        c: [1, 2, 3]
-    &#125;
-&#125;
-observe(obj)
-
-
-obj.b.c.push(4, &#123; a: 1 &#125;) // print =&gt; &quot;触发视图更新--改变了数组&quot;
-
-obj.b.c[0] = 0 // 不会触发更新视图
-
-obj.b.c[4].a = 2 // print =&gt; &quot;触发视图更新--修改了属性:a;&quot;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/30/vue-dataReactive/ " class="go-post">
         阅读全文
     </a>
 </div>

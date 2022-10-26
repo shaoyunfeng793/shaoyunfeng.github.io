@@ -166,6 +166,166 @@
 
 <div class="post">
 
+    <a href="/2022/10/26/vue-dataReactive/">
+        <h2>
+            Vue源码之数据响应原理
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Vue">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Vue
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/10/26
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Vue源码之数据响应原理"><a href="#Vue源码之数据响应原理" class="headerlink" title="Vue源码之数据响应原理"></a>Vue源码之数据响应原理</h3><p><strong>ps:</strong> <em>简单了解一下vue数据响应的原理，vue2通过es5的<code>defineProperty</code>来劫持数据，所以不兼容ie8及以下版本，vue3通过<code>Proxy</code>来进行数据劫持…</em></p>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">// 监听数据
+function observe(value) &#123;
+    if (typeof value != &#39;object&#39;) &#123;
+        return
+    &#125;
+    let ob;
+    if (value.__ob__ !== undefined) &#123;
+        ob = value.__ob__;
+    &#125; else &#123;
+        ob = new Observer(value);
+    &#125;
+    return ob;
+&#125;
+// 数据劫持
+function defineReactive(data, key, val) &#123;
+    if (arguments.length == 2) &#123;
+        val = data[key];
+    &#125;
+    // 递归监听子数据
+    observe(val)
+    //  也可使用proxy reflect方式来劫持 会更为便捷
+    Object.defineProperty(data, key, &#123;
+        get() &#123;
+            return val;
+        &#125;,
+        set(newVal) &#123;
+            console.log(&#39;触发视图更新--修改了属性:&#39; + key + &#39;;&#39;)
+            val = newVal;
+            observe(newVal);
+        &#125;
+    &#125;)
+&#125;
+
+// 数据观察器
+class Observer &#123;
+    constructor(val) &#123;
+        Object.defineProperty(val, &#39;__ob__&#39;, &#123;
+            value: this,
+            enumerable: false
+        &#125;);
+
+        // 遍历
+        this.walk(val)
+    &#125;
+
+    walk(val)&#123;
+        if (Array.isArray(val)) &#123;
+            val.__proto__ = ArrayMethod.prototype;
+            this.observeArray(val)
+        &#125; else &#123;
+            this.observeObj(val);
+        &#125;
+    &#125;
+
+    observeObj(val) &#123;
+        for (let k in val) &#123;
+            defineReactive(val, k)
+        &#125;
+    &#125;
+
+    observeArray(val) &#123;
+        for (let key in val) &#123;
+            observe(val[key])
+        &#125;
+    &#125;
+&#125;
+
+// 改写数组方法， 这边只改写了一个push
+function ArrayMethod() &#123; &#125;
+
+ArrayMethod.prototype.push = function (...args) &#123;
+    console.log(&#39;触发视图更新--改变了数组&#39;)
+    const res = Array.prototype.push.apply(this, args)
+    // 新增的数据这些也需要去观察
+    this.__ob__.observeArray(args);
+    return res
+&#125;
+
+// 模拟vue $set
+function $set(data, key, val)&#123;
+   // 先去帮他设值
+   data[key] = val
+   // 重新遍历一下
+   data.__ob__.walk()
+   // 触发视图更新
+   console.log(&#39;触发视图更新&#39;, data)
+&#125;
+
+// 测试
+var obj = &#123;
+    a: 1,
+    b: &#123;
+        c: [1, 2, 3]
+    &#125;
+&#125;
+
+observe(obj)
+
+
+obj.b.c.push(4, &#123; a: 1 &#125;) // print =&gt; &quot;触发视图更新--改变了数组&quot;
+
+obj.b.c[0] = 0 // 不会触发更新视图
+
+obj.b.c[4].a = 2 // print =&gt; &quot;触发视图更新--修改了属性:a;&quot;
+
+obj.c = 33 // 不会触发更新视图
+
+$set(obj, &#39;c&#39;, 33) // 会触发更新视图,经过这部后，后面都可以通过xxx.属性 = 赋值
+
+obj.c = 44 // print =&gt; &quot;触发视图更新--修改了属性:c;&quot;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/10/26/vue-dataReactive/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/10/25/js-fangba/">
         <h2>
             Javascript防扒
@@ -2150,115 +2310,6 @@ export default &#123;
     </div>
 
     <a href="/2022/10/13/utils-webSite/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/10/13/css-aspectRatioDiv/">
-        <h2>
-            CSS技巧之DIV保持长宽比
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/CSS">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                CSS
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/10/13
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="CSS技巧之DIV保持长宽比"><a href="#CSS技巧之DIV保持长宽比" class="headerlink" title="CSS技巧之DIV保持长宽比"></a>CSS技巧之DIV保持长宽比</h3><p><strong>ps:</strong> <em>我们都知道在前端开发中经常遇到需要保持一个元素的长宽比，最常见的就是我们的Img元素，但是除了img、vidoe这种可替换元素元素具有长宽比的特性，那么其它元素如果保持长宽比呢，这给我们的开发带来了许多不便利…</em></p>
-<h4 id="方式1-padding-top-hack"><a href="#方式1-padding-top-hack" class="headerlink" title="方式1 padding-top-hack"></a>方式1 padding-top-hack</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;style&gt;
-        *&#123;
-            padding: 0;
-            margin: 0;
-        &#125;
-        .outer &#123;
-            position: relative;
-            height: 0;
-            padding-top: 56.25%;
-        &#125;
-
-        .inner &#123;
-            background-color: skyblue;
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-        &#125;
-    &lt;/style&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-    &lt;div class=&quot;outer&quot;&gt;
-        &lt;div class=&quot;inner&quot;&gt;&lt;/div&gt;
-    &lt;/div&gt; 
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-<h4 id="方式2-aspect-ratio"><a href="#方式2-aspect-ratio" class="headerlink" title="方式2 aspect-ratio"></a>方式2 aspect-ratio</h4><p><em>该方式存在兼容性问题，想要知道兼容性可在<strong>Can i use</strong>上查看</em></p>
-<pre><code class="html">&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;style&gt;
-        *&#123;
-            padding: 0;
-            margin: 0;
-        &#125;
-        .inner &#123;
-            background-color: skyblue;
-            width: 50%;
-            aspect-ratio: auto 2 / 1; /* 只需这一行 */
-        &#125;
-    &lt;/style&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-    &lt;div class=&quot;inner&quot;&gt;&lt;/div&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/10/13/css-aspectRatioDiv/ " class="go-post">
         阅读全文
     </a>
 </div>

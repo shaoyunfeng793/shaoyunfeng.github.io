@@ -166,6 +166,115 @@
 
 <div class="post">
 
+    <a href="/2022/10/13/css-aspectRatioDiv/">
+        <h2>
+            CSS技巧之DIV保持长宽比
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/CSS">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                CSS
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/10/13
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="CSS技巧之DIV保持长宽比"><a href="#CSS技巧之DIV保持长宽比" class="headerlink" title="CSS技巧之DIV保持长宽比"></a>CSS技巧之DIV保持长宽比</h3><p><strong>ps:</strong> <em>我们都知道在前端开发中经常遇到需要保持一个元素的长宽比，最常见的就是我们的Img元素，但是除了img、vidoe这种可替换元素元素具有长宽比的特性，那么其它元素如果保持长宽比呢，这给我们的开发带来了许多不便利…</em></p>
+<h4 id="方式1-padding-top-hack"><a href="#方式1-padding-top-hack" class="headerlink" title="方式1 padding-top-hack"></a>方式1 padding-top-hack</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;style&gt;
+        *&#123;
+            padding: 0;
+            margin: 0;
+        &#125;
+        .outer &#123;
+            position: relative;
+            height: 0;
+            padding-top: 56.25%;
+        &#125;
+
+        .inner &#123;
+            background-color: skyblue;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        &#125;
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;outer&quot;&gt;
+        &lt;div class=&quot;inner&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt; 
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h4 id="方式2-aspect-ratio"><a href="#方式2-aspect-ratio" class="headerlink" title="方式2 aspect-ratio"></a>方式2 aspect-ratio</h4><p><em>该方式存在兼容性问题，想要知道兼容性可在<strong>Can i use</strong>上查看</em></p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;style&gt;
+        *&#123;
+            padding: 0;
+            margin: 0;
+        &#125;
+        .inner &#123;
+            background-color: skyblue;
+            width: 50%;
+            aspect-ratio: auto 2 / 1; /* 只需这一行 */
+        &#125;
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;inner&quot;&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/10/13/css-aspectRatioDiv/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/10/06/html-mobileH5/">
         <h2>
             移动端H5开发技巧
@@ -1879,81 +1988,6 @@ export default &#123;
     </div>
 
     <a href="/2022/09/30/vue-mergeImg/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/30/vue-waterMark/">
-        <h2>
-            vue项目页面增加水印
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Vue">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/30
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="vue项目页面增加水印"><a href="#vue项目页面增加水印" class="headerlink" title="vue项目页面增加水印"></a>vue项目页面增加水印</h3><p><strong>ps:</strong> <em>领导说要在后台上面添加带上用户名字的水印，嗯…加个指令…，还有就是可能需要使用<code>pointer-event: none;</code>来让这个水印层不会影响到页面的事件操作</em></p>
-<h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">    Vue.directive(&#39;watermark&#39;, (el,binding) =&gt; &#123;
-        let text = binding.value.text;
-        let font = binding.value.font || &quot;16px Microsoft JhengHei&quot;;
-        let textColor = binding.value.textColor || &quot;rgba(215, 215, 215, 0.2)&quot;;
-        let width = binding.value.width || 400;
-        let height = binding.value.height || 200;
-        let textRotate = binding.value.textRotate||-20;
-        
-        function addWaterMarker(parentNode) &#123;
-            var can = document.createElement(&#39;canvas&#39;);
-            var cans = can.getContext(&#39;2d&#39;);
-            parentNode.appendChild(can);
-            can.width = width;
-            can.height = height;
-            can.style.display = &#39;none&#39;;
-            cans.rotate(textRotate * Math.PI / 180);
-            cans.font = font;
-            cans.fillStyle = textColor ;
-            cans.textAlign = &#39;left&#39;;
-            cans.textBaseline = &#39;Middle&#39;;
-            cans.fillText(text, 0,  can.height);
-            parentNode.style.backgroundImage = &quot;url(&quot; + can.toDataURL(&quot;image/png&quot;) + &quot;)&quot;;
-        &#125;
-        addWaterMarker(el)
-    &#125;)
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/30/vue-waterMark/ " class="go-post">
         阅读全文
     </a>
 </div>

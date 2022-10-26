@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>Vue源码之数据响应原理</title>
+      <link href="/2022/10/26/vue-dataReactive/"/>
+      <url>/2022/10/26/vue-dataReactive/</url>
+      
+        <content type="html"><![CDATA[<h3 id="Vue源码之数据响应原理"><a href="#Vue源码之数据响应原理" class="headerlink" title="Vue源码之数据响应原理"></a>Vue源码之数据响应原理</h3><p><strong>ps:</strong> <em>简单了解一下vue数据响应的原理，vue2通过es5的<code>defineProperty</code>来劫持数据，所以不兼容ie8及以下版本，vue3通过<code>Proxy</code>来进行数据劫持…</em></p><h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">// 监听数据function observe(value) &#123;    if (typeof value != &#39;object&#39;) &#123;        return    &#125;    let ob;    if (value.__ob__ !== undefined) &#123;        ob = value.__ob__;    &#125; else &#123;        ob = new Observer(value);    &#125;    return ob;&#125;// 数据劫持function defineReactive(data, key, val) &#123;    if (arguments.length == 2) &#123;        val = data[key];    &#125;    // 递归监听子数据    observe(val)    //  也可使用proxy reflect方式来劫持 会更为便捷    Object.defineProperty(data, key, &#123;        get() &#123;            return val;        &#125;,        set(newVal) &#123;            console.log(&#39;触发视图更新--修改了属性:&#39; + key + &#39;;&#39;)            val = newVal;            observe(newVal);        &#125;    &#125;)&#125;// 数据观察器class Observer &#123;    constructor(val) &#123;        Object.defineProperty(val, &#39;__ob__&#39;, &#123;            value: this,            enumerable: false        &#125;);        // 遍历        this.walk(val)    &#125;    walk(val)&#123;        if (Array.isArray(val)) &#123;            val.__proto__ = ArrayMethod.prototype;            this.observeArray(val)        &#125; else &#123;            this.observeObj(val);        &#125;    &#125;    observeObj(val) &#123;        for (let k in val) &#123;            defineReactive(val, k)        &#125;    &#125;    observeArray(val) &#123;        for (let key in val) &#123;            observe(val[key])        &#125;    &#125;&#125;// 改写数组方法， 这边只改写了一个pushfunction ArrayMethod() &#123; &#125;ArrayMethod.prototype.push = function (...args) &#123;    console.log(&#39;触发视图更新--改变了数组&#39;)    const res = Array.prototype.push.apply(this, args)    // 新增的数据这些也需要去观察    this.__ob__.observeArray(args);    return res&#125;// 模拟vue $setfunction $set(data, key, val)&#123;   // 先去帮他设值   data[key] = val   // 重新遍历一下   data.__ob__.walk()   // 触发视图更新   console.log(&#39;触发视图更新&#39;, data)&#125;// 测试var obj = &#123;    a: 1,    b: &#123;        c: [1, 2, 3]    &#125;&#125;observe(obj)obj.b.c.push(4, &#123; a: 1 &#125;) // print =&gt; &quot;触发视图更新--改变了数组&quot;obj.b.c[0] = 0 // 不会触发更新视图obj.b.c[4].a = 2 // print =&gt; &quot;触发视图更新--修改了属性:a;&quot;obj.c = 33 // 不会触发更新视图$set(obj, &#39;c&#39;, 33) // 会触发更新视图,经过这部后，后面都可以通过xxx.属性 = 赋值obj.c = 44 // print =&gt; &quot;触发视图更新--修改了属性:c;&quot;</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> Vue </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Javascript防扒</title>
       <link href="/2022/10/25/js-fangba/"/>
       <url>/2022/10/25/js-fangba/</url>
@@ -389,25 +408,6 @@
       <url>/2022/09/30/vue-optimization/</url>
       
         <content type="html"><![CDATA[<h3 id="vue项目小优化配置"><a href="#vue项目小优化配置" class="headerlink" title="vue项目小优化配置"></a>vue项目小优化配置</h3><p><strong>ps:</strong> <em>部署到线上的时候网页加载很慢…，领导叫我去优化下，于是就直接用<code>gzip</code>压缩大法，但是需要后端配合开启gzip，嗯…速度飞起…</em></p><p><code>webpack-bundle-analyzer</code>可以帮我们进行打包分析，避免重复打包，以及合理代码分割</p><h4 id="vue-config-js-配置"><a href="#vue-config-js-配置" class="headerlink" title="vue.config.js 配置"></a>vue.config.js 配置</h4><pre><code class="js">    const BundleAnalyzerPlugin = require(&#39;webpack-bundle-analyzer&#39;).BundleAnalyzerPlugin;    chainWebpack(config)&#123;        // ...        config            .when(process.env.NODE_ENV !== &#39;development&#39;,                config =&gt; &#123;                    /* 打包分析插件 */                    config                        .plugin(&#39;webpackBundleAnalyzer&#39;)                        .use(BundleAnalyzerPlugin)                    /* 开启gzip压缩，需要后端配合 */                    config                        .plugin(&#39;compressionWebpackPlugin&#39;)                        .use(&#39;compression-webpack-plugin&#39;, [&#123;                            filename: &#39;[path].gz[query]&#39;,                            algorithm: &#39;gzip&#39;,                            test: new RegExp(&quot;\\.(&quot; + productionGzipExtensions.join(&quot;|&quot;) + &quot;)$&quot;),                            threshold: 10240,                            minRatio: 0.8,                            deleteOriginalAssets: false                        &#125;])                    /* 配置打包后删除console.log和debugger */                    config.optimization.minimizer(&#39;terser&#39;).tap((args) =&gt; &#123;                        args[0].terserOptions.compress.drop_debugger = true                        args[0].terserOptions.compress.pure_funcs = [&#39;console.log&#39;]                        return args                    &#125;)                    /* 代码分割 */                    config                        .optimization.splitChunks(&#123;                            chunks: &#39;all&#39;, // all-同步异步都分割,inital-对同步分割,async-对异步分割                            cacheGroups: &#123;                                libs: &#123;                                    name: &#39;chunk-libs&#39;, // 组名                                    test: /[\\/]node_modules[\\/]/,                                    priority: 10, // 优先级                                    /* minSize: 5 * 1024 // 达到5kb才分割 */                                    /* minChunks: 1 // 引用1次就单独打包 */                                &#125;,                                elementUI: &#123;                                    name: &#39;chunk-elementUI&#39;,                                     priority: 20,                                     test: /[\\/]node_modules[\\/]_?element-ui(.*)/                                 &#125;,                                commons: &#123;                                    name: &#39;chunk-commons&#39;,                                    test: resolve(&#39;src/components&#39;),                                     minChunks: 3,                                    priority: 5,                                    reuseExistingChunk: true                                &#125;                            &#125;                        &#125;)                &#125;            )    &#125;</code></pre>]]></content>
-      
-      
-      <categories>
-          
-          <category> Vue </category>
-          
-      </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Vue源码之数据响应原理</title>
-      <link href="/2022/09/30/vue-dataReactive/"/>
-      <url>/2022/09/30/vue-dataReactive/</url>
-      
-        <content type="html"><![CDATA[<h3 id="Vue源码之数据响应原理"><a href="#Vue源码之数据响应原理" class="headerlink" title="Vue源码之数据响应原理"></a>Vue源码之数据响应原理</h3><p><strong>ps:</strong> <em>简单了解一下vue数据响应的原理，vue2通过es5的<code>defineProperty</code>来劫持数据，所以不兼容ie8及以下版本，vue3通过<code>Proxy</code>来进行数据劫持…</em></p><h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">// 监听数据function observe(value) &#123;    if (typeof value != &#39;object&#39;) &#123;        return    &#125;    let ob;    if (value.__ob__ !== undefined) &#123;        ob = value.__ob__;    &#125; else &#123;        ob = new Observer(value);    &#125;    return ob;&#125;// 数据劫持function defineReactive(data, key, val) &#123;    if (arguments.length == 2) &#123;        val = data[key];    &#125;    // 递归监听子数据    observe(val)    //  也可使用proxy reflect方式来劫持 会更为便捷    Object.defineProperty(data, key, &#123;        get() &#123;            return val;        &#125;,        set(newVal) &#123;            console.log(&#39;触发视图更新--修改了属性:&#39; + key + &#39;;&#39;)            val = newVal;            observe(newVal);        &#125;    &#125;)&#125;// 数据观察器class Observer &#123;    constructor(val) &#123;        Object.defineProperty(val, &#39;__ob__&#39;, &#123;            value: this,            enumerable: false        &#125;);        if (Array.isArray(val)) &#123;            val.__proto__ = ArrayMethod.prototype;            this.observeArray(val)        &#125; else &#123;            this.walk(val);        &#125;    &#125;    walk(value) &#123;        for (let k in value) &#123;            defineReactive(value, k)        &#125;    &#125;    observeArray(value) &#123;        for (let key in value) &#123;            observe(value[key])        &#125;    &#125;&#125;// 改写数组方法function ArrayMethod() &#123;&#125;ArrayMethod.prototype.push = function (...args) &#123;    console.log(&#39;触发视图更新--改变了数组&#39;)    const res = Array.prototype.push.apply(this, args)    // 新增的数据这些也需要去观察    this.__ob__.observeArray(args);    return res&#125;// 测试var obj = &#123;    a: 1,    b: &#123;        c: [1, 2, 3]    &#125;&#125;observe(obj)obj.b.c.push(4, &#123; a: 1 &#125;) // print =&gt; &quot;触发视图更新--改变了数组&quot;obj.b.c[0] = 0 // 不会触发更新视图obj.b.c[4].a = 2 // print =&gt; &quot;触发视图更新--修改了属性:a;&quot;</code></pre>]]></content>
       
       
       <categories>

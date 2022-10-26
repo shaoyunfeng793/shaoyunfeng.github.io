@@ -146,7 +146,7 @@
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
             </span>
-            2022/9/30
+            2022/10/26
         </span>
 
         
@@ -205,32 +205,35 @@ class Observer &#123;
             value: this,
             enumerable: false
         &#125;);
+
+        // 遍历
+        this.walk(val)
+    &#125;
+
+    walk(val)&#123;
         if (Array.isArray(val)) &#123;
             val.__proto__ = ArrayMethod.prototype;
             this.observeArray(val)
         &#125; else &#123;
-            this.walk(val);
-        &#125;
-
-    &#125;
-
-    walk(value) &#123;
-        for (let k in value) &#123;
-            defineReactive(value, k)
+            this.observeObj(val);
         &#125;
     &#125;
 
-    observeArray(value) &#123;
-        for (let key in value) &#123;
-            observe(value[key])
+    observeObj(val) &#123;
+        for (let k in val) &#123;
+            defineReactive(val, k)
+        &#125;
+    &#125;
+
+    observeArray(val) &#123;
+        for (let key in val) &#123;
+            observe(val[key])
         &#125;
     &#125;
 &#125;
 
-// 改写数组方法
-function ArrayMethod() &#123;
-
-&#125;
+// 改写数组方法， 这边只改写了一个push
+function ArrayMethod() &#123; &#125;
 
 ArrayMethod.prototype.push = function (...args) &#123;
     console.log(&#39;触发视图更新--改变了数组&#39;)
@@ -240,6 +243,16 @@ ArrayMethod.prototype.push = function (...args) &#123;
     return res
 &#125;
 
+// 模拟vue $set
+function $set(data, key, val)&#123;
+   // 先去帮他设值
+   data[key] = val
+   // 重新遍历一下
+   data.__ob__.walk()
+   // 触发视图更新
+   console.log(&#39;触发视图更新&#39;, data)
+&#125;
+
 // 测试
 var obj = &#123;
     a: 1,
@@ -247,6 +260,7 @@ var obj = &#123;
         c: [1, 2, 3]
     &#125;
 &#125;
+
 observe(obj)
 
 
@@ -255,6 +269,12 @@ obj.b.c.push(4, &#123; a: 1 &#125;) // print =&gt; &quot;触发视图更新--改
 obj.b.c[0] = 0 // 不会触发更新视图
 
 obj.b.c[4].a = 2 // print =&gt; &quot;触发视图更新--修改了属性:a;&quot;
+
+obj.c = 33 // 不会触发更新视图
+
+$set(obj, &#39;c&#39;, 33) // 会触发更新视图,经过这部后，后面都可以通过xxx.属性 = 赋值
+
+obj.c = 44 // print =&gt; &quot;触发视图更新--修改了属性:c;&quot;
 </code></pre>
 
     </div>

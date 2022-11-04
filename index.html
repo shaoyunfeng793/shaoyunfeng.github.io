@@ -609,12 +609,18 @@ const mkdirp = require(&#39;mkdirp&#39;)
 const async = require(&#39;async&#39;)
 const URL = require(&quot;url&quot;)
 
-var fetch_link = &#39;https://www.tupianzj.com/meinv/xiezhen/&#39;;
+// 保存地址
 var savePath = &#39;./img/&#39;;
-var count = 0;
+// 匹配URL
 var UrlReg = new RegExp(/^https?:\/\/(([a-zA-Z0-9_-])+(\.)?)*(:\d+)?(\/((\.)?(\?)?=?&amp;?[a-zA-Z0-9_-](\?)?)*)*$/i);
+// link收集器
+var globalLinkQueue = [];
+// 爬取次数
+var spiderCount = 0;
+// 爬取次数限制
+var spiderCountLimit = 2;
 
-spider(fetch_link)
+spider(&#39;https://www.tupianzj.com/meinv/xiezhen/&#39;)
 
 // 校验是否是合法的href
 function isValidHref(href) &#123;
@@ -658,14 +664,13 @@ function getHrefInfo(href) &#123;
         domain: domain
     &#125;
 &#125;
-
 // 请求url
 function req(url) &#123;
     return new Promise((rev, rej) =&gt; &#123;
         request(&#39;GET&#39;, url)
             .charset(&#39;gbk&#39;)
             .buffer(true)
-            .set(&#39;Cookie&#39;, &#39;t=80677fa7d36bfd96620bf46cb23a6a2a; r=5723; Hm_lvt_f5329ae3e00629a7bb8ad78d0efb7273=1667359683; Hm_lpvt_f5329ae3e00629a7bb8ad78d0efb7273=1667373564&#39;)
+            .set(&#39;Cookie&#39;, &#39;t=cdd3345174aba64147a802b43a0999e6; r=8221; Hm_lvt_f5329ae3e00629a7bb8ad78d0efb7273=1667359683,1667462127,1667525488; Hm_lpvt_f5329ae3e00629a7bb8ad78d0efb7273=1667538578&#39;)
             .set(&#39;User-Agent&#39;, &#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36&#39;)
             .end(function (err, res) &#123;
                 if (err) &#123;
@@ -680,6 +685,7 @@ function req(url) &#123;
 
 // 爬虫
 function spider(fetch_link) &#123;
+    console.log(`开始第$&#123;++spiderCount&#125;次入口爬虫...`)
     req(fetch_link).then(res =&gt; &#123;
         let linksAry = [];
         fetchLinks(&#123;
@@ -688,7 +694,6 @@ function spider(fetch_link) &#123;
             linksAry: linksAry,
             link: fetch_link
         &#125;);
-
         console.log(&#39;第一次抓取到的链接：\n&#39;, linksAry)
 
 
@@ -713,17 +718,21 @@ function spider(fetch_link) &#123;
                     href: href
                 &#125;);
 
-                console.log(&#39;第二次抓取到的链接：\n&#39;, linksAry)
-
                 return linksAry;
 
             &#125; else &#123;
-                // 继续深入爬取
-                // spider(href)
+                // 加入集合
+                if (!globalLinkQueue.some(d =&gt; d == href)) &#123;
+                    globalLinkQueue.push(href)
+                &#125;
             &#125;
 
         &#125;, (err, linksAry) =&gt; &#123;
             let links = linksAry.filter(d =&gt; d != undefined).flat();
+            let count = 0;
+            let allCount = links.length;
+            console.log(&#39;第二次抓取到的链接：\n&#39;, links);
+
             async.mapLimit(links, 1, async function (&#123; href, title &#125;) &#123;
                 let &#123; text &#125; = await req(href);
                 let $ = cheerio.load(text);
@@ -737,7 +746,12 @@ function spider(fetch_link) &#123;
                     &#125;
                 &#125;
                 await download(imgSrc, savePath + title);
-                console.log(`当前图片下载数:$&#123;++count&#125;`)
+                console.log(`当前图片下载进度:$&#123;++count&#125;/$&#123;allCount&#125;\n`)
+            &#125;, () =&gt; &#123;
+                let href = globalLinkQueue.shift()
+                if (href &amp;&amp; spiderCount &lt;= spiderCountLimit) &#123;
+                    spider(href)
+                &#125;
             &#125;)
         &#125;)
     &#125;).catch(err =&gt; &#123;

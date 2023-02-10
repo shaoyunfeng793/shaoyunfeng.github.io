@@ -166,6 +166,249 @@
 
 <div class="post">
 
+    <a href="/2023/02/10/skill-mobileH5/">
+        <h2>
+            axios拦截器配置
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/小乔">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                小乔
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2023/2/10
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <p><strong>记录一下工作中开发移动端h5时，用到的一些little skill</strong></p>
+<h4 id="微信-amp-支付宝"><a href="#微信-amp-支付宝" class="headerlink" title="微信&amp;支付宝"></a>微信&amp;支付宝</h4><pre><code class="js">// 打开微信扫一扫 
+location.href = &#39;weixin://scanqrcode&#39;
+
+// 微信可拉起app stroe (❌哒咩了，被微信克制了)
+location.href = &#39;https://itunes.apple.com/app/idxxxxxxxx&#39;
+
+// 打开支付宝扫一扫
+location.href = &#39;alipays://platformapi/startapp?saId=10000007&amp;qrcode=https://qr.alipay.com/bax02911brluc2xieoph6001&#39;
+
+// 支付宝打开指定页面
+location.href = &#39;alipays://platformapi/startapp?appId=20000067&amp;url=https%3A%2F%2Fwww.baidu.com&#39;
+
+// 更多快捷指令合集（知乎）： https://zhuanlan.zhihu.com/p/582472115
+</code></pre>
+<h4 id="解决Safari浏览器不能自动播放视频"><a href="#解决Safari浏览器不能自动播放视频" class="headerlink" title="解决Safari浏览器不能自动播放视频"></a>解决Safari浏览器不能自动播放视频</h4><p><strong>增加muted、 playsinline属性解决ios浏览器不自动播放视频的问题，还需要🔕视频</strong></p>
+<pre><code class="html">    &lt;video id=&quot;video&quot; muted=&quot;muted&quot; playsinline style=&quot;width: 100vw;height: 100vh;background: #000;&quot;
+    src=&quot;https://mdhw.oss-cn-hangzhou.aliyuncs.com/promotion/openbox.mp4&quot;&gt;&lt;/video&gt;
+</code></pre>
+<h4 id="利用新浪接口获取用户ip"><a href="#利用新浪接口获取用户ip" class="headerlink" title="利用新浪接口获取用户ip"></a>利用新浪接口获取用户ip</h4><pre><code class="html">    &lt;!-- 引入新浪的js --&gt;
+   &lt;script src=&quot;http://pv.sohu.com/cityjson?ie=utf-8&quot;&gt;&lt;/script&gt;
+   &lt;script&gt;
+        // 直接获取IP和城市名
+        console.log(returnCitySN[&#39;cip&#39;] + returnCitySN[&#39;cname&#39;]);
+   &lt;/script&gt;
+</code></pre>
+<h4 id="vueWEB项目打包成app"><a href="#vueWEB项目打包成app" class="headerlink" title="vueWEB项目打包成app"></a>vueWEB项目打包成app</h4><p><strong>使用Hbuildx工具打包成5+app即可</strong></p>
+<p>1.在hbuildx里先新建一个项目（5+app）<br>2.在vue项目中先<code>build</code>一下，生成到<code>dist目录</code><br>3.将<code>dist目录</code>下的代码全都拷贝到新建的5+app目录下，直接覆盖即可<br>4.可以点击运行到浏览器进行预览<br>5.云端打包成app需要的安卓证书、ios证书获取方式见文档</p>
+<h5 id="安卓端侧边滑动返回监听"><a href="#安卓端侧边滑动返回监听" class="headerlink" title="安卓端侧边滑动返回监听"></a>安卓端侧边滑动返回监听</h5><p>把下面代码直接放在<code>public</code>下面的<code>index.html</code>的<code>body</code>下面即可</p>
+<pre><code class="html">    &lt;script&gt;
+        const webview = plus.webview.currentWebview();
+        document.addEventListener(&#39;plusready&#39;, () =&gt; &#123;
+            //等待plus ready后再调用5+ API：
+            let first = null;
+            plus.key.addEventListener(&#39;backbutton&#39;, () =&gt; &#123;
+
+                webview.canBack((e) =&gt; &#123;
+                    if (e.canBack) &#123;
+                        webview.back();
+                    &#125; else &#123;
+                        //首次按键，提示‘再次操作退出应用’
+                        if (!first) &#123;
+                            //获取第一次点击的时间戳
+                            first = new Date().getTime();
+                            //通过H5+ API 调用Android 上的toast 提示框
+                            plus.nativeUI.toast(&quot;再次操作退出应用&quot;, &#123;
+                                duration: &#39;short&#39;
+                            &#125;);
+                            setTimeout(() =&gt; &#123;
+                                first = null;
+                            &#125;, 1000);
+                        &#125; else &#123;
+                            if (new Date().getTime() - first &lt; 1000) &#123;
+                                //获取第二次点击的时间戳, 两次之差 小于 1000ms 说明1s点击了两次,
+                                plus.runtime.quit(); //退出应用
+                            &#125;
+                        &#125;
+                    &#125;
+                &#125;)
+            &#125;);
+        &#125;);
+    &lt;/script&gt;
+</code></pre>
+<p><strong>由于vue项目打包成app其实本身就是套在webview里面运行的，所以一些跳转页面除了<code>$router.push</code>还有就是<code>location.href</code>，如果不兼容一下APP里的会导致页面返回不了，举个例子：app里有个广告banner,点击跳转http链接，结果用户侧滑会直接导致退出应用，即关闭掉了webview，因为app页面承载本身就是一个webviewObject,跳转后的http链接是直接在这个webviewObject上显示的，通过下面代码帮我们兼容跳转http(可以控制app内部打开&#x2F;外部浏览器打开)</strong></p>
+<pre><code class="js">function toWebLink(url, openType = &#39;outside&#39;) &#123;
+  try &#123;
+    if (openType === &#39;inner&#39;) &#123;
+      let wv = plus.webview.getWebviewById(&#39;webview&#39;);
+      // plus api 创建并打开新的webview 详见：https://www.html5plus.org/doc/zh_cn/webview.html#plus.webview.open
+      plus.webview.open(
+        url,
+        &#39;webview&#39;,
+        &#123;
+          titleNView: &#123;
+            titleSize: &#39;14px&#39;,
+            buttons: [
+              &#123;
+                type: &#39;back&#39;,
+                float: &#39;left&#39;,
+                onclick: function () &#123;
+                  wv.canBack((e) =&gt; &#123;
+                    if (e.canBack) &#123;
+                      wv.back();
+                    &#125; else &#123;
+                      wv.close();
+                    &#125;
+                  &#125;);
+                &#125;,
+              &#125;,
+            ],
+          &#125;,
+        &#125;,
+        &#39;slide-in-right&#39;,
+        300,
+        function () &#123;
+          // console.log(&#39;打开了&#39;, JSON.stringify(plus.webview.all()));
+        &#125;,
+      );
+    &#125; else &#123;
+      plus.runtime.openURL(url);
+    &#125;
+
+  &#125; catch (e) &#123;
+    console.log(e);
+    window.location.href = url;
+  &#125;
+&#125;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2023/02/10/skill-mobileH5/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
+    <a href="/2023/01/04/svga-svga/">
+        <h2>
+            SVGA的简单使用
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Svga">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Svga
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2023/1/4
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="SVGA的简单使用"><a href="#SVGA的简单使用" class="headerlink" title="SVGA的简单使用"></a>SVGA的简单使用</h3><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot;
+        content=&quot;width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;&gt;
+    &lt;title&gt;SvgaDemo&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;first_screen&quot;&gt;
+        &lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+    // GitHub： https://github.com/svga/SVGAPlayer-Web
+    var first_screen = document.querySelector(&#39;.first_screen&#39;);
+    var canvas = document.getElementById(&#39;canvas&#39;)
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    var parser = new SVGA.Parser(&#39;#canvas&#39;);
+    var player = new SVGA.Player(&#39;#canvas&#39;);
+    player.loops = 1;
+    player.setContentMode(&#39;AspectFill&#39;)
+    parser.load(&#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/promotion/chou.svga&#39;, svga =&gt; &#123;
+        player.setVideoItem(svga)
+        player.startAnimation()
+        player.onFinished(function () &#123;
+            first_screen.remove()
+            player.clear()
+        &#125;)
+    &#125;)
+
+&lt;/script&gt;
+
+&lt;/html&gt;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2023/01/04/svga-svga/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/10/26/vue-dataReactive/">
         <h2>
             Vue源码之数据响应原理
@@ -1828,306 +2071,6 @@ function spider(fetch_link) &#123;
     </div>
 
     <a href="/2022/10/18/canvas-diaoWawa/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/10/15/vue-myselfCpns/">
-        <h2>
-            Vue之优雅的构建自己的组件库
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Vue">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/10/15
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="Vue之优雅的构建自己的组件库（Vue3）"><a href="#Vue之优雅的构建自己的组件库（Vue3）" class="headerlink" title="Vue之优雅的构建自己的组件库（Vue3）"></a>Vue之优雅的构建自己的组件库（Vue3）</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p><em>现在市面上的组件库五花八门，但是又大同小异，现在就来看看如何较为优雅的开发自己的一套组件库，该篇写的组件都较为简单，组件复杂度可以说完全没有，但是主要想讲的是整套组件开发的大致结构</em></p>
-<h4 id="组件库目录结构"><a href="#组件库目录结构" class="headerlink" title="组件库目录结构"></a>组件库目录结构</h4><p><img src="https://i.postimg.cc/1tp4dfF6/myself-Cpns-mulu.jpg" alt="目录结构"></p>
-<p>把所有组件以文件夹的方式都放在<strong>src</strong>目录里，每个文件夹内都包含一<em>index.js</em>，和<em>index.css</em>，还有可能包括渲染组件的<code>.js</code>或者<code>.vue</code>文件</p>
-<p><em>解释下每个文件的作用: 以<strong>button</strong>为例</em></p>
-<h5 id="button-js"><a href="#button-js" class="headerlink" title="button.js"></a>button.js</h5><p>通过<code>h函数</code>来渲染出组件，当然也可以写成<code>.vue</code>的单文件形式</p>
-<pre><code class="js">// vue3 通过import拿到 h函数
-import &#123; h &#125; from &#39;vue&#39;
-
-export default &#123;
-    name: &#39;button&#39;, // 用来注册组件名
-    props: &#123;
-        color: &#123;
-            type: String,
-            default: &#39;aqua&#39;
-        &#125;,
-        size: &#123;
-            type: String,
-            default: &#39;medium&#39;
-        &#125;
-    &#125;,
-    render(&#123; color, size &#125;) &#123;
-        return h(&#39;div&#39;, &#123; class: `yf-button yf-button--$&#123;size&#125;`, style: `background-color: $&#123;color&#125;` &#125;, [this.$slots.default ? this.$slots.default() : &#39;按钮&#39;])
-    &#125;
-&#125;
-</code></pre>
-<h5 id="index-js"><a href="#index-js" class="headerlink" title="index.js"></a>index.js</h5><pre><code class="js">import Button from &quot;./button.js&quot;;
-
-// 在单个组件被使用时，即被vue.use()的时候直接注册成全局组件
-Button.install = function (app) &#123;
-    app.component(Button.name, Button);
-&#125;;
-
-export default Button
-</code></pre>
-<h5 id="index-css"><a href="#index-css" class="headerlink" title="index.css"></a>index.css</h5><pre><code class="css">.yf-button &#123;
-    display: inline-block;
-    margin: 10px;
-    border-radius: 5px;
-    padding: 8px 15px;
-    background-color: aqua;
-    color: #fff;
-    cursor: pointer;
-&#125;
-
-.yf-button--large &#123;
-    padding: 10px 20px;
-&#125;
-
-.yf-button--medium &#123;
-    padding: 8px 15px;
-&#125;
-
-.yf-button--small &#123;
-    padding: 4px 8px;
-&#125;
-
-.yf-button:active &#123;
-    filter: grayscale(0.3);
-&#125;
-</code></pre>
-<h4 id="所有组件的总入口文件"><a href="#所有组件的总入口文件" class="headerlink" title="所有组件的总入口文件"></a>所有组件的总入口文件</h4><p>与<em>src目录</em>同级的2个文件：<strong>index.js</strong>、<strong>index.css</strong>是所有组件的总入口</p>
-<h5 id="总入口index-js"><a href="#总入口index-js" class="headerlink" title="总入口index.js"></a>总入口index.js</h5><pre><code class="js">import button from &#39;./src/button/index.js&#39;
-import loading from &#39;./src/loading/index.js&#39;
-import splitline from &#39;./src/splitline/index.js&#39;
-import ul from &#39;./src/ul/index.js&#39;
-import li from &#39;./src/li/index.js&#39;
-import Switch from &#39;./src/switch/index.js&#39;
-
-const components = [
-    button,
-    loading,
-    splitline,
-    ul,
-    li,
-    Switch
-];
-
-export default &#123;
-    install(app) &#123;
-        // 通过异步方式直接引入总入口index.css文件
-        import(&#39;./index.css&#39;);
-
-        // 遍历注册全局组件
-        components.forEach(cpn =&gt; &#123;
-            app.component(`yf-$&#123;cpn.name&#125;`, cpn)
-        &#125;)
-    &#125;,
-    button,
-    loading,
-    splitline,
-    ul,
-    li,
-    Switch
-&#125;
-</code></pre>
-<h5 id="总入口index-css"><a href="#总入口index-css" class="headerlink" title="总入口index.css"></a>总入口index.css</h5><pre><code class="css">
-@import &#39;./src/button/index.css&#39;;
-@import &#39;./src/loading/index.css&#39;;
-@import &#39;./src/splitline/index.css&#39;;
-@import &#39;./src/ul/index.css&#39;;
-@import &#39;./src/message/index.css&#39;;
-@import &#39;./src/switch/index.css&#39;;
-</code></pre>
-<h4 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h4><p>在vue项目的<code>main.js</code>中，键入代码（以<em>vite+vue3</em>项目为例）</p>
-<pre><code class="js">import &#123; createApp &#125; from &#39;vue&#39;
-import &#39;./style.css&#39;
-import App from &#39;./App.vue&#39;
-import router from &#39;./router/index.js&#39;
-
-// 导入我的组件库  注意：一定得导！得导！导！
-import yfCpns from &#39;./yf-cpns/index.js&#39;
-
-// 导入自己写的message插件， 通过this.$message来提示信息
-import message from &#39;./yf-cpns/src/message&#39;
-
-
-const app = createApp(App)
-
-// 注册我的组件库  注意：一定得注！得注！注！
-app.use(yfCpns)
-app.use(message)
-
-app.use(router).mount(&#39;#app&#39;)
-</code></pre>
-<p>在某个页面<code>.vue</code>文件中直接使用，代码如下</p>
-<pre><code class="vue">&lt;template&gt;
-  &lt;div&gt;
-    &lt;yf-button color=&quot;pink&quot; size=&quot;small&quot;&gt;小按钮&lt;/yf-button&gt;
-    &lt;yf-button&gt;按钮&lt;/yf-button&gt;
-    &lt;yf-button color=&quot;greenyellow&quot; size=&quot;large&quot;&gt;大按钮&lt;/yf-button&gt;
-
-    &lt;yf-splitline /&gt;
-
-    &lt;yf-loading color=&quot;pink&quot; size=&quot;small&quot;&gt;&lt;/yf-loading&gt;
-    &lt;yf-loading&gt;&lt;/yf-loading&gt;
-    &lt;yf-loading color=&quot;greenyellow&quot; size=&quot;large&quot;&gt;&lt;/yf-loading&gt;
-
-    &lt;yf-splitline /&gt;
-
-    &lt;yf-ul&gt;
-      &lt;yf-li&gt;看电影&lt;/yf-li&gt;
-      &lt;yf-li&gt;听音乐&lt;/yf-li&gt;
-      &lt;yf-li&gt;打游戏&lt;/yf-li&gt;
-      &lt;yf-li&gt;做爱做的事&lt;/yf-li&gt;
-    &lt;/yf-ul&gt;
-    &lt;yf-ul sign=&quot;🎃&quot;&gt;
-      &lt;yf-li&gt;看电影&lt;/yf-li&gt;
-      &lt;yf-li&gt;听音乐&lt;/yf-li&gt;
-      &lt;yf-li&gt;打游戏&lt;/yf-li&gt;
-      &lt;yf-li&gt;做爱做的事&lt;/yf-li&gt;
-    &lt;/yf-ul&gt;
-    &lt;yf-ul sign=&quot;😊&quot;&gt;
-      &lt;yf-li&gt;看电影&lt;/yf-li&gt;
-      &lt;yf-li&gt;听音乐&lt;/yf-li&gt;
-      &lt;yf-li&gt;打游戏&lt;/yf-li&gt;
-      &lt;yf-li&gt;做爱做的事&lt;/yf-li&gt;
-    &lt;/yf-ul&gt;
-
-    &lt;yf-splitline /&gt;
-
-    &lt;yf-button color=&quot;greenyellow&quot; @click=&quot;showSuccess&quot;&gt;成功提示&lt;/yf-button&gt;
-    &lt;yf-button @click=&quot;showNormal&quot;&gt;普通提示&lt;/yf-button&gt;
-    &lt;yf-button color=&quot;red&quot; @click=&quot;showError&quot;&gt;失败提示&lt;/yf-button&gt;
-
-    &lt;yf-splitline /&gt;
-
-    &lt;yf-switch v-model=&quot;checkValue&quot;&gt;&lt;/yf-switch&gt;
-  &lt;/div&gt;
-&lt;/template&gt;
-
-&lt;script&gt;
-export default &#123;
-  data() &#123;
-    return &#123;
-      checkValue: false
-    &#125;;
-  &#125;,
-  methods: &#123;
-    showNormal() &#123;
-      this.$message(&#123;
-        content: &quot;普通信息&quot;
-      &#125;);
-    &#125;,
-    showSuccess() &#123;
-      this.$message.success(&quot;成功信息&quot;);
-    &#125;,
-    showError() &#123;
-      this.$message.error(&quot;错误信息&quot;);
-    &#125;
-  &#125;
-&#125;;
-&lt;/script&gt;
-</code></pre>
-<h4 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a>效果图</h4><p><img src="https://i.postimg.cc/J4RH9cPh/myself-Cpns-xiaoguo.gif" alt="目录结构"></p>
-<p>码云地址：<a target="_blank" rel="noopener" href="https://gitee.com/shaoyunfeng793/yf-cpns">https://gitee.com/shaoyunfeng793/yf-cpns</a></p>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/10/15/vue-myselfCpns/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/10/13/utils-webSite/">
-        <h2>
-            一些可能用到的工具网站
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Utils">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Utils
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/10/13
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="一些可能用到的工具网站"><a href="#一些可能用到的工具网站" class="headerlink" title="一些可能用到的工具网站"></a>一些可能用到的工具网站</h3><h4 id="1-去除多余CSS"><a href="#1-去除多余CSS" class="headerlink" title="1.去除多余CSS"></a>1.去除多余CSS</h4><p>注入html代码和css完成去除多余css<br>地址： <a target="_blank" rel="noopener" href="https://uncss-online.com/">https://uncss-online.com/</a></p>
-<h4 id="2-CSS-sprite图"><a href="#2-CSS-sprite图" class="headerlink" title="2.CSS sprite图"></a>2.CSS sprite图</h4><p>上传若干图片，帮你生成雪碧图，还可以帮助你直接定位到相应图标的css样式<br>地址： <a target="_blank" rel="noopener" href="https://www.toptal.com/developers/css/sprite-generator">https://www.toptal.com/developers/css/sprite-generator</a>; <a target="_blank" rel="noopener" href="http://www.spritecow.com/">http://www.spritecow.com/</a>;</p>
-<h4 id="3-图片压缩TinyPng"><a href="#3-图片压缩TinyPng" class="headerlink" title="3.图片压缩TinyPng"></a>3.图片压缩TinyPng</h4><p>一个很强大且免费的压缩网站<br>地址： <a target="_blank" rel="noopener" href="https://tinypng.com/">https://tinypng.com</a></p>
-<h4 id="4-css动画"><a href="#4-css动画" class="headerlink" title="4.css动画"></a>4.css动画</h4><p>有很多css动画样式，可以直接查看效果<br>地址： <a target="_blank" rel="noopener" href="https://animate.style/">https://animate.style/</a></p>
-<h4 id="5-css渐变颜色"><a href="#5-css渐变颜色" class="headerlink" title="5.css渐变颜色"></a>5.css渐变颜色</h4><p>有很多好看的渐变颜色<br>地址： <a target="_blank" rel="noopener" href="https://webkul.github.io/coolhue/">https://webkul.github.io/coolhue/</a></p>
-<h4 id="6-删除背景"><a href="#6-删除背景" class="headerlink" title="6.删除背景"></a>6.删除背景</h4><p>一个扣除背景的网站<br>地址： <a target="_blank" rel="noopener" href="https://www.remove.bg/">https://www.remove.bg/</a></p>
-<h4 id="7-转换文件格式"><a href="#7-转换文件格式" class="headerlink" title="7.转换文件格式"></a>7.转换文件格式</h4><p>一个可以免费转换文件格式的网站，（有限制）<br>地址： <a target="_blank" rel="noopener" href="https://convertio.co/zh/">https://convertio.co/zh/</a></p>
-<h4 id="8-emoji表情符号"><a href="#8-emoji表情符号" class="headerlink" title="8.emoji表情符号"></a>8.emoji表情符号</h4><p>一个emoji表情符号大全的网站<br>地址： <a target="_blank" rel="noopener" href="https://emojipedia.org/">https://emojipedia.org/</a></p>
-<h4 id="9-图片托管"><a href="#9-图片托管" class="headerlink" title="9.图片托管"></a>9.图片托管</h4><p>免费图片托管的网站，可以把博客图片都托管到这<br>地址： <a target="_blank" rel="noopener" href="https://postimages.org/">https://postimages.org/</a></p>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/10/13/utils-webSite/ " class="go-post">
         阅读全文
     </a>
 </div>

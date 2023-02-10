@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | Webpack</title>
+    <title>杨红蓝 | axios拦截器配置</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,224 +135,147 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/Axios/" style=background:#ffa2c4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Axios
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>axios拦截器配置 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2023/2/10
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/BOM/" style=background:#00a596>
+        <span class="category">
+            <a href="/categories/小乔">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                BOM
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Canvas/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Canvas
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/CSS/" style=background:#ffa2c4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                CSS
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#03a9f4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/小乔/" style=background:#03a9f4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 小乔
             </a>
         </span>
         
-        
-        
-        <span>
-            <a href="/categories/Node/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Node
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/axios/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                axios
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Svga/" style=background:#ffa2c4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Svga
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Utils/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Utils
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Webpack/" style='background:linear-gradient(120deg, #9abbf7 0%, #ffbbf4 100%)'>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Webpack
-            </a>
-        </span>
-        
+
         
     </div>
-    <div id="archives">
-        
-        <a-timeline>
-            <a-timeline-item timestamp="2022/9/30" placement="top" color="#a5c2f5">
-                <a-card hoverable>
-                    <div class="item-time">2022/9/30</div>
-                    <a href="/2022/09/30/webpack-mergeConfig/">
-                        <h3>Webpack之拆分/合并配置</h3>
-                    </a>
-                    <div class="info">
-                        
-                        <span class="category">
-                            <a href="/categories/Webpack">
-                                <span class="icon">
-                                    <a-icon type="book" theme="filled" />
-                                </span>
-                                Webpack
-                            </a>
-                        </span>
-                        
 
-                        
-                    </div>
-                </a-card>
-            </a-timeline-item>
-        </a-timeline>
-        
-        <a-timeline>
-            <a-timeline-item timestamp="2022/9/30" placement="top" color="#a5c2f5">
-                <a-card hoverable>
-                    <div class="item-time">2022/9/30</div>
-                    <a href="/2022/09/30/webpack-multiInput/">
-                        <h3>Webpack之多入口&amp;三种hash</h3>
-                    </a>
-                    <div class="info">
-                        
-                        <span class="category">
-                            <a href="/categories/Webpack">
-                                <span class="icon">
-                                    <a-icon type="book" theme="filled" />
-                                </span>
-                                Webpack
-                            </a>
-                        </span>
-                        
+    <div class="content" v-pre>
+        <p><strong>记录一下工作中开发移动端h5时，用到的一些little skill</strong></p>
+<h4 id="微信-amp-支付宝"><a href="#微信-amp-支付宝" class="headerlink" title="微信&amp;支付宝"></a>微信&amp;支付宝</h4><pre><code class="js">// 打开微信扫一扫 
+location.href = &#39;weixin://scanqrcode&#39;
 
-                        
-                    </div>
-                </a-card>
-            </a-timeline-item>
-        </a-timeline>
-        
-        <a-timeline>
-            <a-timeline-item timestamp="2022/9/30" placement="top" color="#a5c2f5">
-                <a-card hoverable>
-                    <div class="item-time">2022/9/30</div>
-                    <a href="/2022/09/30/webpack-optimization/">
-                        <h3>Webpack之抽离压缩css</h3>
-                    </a>
-                    <div class="info">
-                        
-                        <span class="category">
-                            <a href="/categories/Webpack">
-                                <span class="icon">
-                                    <a-icon type="book" theme="filled" />
-                                </span>
-                                Webpack
-                            </a>
-                        </span>
-                        
+// 微信可拉起app stroe (❌哒咩了，被微信克制了)
+location.href = &#39;https://itunes.apple.com/app/idxxxxxxxx&#39;
 
-                        
-                    </div>
-                </a-card>
-            </a-timeline-item>
-        </a-timeline>
-        
+// 打开支付宝扫一扫
+location.href = &#39;alipays://platformapi/startapp?saId=10000007&amp;qrcode=https://qr.alipay.com/bax02911brluc2xieoph6001&#39;
+
+// 支付宝打开指定页面
+location.href = &#39;alipays://platformapi/startapp?appId=20000067&amp;url=https%3A%2F%2Fwww.baidu.com&#39;
+
+// 更多快捷指令合集（知乎）： https://zhuanlan.zhihu.com/p/582472115
+</code></pre>
+<h4 id="解决Safari浏览器不能自动播放视频"><a href="#解决Safari浏览器不能自动播放视频" class="headerlink" title="解决Safari浏览器不能自动播放视频"></a>解决Safari浏览器不能自动播放视频</h4><p><strong>增加muted、 playsinline属性解决ios浏览器不自动播放视频的问题，还需要🔕视频</strong></p>
+<pre><code class="html">    &lt;video id=&quot;video&quot; muted=&quot;muted&quot; playsinline style=&quot;width: 100vw;height: 100vh;background: #000;&quot;
+    src=&quot;https://mdhw.oss-cn-hangzhou.aliyuncs.com/promotion/openbox.mp4&quot;&gt;&lt;/video&gt;
+</code></pre>
+<h4 id="利用新浪接口获取用户ip"><a href="#利用新浪接口获取用户ip" class="headerlink" title="利用新浪接口获取用户ip"></a>利用新浪接口获取用户ip</h4><pre><code class="html">    &lt;!-- 引入新浪的js --&gt;
+   &lt;script src=&quot;http://pv.sohu.com/cityjson?ie=utf-8&quot;&gt;&lt;/script&gt;
+   &lt;script&gt;
+        // 直接获取IP和城市名
+        console.log(returnCitySN[&#39;cip&#39;] + returnCitySN[&#39;cname&#39;]);
+   &lt;/script&gt;
+</code></pre>
+<h4 id="vueWEB项目打包成app"><a href="#vueWEB项目打包成app" class="headerlink" title="vueWEB项目打包成app"></a>vueWEB项目打包成app</h4><p><strong>使用Hbuildx工具打包成5+app即可</strong></p>
+<p>1.在hbuildx里先新建一个项目（5+app）<br>2.在vue项目中先<code>build</code>一下，生成到<code>dist目录</code><br>3.将<code>dist目录</code>下的代码全都拷贝到新建的5+app目录下，直接覆盖即可<br>4.可以点击运行到浏览器进行预览<br>5.云端打包成app需要的安卓证书、ios证书获取方式见文档</p>
+<h5 id="安卓端侧边滑动返回监听"><a href="#安卓端侧边滑动返回监听" class="headerlink" title="安卓端侧边滑动返回监听"></a>安卓端侧边滑动返回监听</h5><p>把下面代码直接放在<code>public</code>下面的<code>index.html</code>的<code>body</code>下面即可</p>
+<pre><code class="html">    &lt;script&gt;
+        const webview = plus.webview.currentWebview();
+        document.addEventListener(&#39;plusready&#39;, () =&gt; &#123;
+            //等待plus ready后再调用5+ API：
+            let first = null;
+            plus.key.addEventListener(&#39;backbutton&#39;, () =&gt; &#123;
+
+                webview.canBack((e) =&gt; &#123;
+                    if (e.canBack) &#123;
+                        webview.back();
+                    &#125; else &#123;
+                        //首次按键，提示‘再次操作退出应用’
+                        if (!first) &#123;
+                            //获取第一次点击的时间戳
+                            first = new Date().getTime();
+                            //通过H5+ API 调用Android 上的toast 提示框
+                            plus.nativeUI.toast(&quot;再次操作退出应用&quot;, &#123;
+                                duration: &#39;short&#39;
+                            &#125;);
+                            setTimeout(() =&gt; &#123;
+                                first = null;
+                            &#125;, 1000);
+                        &#125; else &#123;
+                            if (new Date().getTime() - first &lt; 1000) &#123;
+                                //获取第二次点击的时间戳, 两次之差 小于 1000ms 说明1s点击了两次,
+                                plus.runtime.quit(); //退出应用
+                            &#125;
+                        &#125;
+                    &#125;
+                &#125;)
+            &#125;);
+        &#125;);
+    &lt;/script&gt;
+</code></pre>
+<p><strong>由于vue项目打包成app其实本身就是套在webview里面运行的，所以一些跳转页面除了<code>$router.push</code>还有就是<code>location.href</code>，如果不兼容一下APP里的会导致页面返回不了，举个例子：app里有个广告banner,点击跳转http链接，结果用户侧滑会直接导致退出应用，即关闭掉了webview，因为app页面承载本身就是一个webviewObject,跳转后的http链接是直接在这个webviewObject上显示的，通过下面代码帮我们兼容跳转http(可以控制app内部打开&#x2F;外部浏览器打开)</strong></p>
+<pre><code class="js">function toWebLink(url, openType = &#39;outside&#39;) &#123;
+  try &#123;
+    if (openType === &#39;inner&#39;) &#123;
+      let wv = plus.webview.getWebviewById(&#39;webview&#39;);
+      // plus api 创建并打开新的webview 详见：https://www.html5plus.org/doc/zh_cn/webview.html#plus.webview.open
+      plus.webview.open(
+        url,
+        &#39;webview&#39;,
+        &#123;
+          titleNView: &#123;
+            titleSize: &#39;14px&#39;,
+            buttons: [
+              &#123;
+                type: &#39;back&#39;,
+                float: &#39;left&#39;,
+                onclick: function () &#123;
+                  wv.canBack((e) =&gt; &#123;
+                    if (e.canBack) &#123;
+                      wv.back();
+                    &#125; else &#123;
+                      wv.close();
+                    &#125;
+                  &#125;);
+                &#125;,
+              &#125;,
+            ],
+          &#125;,
+        &#125;,
+        &#39;slide-in-right&#39;,
+        300,
+        function () &#123;
+          // console.log(&#39;打开了&#39;, JSON.stringify(plus.webview.all()));
+        &#125;,
+      );
+    &#125; else &#123;
+      plus.runtime.openURL(url);
+    &#125;
+
+  &#125; catch (e) &#123;
+    console.log(e);
+    window.location.href = url;
+  &#125;
+&#125;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">

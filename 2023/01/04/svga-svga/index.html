@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | SVGA的简单使用</title>
+    <title>杨红蓝 | SVGA动画的使用</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -139,7 +139,7 @@
 <div class="articlebg"></div>
 <div class="article">
     <div>
-        <h1>SVGA的简单使用 </h1>
+        <h1>SVGA动画的使用 </h1>
     </div>
     <div class="info">
         <span class="date">
@@ -172,7 +172,7 @@
     &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
     &lt;meta name=&quot;viewport&quot;
         content=&quot;width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;&gt;
-    &lt;title&gt;SvgaDemo&lt;/title&gt;
+    &lt;title&gt;Svga动画&lt;/title&gt;
 &lt;/head&gt;
 
 &lt;body&gt;
@@ -198,6 +198,85 @@
             player.clear()
         &#125;)
     &#125;)
+
+&lt;/script&gt;
+
+&lt;/html&gt;
+</code></pre>
+<h3 id="SVGA的分段播放"><a href="#SVGA的分段播放" class="headerlink" title="SVGA的分段播放"></a>SVGA的分段播放</h3><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot;
+        content=&quot;width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;&gt;
+    &lt;title&gt;Demo&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;first_screen&quot;&gt;
+        &lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
+        &lt;div id=&quot;svga_btn&quot; style=&quot;width: 120px;height:120px;position: absolute;top: 44%;left: 0;right:0;margin: auto;&quot;&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;script src=&quot;/static/js/svga.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+    var first_screen = document.querySelector(&#39;.first_screen&#39;);
+    var canvas = document.getElementById(&#39;canvas&#39;)
+    var svga_btn = document.getElementById(&#39;svga_btn&#39;)
+    var step = 0;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+
+    if (sessionStorage.getItem(&#39;cxm_paying&#39;) == &#39;true&#39;) &#123;
+        first_screen.remove()
+    &#125; else &#123;
+        var parser = new SVGA.Parser(&#39;#canvas&#39;);
+        var player = new SVGA.Player(&#39;#canvas&#39;);
+
+        player.setContentMode(&#39;AspectFill&#39;)
+        parser.load(&#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/promotion/chou.svga&#39;, svga =&gt; &#123;
+            player.setVideoItem(svga)
+            palyFrame(step);
+            svga_btn.addEventListener(&#39;click&#39;, function () &#123;
+                step++;
+                palyFrame(step);
+                svga_btn.style.display = &#39;none&#39;;
+            &#125;)
+            player.onFinished(function () &#123;
+                svga_btn.style.display = &#39;block&#39;;
+                player.clear();
+                if (step === 2) &#123;
+                    first_screen.remove()
+                &#125; else &#123;
+                    palyFrame(0)
+                &#125;
+            &#125;)
+        &#125;)
+    &#125;
+    function palyFrame(step) &#123;
+        switch (step) &#123;
+            case 0:
+                player.loops = 0;
+                player.startAnimationWithRange(&#123; location: 0, length: 120 &#125;);
+                break;
+            case 1:
+                // 第一次播放动画
+                player.loops = 1;
+                player.startAnimationWithRange(&#123; location: 120, length: 100 &#125;);
+                break;
+            case 2:
+                // 第二次播放动画
+                player.loops = 1;
+                player.startAnimationWithRange(&#123; location: 340, length: 150 &#125;);
+                break;
+            default:
+                return;
+        &#125;
+    &#125;
 
 &lt;/script&gt;
 

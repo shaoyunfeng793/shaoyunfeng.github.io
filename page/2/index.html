@@ -166,6 +166,170 @@
 
 <div class="post">
 
+    <a href="/2022/10/19/canvas-qipao/">
+        <h2>
+            Canvas之全屏气泡
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Canvas">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Canvas
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/10/19
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Canvas之全屏气泡"><a href="#Canvas之全屏气泡" class="headerlink" title="Canvas之全屏气泡"></a>Canvas之全屏气泡</h3><h4 id="效果预览"><a href="#效果预览" class="headerlink" title="效果预览"></a>效果预览</h4><p><a target="_blank" rel="noopener" href="https://postimg.cc/LqtCKYqQ"><img src="https://i.postimg.cc/6QSDZCBK/qipao-xiaoguo.gif" alt="qipao-xiaoguo.gif"></a></p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;zh&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;全屏气泡&lt;/title&gt;
+    &lt;style&gt;
+        * &#123;
+            margin: 0;
+            padding: 0;
+        &#125;
+
+        html,
+        body &#123;
+            height: 100%;
+        &#125;
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+&lt;script&gt;
+    if (canvas.getContext) &#123;
+        canvas.width = document.documentElement.clientWidth
+        canvas.height = document.documentElement.clientHeight
+        canvas.style.backgroundColor = &#39;white&#39;
+        const ctx = canvas.getContext(&#39;2d&#39;)
+        // 声明变量
+        let radius = 20,
+            r,
+            g,
+            b,
+            a,
+            x,
+            y,
+            arr = [],
+            temp = [];
+        
+        // 先画5个气泡
+        for (let i = 0; i &lt; 5; i++) &#123;
+            createPop()
+        &#125;
+
+        // 监听点击事件
+        canvas.addEventListener(&#39;click&#39;, event =&gt; &#123;
+            console.log(&quot;点击了canvas：&quot;, event);
+            x = event.offsetX
+            y = event.offsetY
+            radius = 5
+            createPop(x, y, radius)
+        &#125;)
+
+        // 定时刷新canvas
+        setInterval(() =&gt; &#123;
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            arr.forEach((item, index) =&gt; &#123;
+                if (item.a &lt;= 0) &#123;
+                    temp.push(index)
+                &#125; else &#123;
+                    item.radius += 0.5
+                    item.a -= 0.005
+                &#125;
+                drawPop(item.radius, item.r, item.g, item.b, item.a, item.x, item.y)
+            &#125;)
+            arr = arr.filter(item =&gt; &#123;
+                return item.a &gt; 0
+            &#125;)
+        &#125;, 1000 / 60);
+
+        // 定时添加新的气泡
+        setInterval(() =&gt; &#123;
+            createPop()
+        &#125;, 500);
+
+        // 画气泡
+        function drawPop(radius, r, g, b, a, x, y) &#123;
+            ctx.beginPath()
+            ctx.arc(x, y, radius, 0, 2 * Math.PI)
+            ctx.fillStyle = `rgba($&#123;r&#125;,$&#123;g&#125;,$&#123;b&#125;,$&#123;a&#125;)`
+            ctx.fill()
+        &#125;
+
+        // 气泡数据
+        function createPop(x, y, radius) &#123;
+            r = arcRandomColor()
+            g = arcRandomColor()
+            b = arcRandomColor()
+            radius = radius || Math.ceil(Math.random() * 10)
+            x = x || Math.ceil(Math.random() * canvas.width)
+            y = y || Math.ceil(Math.random() * canvas.height)
+            a = 1
+            const temp = &#123;
+                r,
+                g,
+                b,
+                a,
+                x,
+                y,
+                radius
+            &#125;
+            arr.push(temp)
+        &#125;
+
+        // 随机数据
+        function arcRandomColor() &#123;
+            return Math.ceil(Math.random() * 254)
+        &#125;
+    &#125;
+&lt;/script&gt;
+
+&lt;/html&gt;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/10/19/canvas-qipao/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/10/18/canvas-diaoWawa/">
         <h2>
             Canvas之钓娃娃GameDemo
@@ -1735,173 +1899,6 @@ function render() &#123;
     </div>
 
     <a href="/2022/09/30/webpack-mergeConfig/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/30/js-aliOssUpload/">
-        <h2>
-            阿里oss上传工具函数
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Js">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/30
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="阿里oss上传工具函数"><a href="#阿里oss上传工具函数" class="headerlink" title="阿里oss上传工具函数"></a>阿里oss上传工具函数</h3><p><strong>ps:</strong> <em>现在很多图片上传都是托管到阿里云oss上的,前端方法如下</em></p>
-<h4 id="安装-ali-oss"><a href="#安装-ali-oss" class="headerlink" title="安装 ali-oss"></a>安装 ali-oss</h4><p><code>compressorjs</code>用来压缩图片，<code>ali-oss</code>用来上传oss</p>
-<pre><code class="bash">    npm install ali-oss
-    npm install compressorjs
-</code></pre>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    import OSS from &#39;ali-oss&#39;;
-    import Compressor from &#39;compressorjs&#39;;
-    import &#123; randomString &#125; from &#39;@/utils/index.js&#39;;
-
-    const &#123; accessKeyId, accessKeySecret, region, endpoint &#125; = &#123;
-    region: &#39;your region&#39;,
-    accessKeyId: &#39;your accessKeyId&#39;,
-    accessKeySecret: &#39;your accessKeySecret&#39;,
-    endpoint: &#39;oss-cn-hangzhou.aliyuncs.com&#39;
-    &#125;;
-
-    const client = new OSS(&#123;
-    // yourRegion填写Bucket所在地域。以华东1（杭州）为例，Region填写为oss-cn-hangzhou。
-    region: region,
-    // 从STS服务获取的临时访问密钥（AccessKey ID和AccessKey Secret）。
-    accessKeyId: accessKeyId,
-    accessKeySecret: accessKeySecret,
-    endpoint: endpoint,
-    // 填写Bucket名称。
-    bucket: &#39;mdhw&#39;
-    &#125;);
-    /**
-     * 图片压缩
-     */
-    function compressImage(fileList, backType, limitSize, quality) &#123;
-    const promiseAry = [];
-    const maxSize = limitSize * 1024 * 1024;
-    fileList.forEach(image =&gt; &#123;
-        promiseAry.push(new Promise((resolve, reject) =&gt; &#123;
-        if (image.size &lt;= maxSize) &#123; // 没操过限制，不用压缩
-            resolve(image)
-        &#125;
-        else &#123;
-            new Compressor(image, &#123;
-            // maxWidth: 750,
-            // maxHeight: 750,
-            quality: quality || 0.8,
-            success(result) &#123;
-                let file = new File([result], image.name, &#123; type: image.type &#125;)
-
-                if (!backType || backType == &#39;blob&#39;) &#123;
-                resolve(result)
-                &#125; else if (backType == &#39;file&#39;) &#123;
-                resolve(file)
-                &#125; else &#123;
-                resolve(file)
-                &#125;
-            &#125;,
-            error(err) &#123;
-                console.log(&#39;图片压缩失败----&gt;&gt;&gt;&gt;&gt;&#39;, err)
-                resolve(image)
-            &#125;
-            &#125;)
-        &#125;
-        &#125;))
-    &#125;)
-    return Promise.all(promiseAry)
-    &#125;
-
-    const defaultLimit = 1;
-    /**
-     *
-     * @param fileList 上传图片的资源路径
-     * @param dir oss要保存的文件夹
-     * @param limitSize oss图片限制 默认1m 0为不限制
-     * @returns &#123;OSS文件路径&#125;
-     */
-
-    async function uploadOSS(fileList, dir = &#39;file&#39;, &#123;
-    limitSize = defaultLimit, compress = false
-    &#125;) &#123;
-    return new Promise((resolve, reject) =&gt; &#123;
-        const promiseAry = [];
-        let randomVal, randomStr, imgtype, fileName, tmpAry, maxSize = limitSize * 1024 * 1024;
-        let _Promise = compress ? compressImage(fileList, &#39;file&#39;, limitSize) : Promise.resolve(fileList)
-
-        if (compress) &#123;
-        console.log(&#39;压缩前的图片列表&#39;, fileList)
-        &#125;
-        _Promise.then(fileList =&gt; &#123;
-        if (compress) &#123;
-            console.log(&#39;压缩后的图片列表&#39;, fileList)
-        &#125;
-        const canUploadList = limitSize == 0 ? fileList : fileList.filter(file =&gt; file.size &lt;= maxSize);
-        canUploadList.forEach(file =&gt; &#123;
-
-            tmpAry = file.name.split(&#39;.&#39;);
-            imgtype = tmpAry[tmpAry.length - 1]
-            randomVal = +new Date();
-            randomStr = randomString()
-            fileName = `$&#123;randomVal&#125;_$&#123;randomStr&#125;.$&#123;imgtype&#125;`
-            promiseAry.push(client.put(`$&#123;dir&#125;/$&#123;fileName&#125;`, file, &#123;
-            headers: &#123;
-                &#39;aa&#39;: &#39;aa&#39;
-            &#125;
-            &#125;))
-        &#125;)
-        Promise.all(promiseAry).then(result =&gt; &#123;
-            let code = canUploadList.length == fileList.length ? 1 : 0
-            resolve(&#123;
-            result,
-            code,
-            msg: code == 1 ? &#39;上传成功&#39; : `$&#123;fileList.length == 1 ? &#39;&#39; : &#39;部分&#39;&#125;图片大小超过$&#123;limitSize&#125;M`
-            &#125;);
-        &#125;).catch(e =&gt; &#123;
-            reject(e)
-        &#125;)
-        &#125;)
-
-    &#125;);
-    &#125;
-
-    export &#123; uploadOSS, defaultLimit &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/30/js-aliOssUpload/ " class="go-post">
         阅读全文
     </a>
 </div>

@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>axios中断请求</title>
+      <link href="/2023/02/13/axios-axiosAbort/"/>
+      <url>/2023/02/13/axios-axiosAbort/</url>
+      
+        <content type="html"><![CDATA[<h3 id="axios中断请求"><a href="#axios中断请求" class="headerlink" title="axios中断请求"></a>axios中断请求</h3><h4 id="AbortController"><a href="#AbortController" class="headerlink" title="AbortController"></a>AbortController</h4><p>从<code>v0.22.0</code>开始，Axios支持AbortController以Fetch接口的方式取消请求：</p><pre><code class="js">    const controller = new AbortController();     axios.get(&#39;/foo/bar&#39;, &#123;        signal: controller.signal// signal 暗示；信号    &#125;).then(res =&gt; &#123;        // todo...    &#125;);    // 取消请求    controller.abort()</code></pre><h4 id="CancelToken"><a href="#CancelToken" class="headerlink" title="CancelToken"></a>CancelToken</h4><p><em>此API自v0.22.0起已弃用，不应在新项目中使用</em></p><pre><code class="html">&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en&quot;&gt;  &lt;head&gt;    &lt;meta charset=&quot;UTF-8&quot; /&gt;    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;    &lt;title&gt;&lt;/title&gt;  &lt;/head&gt;  &lt;body&gt;    &lt;button class=&quot;btn btn-primary&quot;&gt;GET&lt;/button&gt;    &lt;button class=&quot;btn btn-danger&quot;&gt;取消请求&lt;/button&gt;    &lt;script&gt;        btn = document.querySelectorAll(&quot;button&quot;)        const CancelToken = axios.CancelToken;        const source = CancelToken.source();                btn[0].onclick = function () &#123;            axios.get(&#39;http://localhost:3000/posts/&#39;, &#123;                cancelToken: source.token            &#125;).then(                res =&gt; console.log(res)            ).catch(                function (thrown) &#123;                    if (axios.isCancel(thrown)) &#123;                        console.log(&#39;Request canceled&#39;, thrown.message);                    &#125; else &#123;                        console.log(&quot;###&quot;, thrown)                    &#125;                &#125;)        &#125;                     btn[1].onclick = () =&gt; &#123;            source.cancel(&#39;操作已被用户取消。&#39;);        // 一次性， 取消请求(Message参数是可选的)        &#125;     &lt;/script&gt;&lt;/html&gt;</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> Axios </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Vue实现消息轻提示</title>
       <link href="/2023/02/13/vue-toastCpn/"/>
       <url>/2023/02/13/vue-toastCpn/</url>

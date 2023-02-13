@@ -166,6 +166,103 @@
 
 <div class="post">
 
+    <a href="/2023/02/13/axios-axiosAbort/">
+        <h2>
+            axios中断请求
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Axios">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Axios
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2023/2/13
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="axios中断请求"><a href="#axios中断请求" class="headerlink" title="axios中断请求"></a>axios中断请求</h3><h4 id="AbortController"><a href="#AbortController" class="headerlink" title="AbortController"></a>AbortController</h4><p>从<code>v0.22.0</code>开始，Axios支持AbortController以Fetch接口的方式取消请求：</p>
+<pre><code class="js">    const controller = new AbortController();
+ 
+    axios.get(&#39;/foo/bar&#39;, &#123;
+        signal: controller.signal	// signal 暗示；信号
+    &#125;).then(res =&gt; &#123;
+        // todo...
+    &#125;);
+    // 取消请求
+    controller.abort()
+</code></pre>
+<h4 id="CancelToken"><a href="#CancelToken" class="headerlink" title="CancelToken"></a>CancelToken</h4><p><em>此API自v0.22.0起已弃用，不应在新项目中使用</em></p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;
+    &lt;title&gt;&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;button class=&quot;btn btn-primary&quot;&gt;GET&lt;/button&gt;
+    &lt;button class=&quot;btn btn-danger&quot;&gt;取消请求&lt;/button&gt;
+    &lt;script&gt;
+        btn = document.querySelectorAll(&quot;button&quot;)
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
+        
+        btn[0].onclick = function () &#123;
+            axios.get(&#39;http://localhost:3000/posts/&#39;, &#123;
+                cancelToken: source.token
+            &#125;).then(
+                res =&gt; console.log(res)
+            ).catch(
+                function (thrown) &#123;
+                    if (axios.isCancel(thrown)) &#123;
+                        console.log(&#39;Request canceled&#39;, thrown.message);
+                    &#125; else &#123;
+                        console.log(&quot;###&quot;, thrown)
+                    &#125;
+                &#125;)
+        &#125;
+     
+        
+        btn[1].onclick = () =&gt; &#123;
+            source.cancel(&#39;操作已被用户取消。&#39;);        // 一次性， 取消请求(Message参数是可选的)
+        &#125; 
+    &lt;/script&gt;
+&lt;/html&gt;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2023/02/13/axios-axiosAbort/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2023/02/13/vue-toastCpn/">
         <h2>
             Vue实现消息轻提示
@@ -1810,170 +1907,6 @@ function spider(fetch_link) &#123;
     </div>
 
     <a href="/2022/10/20/canvas-guaguaka/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/10/19/canvas-qipao/">
-        <h2>
-            Canvas之全屏气泡
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Canvas">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Canvas
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/10/19
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="Canvas之全屏气泡"><a href="#Canvas之全屏气泡" class="headerlink" title="Canvas之全屏气泡"></a>Canvas之全屏气泡</h3><h4 id="效果预览"><a href="#效果预览" class="headerlink" title="效果预览"></a>效果预览</h4><p><a target="_blank" rel="noopener" href="https://postimg.cc/LqtCKYqQ"><img src="https://i.postimg.cc/6QSDZCBK/qipao-xiaoguo.gif" alt="qipao-xiaoguo.gif"></a></p>
-<pre><code class="html">&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;zh&quot;&gt;
-
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;title&gt;全屏气泡&lt;/title&gt;
-    &lt;style&gt;
-        * &#123;
-            margin: 0;
-            padding: 0;
-        &#125;
-
-        html,
-        body &#123;
-            height: 100%;
-        &#125;
-    &lt;/style&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-    &lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
-&lt;/body&gt;
-&lt;script&gt;
-    if (canvas.getContext) &#123;
-        canvas.width = document.documentElement.clientWidth
-        canvas.height = document.documentElement.clientHeight
-        canvas.style.backgroundColor = &#39;white&#39;
-        const ctx = canvas.getContext(&#39;2d&#39;)
-        // 声明变量
-        let radius = 20,
-            r,
-            g,
-            b,
-            a,
-            x,
-            y,
-            arr = [],
-            temp = [];
-        
-        // 先画5个气泡
-        for (let i = 0; i &lt; 5; i++) &#123;
-            createPop()
-        &#125;
-
-        // 监听点击事件
-        canvas.addEventListener(&#39;click&#39;, event =&gt; &#123;
-            console.log(&quot;点击了canvas：&quot;, event);
-            x = event.offsetX
-            y = event.offsetY
-            radius = 5
-            createPop(x, y, radius)
-        &#125;)
-
-        // 定时刷新canvas
-        setInterval(() =&gt; &#123;
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
-            arr.forEach((item, index) =&gt; &#123;
-                if (item.a &lt;= 0) &#123;
-                    temp.push(index)
-                &#125; else &#123;
-                    item.radius += 0.5
-                    item.a -= 0.005
-                &#125;
-                drawPop(item.radius, item.r, item.g, item.b, item.a, item.x, item.y)
-            &#125;)
-            arr = arr.filter(item =&gt; &#123;
-                return item.a &gt; 0
-            &#125;)
-        &#125;, 1000 / 60);
-
-        // 定时添加新的气泡
-        setInterval(() =&gt; &#123;
-            createPop()
-        &#125;, 500);
-
-        // 画气泡
-        function drawPop(radius, r, g, b, a, x, y) &#123;
-            ctx.beginPath()
-            ctx.arc(x, y, radius, 0, 2 * Math.PI)
-            ctx.fillStyle = `rgba($&#123;r&#125;,$&#123;g&#125;,$&#123;b&#125;,$&#123;a&#125;)`
-            ctx.fill()
-        &#125;
-
-        // 气泡数据
-        function createPop(x, y, radius) &#123;
-            r = arcRandomColor()
-            g = arcRandomColor()
-            b = arcRandomColor()
-            radius = radius || Math.ceil(Math.random() * 10)
-            x = x || Math.ceil(Math.random() * canvas.width)
-            y = y || Math.ceil(Math.random() * canvas.height)
-            a = 1
-            const temp = &#123;
-                r,
-                g,
-                b,
-                a,
-                x,
-                y,
-                radius
-            &#125;
-            arr.push(temp)
-        &#125;
-
-        // 随机数据
-        function arcRandomColor() &#123;
-            return Math.ceil(Math.random() * 254)
-        &#125;
-    &#125;
-&lt;/script&gt;
-
-&lt;/html&gt;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/10/19/canvas-qipao/ " class="go-post">
         阅读全文
     </a>
 </div>

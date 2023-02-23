@@ -622,6 +622,17 @@ export default &#123;
     &#125;
   &#125;,
   created() &#123;
+    // 这里还需要处理all其中如果有失败的问题
+    // 通过处理下promise数组来解决，catch：rej =&gt; []的原因是列表都是数组格式的数据
+    /**
+     *  let transferedPromise = (reqList) =&gt; &#123;
+            return reqList.map(item =&gt; &#123;
+                return item.then(res =&gt; res).catch(rej =&gt; [])
+            &#125;)
+        &#125;
+     * 
+     */
+   
     Promise.all([
       ReaderDriver.getRecommend(),
       ReaderDriver.getRank(&#39;hot&#39;),

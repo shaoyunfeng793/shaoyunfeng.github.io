@@ -166,6 +166,93 @@
 
 <div class="post">
 
+    <a href="/2022/09/30/webpack-optimization/">
+        <h2>
+            Webpack之抽离压缩css
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Webpack">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Webpack
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Webpack之抽离压缩css"><a href="#Webpack之抽离压缩css" class="headerlink" title="Webpack之抽离压缩css"></a>Webpack之抽离压缩css</h3><p>使用 <code>mini-css-extract-plugin</code> 插件的内置loader 替换 <code>style-loader</code></p>
+<p>使用 <code>terser-webpack-plugin</code> 插件压缩js代码</p>
+<p>使用 <code>optimize-css-assets-webpack-plugin</code> 插件压缩css代码</p>
+<h4 id="Webpack-配置"><a href="#Webpack-配置" class="headerlink" title="Webpack 配置"></a>Webpack 配置</h4><pre><code class="js">    const MiniCSSExtractPlugin = require(&#39;mini-css-extract-plugin&#39;);
+ 
+   
+    const TerserPlugin = require(&#39;terser-webpack-plugin&#39;);  // 压缩js插件
+    const OptimizeCssAssetsWebpackPlugin = require(&#39;optimize-css-assets-webpack-plugin&#39;);  // 压缩css插件
+    
+    module.exports = &#123;
+        // ...
+        module: &#123;
+            rules: [
+                &#123;
+                    test: /\.css/,
+                    loader: [
+                        MiniCSSExtractPlugin.loader, // 替换 style-loader
+                        &#39;css-loader&#39;,
+                        &#39;postcss-loader&#39;,  // autoprefixer
+                    ],
+                &#125;
+            ]
+        &#125;,
+        plugins: [
+            new MiniCSSExtractPlugin(&#123;
+                filename: &#39;css/main.[contentHash:8].css&#39;
+            &#125;)
+        ],
+        // 优化配置
+        optimization: &#123;
+            minimizer: &#123;
+                // 压缩js
+                new TerserPlugin(),
+                // 压缩css
+                new OptimizeCssAssetsWebpackPlugin()
+            &#125;
+        &#125;  
+    &#125;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/30/webpack-optimization/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/09/30/webpack-mergeConfig/">
         <h2>
             Webpack之拆分/合并配置
@@ -1617,106 +1704,6 @@ export default &#123;
     </div>
 
     <a href="/2022/09/29/axios-axiosInterceptor/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/29/vue-makeRoutes/">
-        <h2>
-            动态生成vue路由
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Vue">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/29
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="动态生成vue路由"><a href="#动态生成vue路由" class="headerlink" title="动态生成vue路由"></a>动态生成vue路由</h3><p><strong>ps:</strong> <em>实现动态路由，通过后端返回的菜单，然后<code>addRoutes</code>进行动态生成vue的路由，详情：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/shaoyunfeng93/p/16266729.html">https://www.cnblogs.com/shaoyunfeng93/p/16266729.html</a></em></p>
-<h4 id="vue-Code"><a href="#vue-Code" class="headerlink" title="vue Code"></a>vue Code</h4><p>因为在路由中存在毫无实意的父级目录，所以需要有个<code>router-view</code>来承接子页面的展示</p>
-<pre><code class="vue">// RouterView组件
-&lt;template&gt;
-  &lt;router-view&gt;&lt;/router-view&gt;
-&lt;/template&gt;
-</code></pre>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><p>动态生成路由需要和后端开发人员约定好配置的参数,而且<em>后端配置的url需要和前端文件的目录结构一致</em>…<br>用来处理后端返回的菜单拼接成<code>vue-router</code>的格式, 该vue项目是根据<code>vue-admin-template</code>模板<strong>二次开发</strong>的…</p>
-<pre><code class="js">  // 加载视图组件
-  function loadView(componentUrl) &#123;
-      return resolve =&gt; require.ensure([], () =&gt; resolve(require(&#39;@/views&#39; + componentUrl)))
-  &#125;
-
-  // 递归构造路由
-  function buildRoutes(routes) &#123;
-      return routes.map(route =&gt; &#123;
-          let _route = &#123;&#125;;
-          let meta = &#123;
-              title: route.name,
-              icon: route.icon,
-          &#125;;
-          if (route.type == 1) &#123; // 目录
-              _route.component = route.parentId == 0 ? Layout : RouterView;
-              if (route.children &amp;&amp; route.children[0]) &#123;
-                  _route.redirect = route.children[0].path;
-              &#125;
-          &#125; else if (route.type == 2) &#123; // 菜单
-              _route.component = loadView(route.url)
-              meta.actionButtonList = route.children || [];
-          &#125;
-          return &#123;
-              path: route.url,
-              name: route.code,
-              ..._route,
-              meta,
-              children: route.type == 1 ? buildRoutes(route.children || []) : [], // 只有目录才去在构造children路由
-          &#125;
-      &#125;)
-  &#125;
-  // 递归过滤掉有重定向却没有children的父级路由
-  function filterAsyncRoutes(routes) &#123;
-      routes = routes.filter(d =&gt; &#123;
-          return d.type != 1 || (d.children &amp;&amp; d.children.length &gt; 0)
-      &#125;)
-      routes.forEach(route =&gt; &#123;
-          if (route.children &amp;&amp; route.children.length &gt; 0) &#123;
-              route.children = filterAsyncRoutes(route.children)
-          &#125;
-      &#125;)
-      return routes
-  &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/29/vue-makeRoutes/ " class="go-post">
         阅读全文
     </a>
 </div>

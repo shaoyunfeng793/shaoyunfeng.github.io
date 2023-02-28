@@ -1,0 +1,349 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN ">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>杨红蓝 | 前端工程化：你所需要知道的最新的babel兼容性实现方案</title>
+    <meta name="author" content="Yanghonglan">
+    <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
+    <meta name="keywords" content=" ">
+    <link rel="icon" href="https://i.postimg.cc/qBPjnYJ5/avatar.jpg">
+    <link rel="stylesheet" href="/css/antd.min.css">
+    
+    <link rel="stylesheet" href="/css/full-theme.css">
+    
+    <script src="/js/vue.js"></script>
+    <script src="/js/antd.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+
+    <div id="loading"
+        style="height: 100vh; width: 100%; position: fixed;display: flex;z-index: 200; justify-content: space-between;">
+        <div id="loadleft" style="width: 50%;background-color: #ffffff;transition: width 0.6s ease-out;"></div>
+        <div id="loadright" style="width: 50%;background-color: #ffffff;transition: width 0.6s ease-out;"></div>
+        <div
+            style="position: fixed; height: 100vh; width: 100%;display: flex;justify-content: center;align-items: center;">
+            <div id="loadcontent"
+                style="width:400px;height:400px;padding:50px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:solid 10px#a3ddfb; text-align:center;opacity:1;transition:opacity 0.3s ease-out;">
+                <div>
+                    <h2>LOADING...</h2>
+                    <p>加载过慢请开启缓存(浏览器默认开启)</p>
+                    <div>
+                        <img src="https://i.postimg.cc/s2xpb9fW/dancingkitty.gif" alt="loading">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="layout">
+        <transition name="into">
+            <div v-show="show_page" style="display: none;">
+                <div id="menu_show">
+                    
+    <nav id="menu">
+        <div class="desktop-menu">
+            <span class="title">
+                杨红蓝's Blog
+            </span>
+            
+                <a href="/">
+                    <span>
+                        <a-icon type="home" theme="filled" />
+                    </span>
+                    <span>
+                        主页
+                    </span>
+                </a>
+                
+                <a href="/archives">
+                    <span>
+                        <a-icon type="read" theme="filled" />
+                    </span>
+                    <span>
+                        文章
+                    </span>
+                </a>
+                
+                <a href="/categories">
+                    <span>
+                        <a-icon type="book" theme="filled" />
+                    </span>
+                    <span>
+                        分类
+                    </span>
+                </a>
+                
+        </div>
+
+        <div :class="'phone-menu ' + menu_show" id="phone-menu">
+            <div :class="'title'" @click="menu_show=!menu_show">
+                <span style="margin-right: 10px;">
+                    <a-icon type="appstore" theme="filled" />
+                </span>
+                <span>
+                    杨红蓝
+                </span>
+            </div>
+            <div class="items" v-show="menu_show">
+                
+                    <a href="/">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="home"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                主页
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="/archives">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="read"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                文章
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="/categories">
+                        <div class="item">
+                            <div style="min-width:20px; max-width:50px; width: 10%">
+                                <a-icon type="book"
+                                    theme="filled" />
+                            </div>
+                            <div style="min-width:100px;max-width: 150%;width: 20%;">
+                                分类
+                            </div>
+                        </div>
+                    </a>
+                    
+            </div>
+            <div class="curtain" v-show="menu_show"></div>
+        </div>
+
+    </nav>
+                </div>
+
+                <div id="main">
+                     
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>前端工程化：你所需要知道的最新的babel兼容性实现方案 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2023/2/28
+        </span>
+
+        
+        <span class="category">
+            <a href="/categories/前端工程化">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" />
+                </span>
+                前端工程化
+            </a>
+        </span>
+        
+
+        
+    </div>
+
+    <div class="content" v-pre>
+        <h3 id="1-core-js"><a href="#1-core-js" class="headerlink" title="1.core-js"></a>1.core-js</h3><p><code>core-js</code>是JavaScript的模块化标准库，包括了ECMAScript到2021年的新api的向后兼容实现。它和<code>babel</code>高度集成，是babel解决新特性在浏览器中兼容问题的核心依赖。</p>
+<p>目前<code>core-js</code>的版本是<code>3.x</code>，与<code>core-js@2</code>相比不仅在本身的架构上有重大调整，还对babel中的一些插件有重大影响。</p>
+<h4 id="1-1-core-js-2"><a href="#1-1-core-js-2" class="headerlink" title="1.1 core-js@2"></a>1.1 core-js@2</h4><p><code>core-js@2</code>被<code>@babel/polyfill</code>、<code>@babel/preset-env</code>和<code>@babel/runtime-corejs2</code>引入来进行新api的兼容处理，其中有两个核心的模块：</p>
+<p><code>library</code>：不污染全局的runtime模块，供<code>@babel/runtime-corejs2</code>引入；<br><code>modules</code>：污染全局的polyfill模块，供<code>@babel/polyfill和@babel/preset-env</code>引入。</p>
+<p><strong>不污染全局的runtime模块主要是采用模拟替换api的方式解决兼容性问题；污染全局的polyfill模块主要是采用在全局和实例上添加api的方式解决兼容性问题。</strong></p>
+<h4 id="1-2-core-js-3"><a href="#1-2-core-js-3" class="headerlink" title="1.2 core-js@3"></a>1.2 core-js@3</h4><p><code>core-js@3</code>放弃了对<code>@babel/polyfill</code>的支持，被<code>@babel/preset-env</code>和<code>@babel/runtime-corejs3</code>引入来进行新api的兼容处理。</p>
+<p>由于<code>core-js@2</code>包的体积太大（约2M），并且有很多重复的文件被引用。所以，<code>core-js@3</code>对包进行拆分，其中两个核心的包分别是：</p>
+<ul>
+<li><code>core-js</code>：污染全局的polyfill包，供<code>@babel/preset-env</code>引入，等价于<code>core-js@2/modules</code>（约500k, 40k minified and gzipped）；</li>
+<li><code>core-js-pure</code>：不污染全局的runtime包，供<code>@babel/runtime-corejs3</code>引入，等价于<code>core-js@2/library</code>（约440k）。</li>
+</ul>
+<p><code>core-js@2</code>分支已经冻结，不会再添加新特性，新特性都会添加到<code>core-js@3</code>。例如你使用了 Array.prototype.flat()，如果你使用的是<code>core-js@2</code>，那么其不包含此新特性。但是你仍然可以在<code>core-js@3</code>的基础上使用<code>core-js@2</code>的功能。为了可以使用更多的新特性，建议大家使用<code>core-js@3</code>。</p>
+<p><em>关于core-js的内容大家先了解这么多，先有个印象，大家只需要记住一点: <code>corejs</code>才是api兼容实现的提供者❗❗</em></p>
+<h3 id="2-babel-x2F-preset-env"><a href="#2-babel-x2F-preset-env" class="headerlink" title="2.@babel&#x2F;preset-env"></a>2.@babel&#x2F;preset-env</h3><p>babel自6.0起，就不再对代码进行transform，现在只负责parse和generate过程，代码的transform过程全都交给一个个plugin去做。所以在没有配置任何plugin的情况下，经过babel输出的代码是没有改变的。</p>
+<p>有的环境下可能需要转换几十种不同语法的代码，则需要配置几十个plugin，这显然会非常繁琐。所以，为了解决这种问题，babel提供了预设插件机制preset，preset中可以预设置一组插件来便捷的使用这些插件所提供的功能。目前，babel官方推荐使用<code>@babel/preset-env</code>预设插件。</p>
+<p><code>@babel/preset-env</code>主要的作用是用来转换那些已经被正式纳入TC39中的语法。所以它无法对那些还在提案中的语法进行处理，对于处在stage中的语法，需要安装对应的plugin进行处理。</p>
+<pre><code>&#123;
+  &quot;presets&quot;: [
+    [&quot;@babel/preset-env&quot;]
+  ]
+&#125;
+</code></pre>
+<p>除了语法转换，<code>@babel/preset-env</code>另一个重要的功能是对api的处理，也就是在代码中引入polyfill。但是，<code>@babel/preset-env</code>默认是不开启处理api的功能，只有设置了<code>useBuiltIns</code>选项（不为false）才会开启。</p>
+<p><code>@babel/preset-env</code>主要还是依赖<code>core-js</code>来处理api的兼容性，在升级到<code>7.4.0</code>以上的版本以后，既支持<code>core-js@2</code>，也支持<code>core-js@3</code>，所以增加了corejs的配置来控制所需的版本。如果设置了<code>useBuiltIns</code>选项（不为false）就得设置corejs版本，否则babel将会发出警告。</p>
+<pre><code>&#123;
+  &quot;presets&quot;: [
+    [
+      &quot;@babel/preset-env&quot;,
+      &#123;
+        &quot;useBuiltIns&quot;: &quot;usage&quot;, // 也可配置成 entry，配置为 false 则不需要配置 corejs
+        &quot;corejs&quot;: 3// 也可配置成 2
+      &#125;
+    ]
+  ]
+&#125;
+</code></pre>
+<p><code>useBuiltIns</code>是babel7的新功能，这个配置提供了三个选项告诉babel该如何引入polyfill包：</p>
+<h4 id="2-1-usage"><a href="#2-1-usage" class="headerlink" title="2.1 usage"></a>2.1 usage</h4><p>代码中不用主动import，babel会自动将代码里已使用到的且browserslist环境不支持的polyfill导入。<br><em>当然如果您需要自己试一试编译结果的话，可以到babel官网上的在线工具试一试 <a target="_blank" rel="noopener" href="https://www.babeljs.cn/repl">https://www.babeljs.cn/repl</a></em></p>
+<p><strong>编译前：</strong></p>
+<pre><code class="js">const result = [1, 2, 3, 4, 5].copyWithin(0, 3)
+
+const instance = newPromise((resolve, reject) =&gt; &#123;
+  resolve(123)
+&#125;)
+</code></pre>
+<p><strong>编译后：</strong></p>
+<pre><code class="js">&quot;use strict&quot;;
+
+require(&quot;core-js/modules/es.array.copy-within.js&quot;);
+
+require(&quot;core-js/modules/es.object.to-string.js&quot;);
+
+require(&quot;core-js/modules/es.promise.js&quot;);
+
+var result = [1, 2, 3, 4, 5].copyWithin(0, 3);
+var instance = newPromise(function (resolve, reject) &#123;
+  resolve(123);
+&#125;);
+</code></pre>
+<h4 id="2-2-entry"><a href="#2-2-entry" class="headerlink" title="2.2 entry"></a>2.2 entry</h4><p>需要在代码运行之前导入，会将browserslist环境不支持的所有polyfill都导入。</p>
+<p><strong>编译前：</strong></p>
+<pre><code class="js">import&quot;core-js/stable&quot;;
+import&quot;regenerator-runtime/runtime&quot;;
+
+const result = [1, 2, 3, 4, 5].copyWithin(0, 3)
+
+const instance = newPromise((resolve, reject) =&gt; &#123;
+  resolve(123)
+&#125;)
+</code></pre>
+<p><strong>编译后：</strong></p>
+<pre><code class="js">&quot;use strict&quot;;
+
+require(&quot;core-js/modules/es.symbol.js&quot;);
+
+// ... 此处省略400+行代码
+
+require(&quot;regenerator-runtime/runtime&quot;);
+
+var result = [1, 2, 3, 4, 5].copyWithin(0, 3);
+var instance = newPromise(function (resolve, reject) &#123;
+  resolve(123);
+&#125;);
+</code></pre>
+<h4 id="2-3-false"><a href="#2-3-false" class="headerlink" title="2.3 false"></a>2.3 false</h4><p>只做了语法转换，不会导入任何polyfill进来，并且corejs配置将无效。</p>
+<p><strong>编译前：</strong></p>
+<pre><code class="js">const result = [1, 2, 3, 4, 5].copyWithin(0, 3)
+
+const instance = newPromise((resolve, reject) =&gt; &#123;
+    resolve(123)
+&#125;)
+
+const shen = result?.a
+</code></pre>
+<p><strong>编译后：</strong></p>
+<pre><code class="js">&quot;use strict&quot;;
+
+var result = [1, 2, 3, 4, 5].copyWithin(0, 3);
+var instance = newPromise(function (resolve, reject) &#123;
+  resolve(123);
+&#125;);
+var shen = result === null || result === void0 ? void0 : result.a;
+</code></pre>
+<h3 id="3-babel-x2F-polyfill"><a href="#3-babel-x2F-polyfill" class="headerlink" title="3.@babel&#x2F;polyfill"></a>3.@babel&#x2F;polyfill</h3><p><code>@babel/polyfill</code>是一个运行时包，主要是通过核心依赖<code>core-js@2</code>来完成对应浏览器不支持的新的全局和实例api的添加。在升级到<code>core-js@3</code>后，如果还要保留<code>@babel/polyfill</code>的使用，就要在<code>@babel/polyfill</code>中添加<code>core-js@2</code>和<code>core-js@3</code>切换的选项，这样<code>@babel/polyfill</code>中将包含<code>core-js@2</code>和<code>core-js@3</code>两个包，出于这个原因官方决定弃用<code>@babel/polyfill</code>。</p>
+<p>关于<code>@babel/polyfill</code>有三点要说明：<br>如果采用<code>@babel/preset-env</code>的polyfill方案是不需要<code>@babel/polyfill</code>的安装为前提，只需要安装<code>core-js</code>（regenerator-runtime会在安装<code>@babel/preset-env</code>的时候自动安装），然后通过设置<code>useBuiltIns</code>选项来开启对api的兼容性处理。</p>
+<p>当然，你也可以不依赖<code>@babel/preset-env</code>提供的处理api兼容性的能力，直接使用<code>@babel/polyfill</code>来处理。如果使用了<code>core-js@3</code>，则需要做如下的替换工作：</p>
+<pre><code class="js">// before
+import&quot;@babel/polyfill&quot;;
+
+// after
+import&quot;core-js/stable&quot;;
+import&quot;regenerator-runtime/runtime&quot;;
+</code></pre>
+<p><em>注：此篇文章摘自悬笔e绝一文：<a target="_blank" rel="noopener" href="https://baijiahao.baidu.com/s?id=1709714903451987794&amp;wfr=spider&amp;for=pc">https://baijiahao.baidu.com/s?id=1709714903451987794&amp;wfr=spider&amp;for=pc</a> 更多内容可从该文查看</em></p>
+
+    </div>
+
+    
+</div>
+                     
+<footer id="footer">
+    <div class="footer-wrap">
+        <div>
+            © 杨红蓝
+            <span class="footer-icon">
+                <a-icon type="flag" theme="filled" /></span>
+            @Yanghonglan
+        </div>
+        
+    </div>
+
+</footer>
+
+<script src="/js/highlight.min.js"></script>
+<script src="/js/particle.js"></script>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+    <script>
+    new Vue({
+        el: "#layout",
+        data: {
+            show_page: false,
+            onload_menu: false,
+            menu_show: false,
+            card_top: 100
+        },
+        created: function () {
+            var that = this
+            window.onload = function () {
+                that.show_page = true
+                document.getElementById("loadcontent").style.opacity = 0
+                setTimeout(function () {
+                    document.getElementById("loadleft").style.width = 0
+                    document.getElementById("loadright").style.width = 0
+                }, 300)
+                setTimeout(function () {
+                    document.getElementById("loading").style = "display:none"
+                }, 600)
+            }
+        },
+        mounted: function () {
+            var that = this
+            window.addEventListener('scroll', function (e) {
+                that.menu_show = false
+            })
+        },
+        methods: {
+            home_click: function () {
+                window.scrollTo({
+                    top: window.innerHeight - 80,
+                    behavior: "smooth",
+                });
+            }
+        }
+    })
+</script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/haru02.model.json"},"display":{"position":"right","width":200,"height":400},"mobile":{"show":false},"log":false});</script></body>
+
+</html>

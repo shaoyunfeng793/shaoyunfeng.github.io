@@ -166,6 +166,137 @@
 
 <div class="post">
 
+    <a href="/2022/10/20/canvas-masaike/">
+        <h2>
+            Canvas之马赛克
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Canvas">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Canvas
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/10/20
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Canvas之马赛克"><a href="#Canvas之马赛克" class="headerlink" title="Canvas之马赛克"></a>Canvas之马赛克</h3><p>通过<code>getImageData</code>获取到图片像素的数据，对这些像素数据进行一系列处理就能得到不一样的图片效果</p>
+<p>使用<code>putImageData</code>把处理后的像素数据在输出到画布上</p>
+<h4 id="效果预览"><a href="#效果预览" class="headerlink" title="效果预览"></a>效果预览</h4><p><a target="_blank" rel="noopener" href="https://postimg.cc/4710KP8z"><img src="https://i.postimg.cc/wMKYGbLb/canvas-masaike.jpg" alt="canvas-masaike.jpg"></a></p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Canvas马赛克&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;canvas id=&quot;canvas&quot; width=&quot;500&quot; height=&quot;500&quot;&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+&lt;script&gt;
+    var canvas = document.getElementById(&quot;canvas&quot;);
+    var ctx = canvas.getContext(&quot;2d&quot;);
+
+    var img = new Image();
+    img.src = &#39;./img/0.jpeg&#39;;
+    img.onload = function () &#123;
+        draw(this);
+
+    &#125;
+
+    function draw(obj) &#123;
+        ctx.drawImage(obj, 0, 0);
+        
+        var w = obj.width;
+        var h = obj.height;
+        var oImg = ctx.getImageData(0, 0, w, h);
+        //创建一个新的ImageData对象
+        var newImg = ctx.createImageData(w, h);
+        //马赛克的程度，数字越大越模糊
+        var num = 10;
+        //等分画布
+        var stepW = w / num;
+        var stepH = h / num;
+        //这里是循环画布的像素点
+        for (var i = 0; i &lt; stepH; i++) &#123;
+            for (var j = 0; j &lt; stepW; j++) &#123;
+                //获取一个小方格的随机颜色，这是小方格的随机位置获取的
+                var color = getXY(oImg, j * num + Math.floor(Math.random() * num), i * num + Math.floor(Math.random() * num));
+                //这里是循环小方格的像素点，
+                for (var k = 0; k &lt; num; k++) &#123;
+                    for (var l = 0; l &lt; num; l++) &#123;
+                        //设置小方格的颜色
+                        setXY(newImg, j * num + l, i * num + k, color);
+                    &#125;
+                &#125;
+
+            &#125;
+        &#125;
+        ctx.putImageData(newImg, w, 0);
+    &#125;
+
+    function getXY(obj, x, y) &#123;
+        var w = obj.width;
+        var h = obj.height;
+        var d = obj.data;
+        var color = [];
+        color[0] = obj.data[4 * (y * w + x)];
+        color[1] = obj.data[4 * (y * w + x) + 1];
+        color[2] = obj.data[4 * (y * w + x) + 2];
+        color[3] = obj.data[4 * (y * w + x) + 3];
+        return color;
+    &#125;
+
+    function setXY(obj, x, y, color) &#123;
+        var w = obj.width;
+        var h = obj.height;
+        var d = obj.data;
+        obj.data[4 * (y * w + x)] = color[0];
+        obj.data[4 * (y * w + x) + 1] = color[1];
+        obj.data[4 * (y * w + x) + 2] = color[2];
+        obj.data[4 * (y * w + x) + 3] = color[3];
+    &#125;
+&lt;/script&gt;
+
+&lt;/html&gt;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/10/20/canvas-masaike/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/10/20/canvas-guaguaka/">
         <h2>
             Canvas之刮刮卡
@@ -2101,93 +2232,6 @@ function render() &#123;
     </div>
 
     <a href="/2022/09/30/webpack-multiInput/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/30/webpack-optimization/">
-        <h2>
-            Webpack之抽离压缩css
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Webpack">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Webpack
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/30
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="Webpack之抽离压缩css"><a href="#Webpack之抽离压缩css" class="headerlink" title="Webpack之抽离压缩css"></a>Webpack之抽离压缩css</h3><p>使用 <code>mini-css-extract-plugin</code> 插件的内置loader 替换 <code>style-loader</code></p>
-<p>使用 <code>terser-webpack-plugin</code> 插件压缩js代码</p>
-<p>使用 <code>optimize-css-assets-webpack-plugin</code> 插件压缩css代码</p>
-<h4 id="Webpack-配置"><a href="#Webpack-配置" class="headerlink" title="Webpack 配置"></a>Webpack 配置</h4><pre><code class="js">    const MiniCSSExtractPlugin = require(&#39;mini-css-extract-plugin&#39;);
- 
-   
-    const TerserPlugin = require(&#39;terser-webpack-plugin&#39;);  // 压缩js插件
-    const OptimizeCssAssetsWebpackPlugin = require(&#39;optimize-css-assets-webpack-plugin&#39;);  // 压缩css插件
-    
-    module.exports = &#123;
-        // ...
-        module: &#123;
-            rules: [
-                &#123;
-                    test: /\.css/,
-                    loader: [
-                        MiniCSSExtractPlugin.loader, // 替换 style-loader
-                        &#39;css-loader&#39;,
-                        &#39;postcss-loader&#39;,  // autoprefixer
-                    ],
-                &#125;
-            ]
-        &#125;,
-        plugins: [
-            new MiniCSSExtractPlugin(&#123;
-                filename: &#39;css/main.[contentHash:8].css&#39;
-            &#125;)
-        ],
-        // 优化配置
-        optimization: &#123;
-            minimizer: &#123;
-                // 压缩js
-                new TerserPlugin(),
-                // 压缩css
-                new OptimizeCssAssetsWebpackPlugin()
-            &#125;
-        &#125;  
-    &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/30/webpack-optimization/ " class="go-post">
         阅读全文
     </a>
 </div>

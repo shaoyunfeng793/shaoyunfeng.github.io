@@ -166,6 +166,159 @@
 
 <div class="post">
 
+    <a href="/2022/09/28/html-autoCarouselWithHand/">
+        <h2>
+            实现Demo之自动轮播加手势滑动偏移
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/HTML">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                HTML
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/28
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="自动轮播加手势滑动偏移"><a href="#自动轮播加手势滑动偏移" class="headerlink" title="自动轮播加手势滑动偏移"></a>自动轮播加手势滑动偏移</h3><p><strong>ps:</strong> <em>实现一个商品展示自动循环轮播，且用户可以通过手势来控制左右滑动，简易Demo如下</em></p>
+<h4 id="css-Code"><a href="#css-Code" class="headerlink" title="css Code"></a>css Code</h4><pre><code class="css">    * &#123;
+        padding: 0;
+        margin: 0;
+    &#125;
+
+    html,
+    body &#123;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    &#125;
+
+    .container &#123;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    &#125;
+
+    .awrad_outer &#123;
+        width: 300px;
+        overflow: hidden;
+    &#125;
+
+    .awrad_list &#123;
+        width: 900px;
+        overflow: hidden;
+    &#125;
+
+    .award_list_item &#123;
+        float: left;
+        background-color: skyblue;
+        width: 100px;
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+    &#125;
+</code></pre>
+<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Demo之自动轮播加手势滑动偏移&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;div class=&quot;awrad_outer&quot;&gt;
+            &lt;div class=&quot;awrad_list&quot;&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;1&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;2&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;3&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;4&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;5&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;6&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;7&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;8&lt;/div&gt;
+                &lt;div class=&quot;award_list_item&quot;&gt;9&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    var awrad_outer = document.querySelector(&#39;.awrad_outer&#39;);
+    var awrad_list = document.querySelector(&#39;.awrad_list&#39;);
+    var offsetVal = 0;
+    var downX = null;
+    function move() &#123;
+        if (downX != null) &#123;
+            return;
+        &#125;
+        offsetVal--;
+        if (offsetVal &lt;= -600) &#123;
+            offsetVal = 0;
+        &#125;
+        awrad_list.style.transform = `translateX($&#123;offsetVal&#125;px)`;
+        requestAnimationFrame(move)
+    &#125;
+    move();
+    awrad_outer.addEventListener(&#39;touchstart&#39;, function (e) &#123;
+        downX = e.targetTouches[0].clientX;
+    &#125;)
+    awrad_outer.addEventListener(&#39;touchmove&#39;, function (e) &#123;
+        let clientX = e.targetTouches[0].clientX;
+        offsetVal += clientX - downX;
+        downX = clientX; // 修正参照值
+        if (offsetVal &gt; 0) &#123;
+            offsetVal = 0;
+        &#125; else if (offsetVal &lt; -600) &#123;
+            offsetVal = -600;
+        &#125;
+        awrad_list.style.transform = `translateX($&#123;offsetVal&#125;px)`;
+    &#125;)
+    awrad_outer.addEventListener(&#39;touchend&#39;, function (e) &#123;
+        downX = null;
+        move();
+    &#125;)
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/28/html-autoCarouselWithHand/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/09/27/html-lotteryThreeCount/">
         <h2>
             实现Demo之大转盘三连中

@@ -165,6 +165,9 @@
 
     <div class="content" v-pre>
         <p><strong>记录一下工作中开发移动端h5时，用到的一些little skill</strong></p>
+<h4 id="微信实现跳转到公众号关注页"><a href="#微信实现跳转到公众号关注页" class="headerlink" title="微信实现跳转到公众号关注页"></a>微信实现跳转到公众号关注页</h4><p><em>可通过biz值来实现链接跳转</em><br>获取<code>biz</code>值可以通过公众号后台发布的历史文章找一篇复制其链接（链接上就有<code>biz</code>值），如果没有发过文章那就发一篇，同样前面的操作，然后通过拼接链接实现：</p>
+<pre><code class="js">location.href = `https://mp.weixin.qq.com/mp/profile_ext?action=home&amp;__biz=$&#123;你的biz&#125;#wechat_redirect`
+</code></pre>
 <h4 id="微信-amp-支付宝"><a href="#微信-amp-支付宝" class="headerlink" title="微信&amp;支付宝"></a>微信&amp;支付宝</h4><pre><code class="js">// 打开微信扫一扫 
 location.href = &#39;weixin://scanqrcode&#39;
 

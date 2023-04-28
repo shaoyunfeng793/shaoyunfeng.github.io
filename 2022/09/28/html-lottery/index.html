@@ -164,7 +164,8 @@
     </div>
 
     <div class="content" v-pre>
-        <h3 id="H5幸运大转盘"><a href="#H5幸运大转盘" class="headerlink" title="H5幸运大转盘"></a>H5幸运大转盘</h3><h4 id="css-Code"><a href="#css-Code" class="headerlink" title="css Code"></a>css Code</h4><pre><code class="css">    * &#123;
+        <h3 id="H5幸运大转盘"><a href="#H5幸运大转盘" class="headerlink" title="H5幸运大转盘"></a>H5幸运大转盘</h3><p><strong>gitee地址: <a target="_blank" rel="noopener" href="https://gitee.com/shaoyunfeng793/lucky-wheel">https://gitee.com/shaoyunfeng793/lucky-wheel</a></strong></p>
+<h4 id="css-Code"><a href="#css-Code" class="headerlink" title="css Code"></a>css Code</h4><pre><code class="css">    * &#123;
         margin: 0;
         padding: 0;
     &#125;
@@ -236,10 +237,15 @@
 
 &lt;head&gt;
     &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta name=&quot;description&quot; content=&quot;&quot;&gt;
+    &lt;meta name=&quot;author&quot; content=&quot;域叶&quot;&gt;
     &lt;title&gt;幸运大转盘&lt;/title&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;./alert.css&quot;&gt;
 &lt;/head&gt;
 
 &lt;body&gt;
+    &lt;div class=&quot;preloadImg1&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;preloadImg2&quot;&gt;&lt;/div&gt;
     &lt;div class=&quot;container&quot;&gt;
         &lt;div class=&quot;wheel&quot;&gt;
             &lt;canvas id=&quot;wheelCanvas&quot; width=&quot;600px&quot; height=&quot;600px&quot;&gt;&lt;/canvas&gt;
@@ -247,20 +253,20 @@
         &lt;/div&gt;
     &lt;/div&gt;
 &lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    //抽奖转盘
+&lt;script src=&quot;./alert.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+    //抽奖转盘
     var turnWheel = &#123;
         reaward: [
-            &#123; name: &#39;380元优惠券&#39;, icon: &#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/signAward/1649132281714_4Y5c6zXd.png&#39; &#125;,
-            &#123; name: &#39;谢谢参与&#39;, icon: &#39;&#39; &#125;,
-            &#123; name: &#39;30积分&#39;, icon: &#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/signAward/1649132281714_4Y5c6zXd.png&#39; &#125;,
-            &#123; name: &#39;谢谢参与&#39;, icon: &#39;&#39; &#125;,
-            &#123; name: &#39;10积分&#39;, icon: &#39;https://mdhw.oss-cn-hangzhou.aliyuncs.com/signAward/1649132281714_4Y5c6zXd.png&#39; &#125;,
-            &#123; name: &#39;谢谢参与&#39;, icon: &#39;&#39; &#125;,
+            &#123; name: &#39;沙雕老二达&#39;, icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065206471_siCEaEpi.jpg&#39; &#125;,
+            &#123; name: &#39;憨憨狐狸&#39;, icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065297220_maYiZc27.jpg&#39; &#125;,
+            &#123; name: &#39;鸡太美阿坤&#39;, icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065313260_JDMZ2GTW.jpg&#39; &#125;,
+            &#123; name: &#39;色情狂魔辉&#39;, icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065328906_azt6pQD2.jpg&#39; &#125;,
+            &#123; name: &#39;海王牛头人&#39;, icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065383539_rBYtb5BJ.jpg&#39; &#125;,
+            // &#123; name: &#39;高冷男神流川&#39;, icon: &#39;http://mdhw.oss-cn-hangzhou.aliyuncs.com/goods/1652065369843_rny7mahE.jpg&#39; &#125;,
         ], //转盘奖品
         colors: [], //转盘奖品区块对应背景颜色
-        fontColor: &#39;#f00&#39;, //转盘奖品字体颜色
+        fontColor: &#39;#8C42E9&#39;, //转盘奖品字体颜色
         radius: 300, //转盘半径
         textRadius: 320, //转盘奖品位置距离圆心的距离
     &#125;;
@@ -272,7 +278,7 @@
     turnWheel.reaward = turnWheel.reaward.map(d =&gt; &#123;
         let img = new Image();
         img.src = d.icon;
-        d.icon = img
+        d.iconImg = img
         return d
     &#125;)
     turnWheel.colors = [
@@ -285,7 +291,7 @@
     ];
     window.onload = function () &#123;
 
-        drawWheelCanvas(&#39;wheelCanvas&#39;, turnWheel);
+        drawWheelCanvas(&#39;wheelCanvas&#39;, turnWheel, 700, 700);
         var getAward = document.getElementById(&quot;getAward&quot;);
         var index = 0; // 中奖将品的数组下标
         getAward.addEventListener(&quot;click&quot;, function () &#123;
@@ -296,7 +302,11 @@
             index = Math.floor(Math.random() * turnWheel.reaward.length);
             wheelCanvas.classList.add(&quot;transition&quot;);
             twinkle(() =&gt; &#123;
-                alert(&#39;中奖奖品下标：&#39; + index);
+                smoke.alert(`&lt;p&gt;恭喜抽到$&#123;turnWheel.reaward[index].name&#125;&lt;/p&gt;&lt;img style=&quot;width:200px;margin-top:10px&quot; src=&quot;$&#123;turnWheel.reaward[index].icon&#125;&quot; /&gt;`,//第一个参数提示内容
+                    function () &#123;
+                        wheelCanvas.style.transform = &#39;rotate(0deg)&#39;;
+                    &#125;,//第二个参数回调函数
+                    &#123; ok: &quot;确定&quot; &#125;);//第三个参数按钮的属性
             &#125;);
             rotateWheel(index, turnWheel.reaward.length)
         &#125;)
@@ -316,38 +326,59 @@
             wheelCanvas.classList.remove(&#39;transition&#39;);
             wheel.classList.remove(&#39;wheel-light&#39;);
             pointer.classList.add(&#39;pointer-animation&#39;);
-            wheelCanvas.style.transform = &#39;rotate(0deg)&#39;;
             timer &amp;&amp; clearInterval(timer);
 
             typeof callback === &#39;function&#39; &amp;&amp; callback();
 
         &#125;, 2000);
     &#125;
+    // 获取像素比 高清cavas
+    function getPixelRatio(context) &#123;
+
+        var backingStore = context.backingStorePixelRatio ||
+
+            context.webkitBackingStorePixelRatio ||
+
+            context.mozBackingStorePixelRatio ||
+
+            context.msBackingStorePixelRatio ||
+
+            context.oBackingStorePixelRatio ||
+
+            context.backingStorePixelRatio || 1;
+
+        return (window.devicePixelRatio || 1) / backingStore;
+
+    &#125;;
     // 旋转转盘 (index:中奖将品的数组下标)
     function rotateWheel(awardIndex, awardCount) &#123;
         let baseAngle = 360 / awardCount;
         let rotateRound = 360 * 5; // 每次旋转5圈
-        wheelCanvas.style.transform = &#39;rotate(&#39; + ((270 - ((baseAngle / 2) + baseAngle * awardIndex)) + rotateRound) + &#39;deg)&#39;;
+        wheelCanvas.style.transform = &#39;rotate(&#39; + ((360 - (baseAngle * awardIndex)) + rotateRound) + &#39;deg)&#39;;
     &#125;
     // 绘制转盘
-    function drawWheelCanvas(canvasId, turnWheel) &#123;
+    function drawWheelCanvas(canvasId, turnWheel, _w = 700, _h = 700) &#123;
         let canvas = document.getElementById(canvasId);
         let baseAngle = Math.PI * 2 / (turnWheel.reaward.length);
         let ctx = canvas.getContext(&quot;2d&quot;);
-        let canvasW = canvas.width; // 画板的高度
-        let canvasH = canvas.height; // 画板的宽度
+        let _ratio = getPixelRatio(ctx);
+        let canvasW = canvas.width = _w * _ratio;// 画板的高度
+        let canvasH = canvas.height = _h * _ratio; // 画板的宽度
+        canvas.style.width = _w + &#39;px&#39;;
+        canvas.style.height = _h + &#39;px&#39;;
+        ctx.scale(_ratio, _ratio); // 需要在放大同等倍数，因为画布的大小是实际渲染的3倍也就是被缩小了
         ctx.fillStyle = &quot;#fff000&quot;;
         ctx.clearRect(0, 0, canvasW, canvasH);//去掉背景默认的黑色
         ctx.font = &#39;26px Microsoft YaHei&#39;;
         for (let index = 0; index &lt; turnWheel.reaward.length; index++) &#123;
-            let angle = index * baseAngle;
+            let angle = index * baseAngle - baseAngle / 2 - Math.PI / 2;
             let rewardName = turnWheel.reaward[index].name;
-            let translateX = canvasW * 0.5 + Math.cos(angle + baseAngle / 2) * turnWheel.textRadius;
-            let translateY = canvasH * 0.5 + Math.sin(angle + baseAngle / 2) * turnWheel.textRadius;
+            let translateX = _w * 0.5 + Math.cos(angle + baseAngle / 2) * turnWheel.textRadius;
+            let translateY = _h * 0.5 + Math.sin(angle + baseAngle / 2) * turnWheel.textRadius;
             ctx.fillStyle = turnWheel.colors[index];
             ctx.beginPath();
-            ctx.arc(canvasW * 0.5, canvasH * 0.5, turnWheel.radius, angle, angle + baseAngle, false);
-            ctx.lineTo(canvasW * 0.5, canvasH * 0.5);
+            ctx.arc(_w * 0.5, _h * 0.5, Math.min(_w / 2, _h / 2), angle, angle + baseAngle, false);
+            ctx.lineTo(_w * 0.5, _h * 0.5);
             ctx.fill();
             ctx.save();
             ctx.fillStyle = turnWheel.fontColor;
@@ -357,12 +388,15 @@
             //添加对应图标
             if (turnWheel.reaward[index] &amp;&amp; turnWheel.reaward[index].icon) &#123;
 
-                ctx.drawImage(turnWheel.reaward[index].icon, -40, 140, 80, 80);
+                ctx.drawImage(turnWheel.reaward[index].iconImg, -40, 140, 80, 80);
             &#125;
 
             ctx.restore(); //很关键
         &#125;
     &#125;
+&lt;/script&gt;
+
+&lt;/html&gt;
 </code></pre>
 
     </div>

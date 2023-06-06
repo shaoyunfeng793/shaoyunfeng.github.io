@@ -166,6 +166,120 @@
 
 <div class="post">
 
+    <a href="/2022/09/29/axios-axiosInterceptor/">
+        <h2>
+            axios拦截器配置
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Axios">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Axios
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/29
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="axios拦截器配置"><a href="#axios拦截器配置" class="headerlink" title="axios拦截器配置"></a>axios拦截器配置</h3><p><strong>ps:</strong> <em>http请求很多都喜欢配置拦截器，生成专属request方法，通过设置请求拦截器注入token，设置响应拦截器对响应作出响应的处理，比如报错信息，这样就不需要每次在catch里去提示错误信息了</em></p>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    import axios from &quot;axios&quot;;
+    import router from &#39;@/router/index.js&#39;;
+    import &#123; Message &#125; from &quot;element-ui&quot;;
+    import &#123; getToken, removeToken &#125; from &#39;@/utils/auth&#39;
+    const service = axios.create(&#123;
+    timeout: 20000 // 请求超时时间
+    &#125;);
+
+    // request拦截器，
+    service.interceptors.request.use(
+    config =&gt; &#123;
+        // 权限校验
+        var sysToken = getToken();
+        if (sysToken &amp;&amp; sysToken.length &gt; 0) &#123;
+        config.headers[&#39;Authorization&#39;] = sysToken
+        &#125;
+        return config;
+    &#125;,
+    error =&gt; &#123;
+        return Promise.reject(error);
+    &#125;
+    );
+    // response拦截器，
+    service.interceptors.response.use(
+    response =&gt; &#123;
+        if (response.config.responseType === &#39;blob&#39;) &#123;
+
+        if (response.status != 200) &#123;
+
+            Message.error(&#39;请求失败&#39; + response.status);
+            return Promise.reject()
+        &#125; else if (!response.headers[&quot;content-disposition&quot;]) &#123;
+
+            Message.error(&#39;暂无接口访问权限&#39;);
+            return Promise.reject()
+        &#125;
+        return response
+
+        &#125; else &#123;
+
+        if (response.data.code !== 0) &#123;
+            let errMsg = response.data.msg;
+            if (response.data.code == 401) &#123; // token失效
+            if (getToken()) &#123;
+                Message.error(errMsg);
+                removeToken()
+                router.replace(&#39;/Login&#39;)
+            &#125;
+            &#125; else &#123;
+            Message.error(errMsg);
+            &#125;
+            return Promise.reject(errMsg)
+        &#125;
+        return response.data;
+        &#125;
+
+    &#125;,
+    error =&gt; &#123;
+        Message.error(&#39;请求服务器失败&#39;);
+        return Promise.reject(error);
+    &#125;
+    );
+
+    export default service
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/29/axios-axiosInterceptor/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/09/29/vue-makeRoutes/">
         <h2>
             动态生成vue路由
@@ -1653,207 +1767,6 @@ export default &#123;
     </div>
 
     <a href="/2022/09/28/vue-exploreDrag/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/28/html-flutterAnimation/">
-        <h2>
-            实现Demo之滚动信息展示/弹幕
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/HTML">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/28
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="弹幕飘屏-amp-一个横框内的滚动信息展示"><a href="#弹幕飘屏-amp-一个横框内的滚动信息展示" class="headerlink" title="弹幕飘屏&amp;一个横框内的滚动信息展示"></a>弹幕飘屏&amp;一个横框内的滚动信息展示</h3><p><strong>ps:</strong> <em>实现一个展示给用户信息的横幅条，比如xxx购买了xxx产品真种滚屏信息或者弹幕效果，简易Demo如下</em></p>
-<h4 id="html-Code"><a href="#html-Code" class="headerlink" title="html Code"></a>html Code</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;title&gt;Demo之滚动信息展示/弹幕&lt;/title&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-    &lt;!-- 把选择器传入到下面的js函数中即可 --&gt;
-    &lt;div id=&quot;walk&quot;&gt;&lt;/div&gt; 
-    &lt;div id=&quot;danmaku&quot;&gt;&lt;/div&gt; 
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-<h4 id="js-Code-For-竖向滚动信息条"><a href="#js-Code-For-竖向滚动信息条" class="headerlink" title="js Code For 竖向滚动信息条"></a>js Code For 竖向滚动信息条</h4><pre><code class="js">    function Walk(&#123;
-    selector,
-    speed = 1,
-    data = [],
-    danweiLucheng,
-
-&#125;) &#123;
-    this.dom = document.querySelector(selector);
-    this.data = data;
-    this.speed = speed;
-    this.danweiLucheng = danweiLucheng;
-    this.timer = null;
-    this.init();
-    this.render();
-&#125;;
-Walk.prototype.render = function () &#123;
-    let htmlStr = &#39;&#39;;
-    this.data.concat(this.data[0]).forEach(d =&gt; &#123;
-        htmlStr += `&lt;div class=&quot;walking-item&quot;&gt;
-                        &lt;div class=&quot;walking-text&quot;&gt;$&#123;d.message&#125;&lt;/div&gt;
-                        &lt;img class=&quot;walking-img&quot;
-                            src=&quot;$&#123;d.icon&#125;&quot;&gt;
-                    &lt;/div&gt;`;
-    &#125;);
-    this.dom.innerHTML = htmlStr;
-&#125;;
-Walk.prototype.init = function () &#123;
-    this.index = 0;
-    this.lucheng = 0;
-    this.storeLucheng = 0;
-&#125;;
-Walk.prototype.playFrame = function () &#123;
-    setTimeout(() =&gt; &#123;
-
-        this.lucheng = this.storeLucheng;
-        this.timer = setInterval(() =&gt; &#123;
-            this.lucheng += this.speed;
-            this.dom.style.transform = `translate3d(0, -$&#123;this.lucheng&#125;px, 0)`;
-            if (this.lucheng - this.storeLucheng &gt;= this.danweiLucheng) &#123;
-                this.index++; //第一个动画结束，index下标下移
-                this.storeLucheng = this.lucheng;
-                if (this.index &gt;= this.data.length) &#123;
-                    this.dom.style.transform = &#39;translate3d(0, 0, 0)&#39;;
-                    this.init();
-                &#125;
-                clearInterval(this.timer);
-                this.playFrame();
-            &#125;
-
-        &#125;, 20)
-    &#125;, 1500)
-&#125;;
-</code></pre>
-<h4 id="js-Code-For-弹幕"><a href="#js-Code-For-弹幕" class="headerlink" title="js Code For 弹幕"></a>js Code For 弹幕</h4><pre><code class="js">; (function () &#123;
-    var Danmaku = window.Danmaku = function (&#123;
-        selector,
-        data = [],
-        speed = 1,
-        itemWidth = 180,
-        itemHeigth = 30,
-        spaceWidth = 50,
-    &#125;) &#123;
-        this.dom = document.querySelector(selector);
-        this.data = data;
-        this.speed = speed;
-        this.itemWidth = itemWidth;
-        this.itemHeigth = itemHeigth;
-        this.offsetWidth = this.data.length * this.itemWidth + (this.data.length - 1) * spaceWidth;
-        this.currentOffset = this.initOffset = window.innerWidth;
-        this.spaceWidth = spaceWidth;
-        this.init();
-        this.render();
-    &#125;
-    Danmaku.prototype.init = function () &#123;
-        this.currentOffset = this.initOffset;
-        this.dom.style.cssText = `width:$&#123;this.offsetWidth&#125;px;display:flex;background:transparent;transform:translate3d($&#123;this.initOffset&#125;px,0,0)`;
-    &#125;
-    Danmaku.prototype.render = function () &#123;
-        let htmlStr = &#39;&#39;;
-        let styleDom = document.createElement(&#39;style&#39;);
-        styleDom.innerHTML = `
-            .danmaku-item&#123;
-                width:$&#123;this.itemWidth&#125;px;
-                line-height:$&#123;this.itemHeigth&#125;px;
-                display:flex;
-                font-size: 12px;
-                color: #fff;
-                background: rgba(0, 0, 0, 0.7);
-                border-radius: $&#123;this.itemHeigth / 2&#125;px;
-                align-items: center;
-                margin-right: $&#123;this.spaceWidth&#125;px;
-                padding: 0 10px;
-            &#125;
-            .danmaku-item:nth-child(odd)&#123;
-                transform:translate3d(0,$&#123;this.itemHeigth / 3&#125;px,0);
-            &#125;
-            .danmaku-item:nth-child(even)&#123;
-                transform:translate3d(0,-$&#123;this.itemHeigth / 3&#125;px,0);
-            &#125;
-            .danmaku-text&#123;
-                flex: 1;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                word-break: break-all;
-            &#125;
-            .danmaku-img&#123;
-                width: 26px;
-                height: 26px;
-                border-radius: 13px;
-                object-fit: contain;
-                margin-right: 10px;
-            &#125;
-            `;
-        document.head.appendChild(styleDom);
-        this.data.forEach(d =&gt; &#123;
-            htmlStr += `&lt;div class=&quot;danmaku-item&quot;&gt;
-                            &lt;img class=&quot;danmaku-img&quot; src=&quot;$&#123;d.icon&#125;&quot;&gt;
-                            &lt;div class=&quot;danmaku-text&quot;&gt;$&#123;d.time&#125; 获得了星耀款&lt;/div&gt;
-                        &lt;/div&gt;`;
-        &#125;);
-        this.dom.innerHTML = htmlStr;
-    &#125;;
-    Danmaku.prototype.playFrame = function () &#123;
-        this.currentOffset -= this.speed;
-        this.dom.style.transform = `translate3d($&#123;this.currentOffset&#125;px,0,0)`;
-        if (this.currentOffset &lt;= -this.offsetWidth) &#123;
-            this.init();
-        &#125;
-        requestAnimationFrame(() =&gt; &#123;
-            this.playFrame();
-        &#125;)
-    &#125;
-
-&#125;)();
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/28/html-flutterAnimation/ " class="go-post">
         阅读全文
     </a>
 </div>

@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>JS获取用户IP及所在省市区</title>
+      <link href="/2023/06/06/js-getIPaddr/"/>
+      <url>/2023/06/06/js-getIPaddr/</url>
+      
+        <content type="html"><![CDATA[<h3 id="获取用户IP及所在省市区"><a href="#获取用户IP及所在省市区" class="headerlink" title="获取用户IP及所在省市区"></a>获取用户IP及所在省市区</h3><p><strong>ps:</strong> <em>1.通过<code>https://api.ipify.org?format=json</code>来获取当前用户<code>ip</code>（format可以为其他方式，如js&#x2F;jsonp拼接个callback）；2.通过百度查询ip地址的api查询省市区</em></p><h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    ; (function () &#123;        const ajax = function (url, cb = function () &#123; &#125;) &#123;            let xhr;            if (window.XMLHttpRequest) &#123;                xhr = new XMLHttpRequest();            &#125; else if (window.ActiveObject) &#123;//兼容IE6以下版本                xhr = new ActiveXobject(&#39;Microsoft.XMLHTTP&#39;);            &#125;            xhr.open(&quot;GET&quot;, url, true);            xhr.send(null);            xhr.onreadystatechange = function () &#123;                if (xhr.readyState == 4) &#123;                    typeof cb === &#39;function&#39; &amp;&amp; cb(JSON.parse(xhr.responseText))                &#125;            &#125;        &#125;        ajax(&#39;https://api.ipify.org?format=json&#39;, function (d1) &#123;            let ip = d1.ip;            ajax(&#39;https://qifu-api.baidubce.com/ip/geo/v1/district?ip=&#39; + ip, function (d2) &#123;                d2.data.ip = ip;                window.syf_ip_addr = d2.data;            &#125;)        &#125;)    &#125;)();</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> Js </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>前端工程化：你所需要知道的最新的babel兼容性实现方案</title>
       <link href="/2023/02/28/babel-%E5%85%BC%E5%AE%B9%E6%80%A7%E6%96%B9%E6%A1%88/"/>
       <url>/2023/02/28/babel-%E5%85%BC%E5%AE%B9%E6%80%A7%E6%96%B9%E6%A1%88/</url>

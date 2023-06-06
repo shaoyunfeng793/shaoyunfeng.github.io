@@ -166,6 +166,82 @@
 
 <div class="post">
 
+    <a href="/2022/09/30/webpack-multiInput/">
+        <h2>
+            Webpack之多入口&三种hash
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Webpack">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Webpack
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2022/9/30
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="Webpack之多入口-amp-三种hash"><a href="#Webpack之多入口-amp-三种hash" class="headerlink" title="Webpack之多入口&amp;三种hash"></a>Webpack之多入口&amp;三种hash</h3><p>webpack三种hash</p>
+<p>1.全局hash: <code>hash</code> 修改一个地方所有文件hash都改变</p>
+<p>2.内容hash: <code>contentHash</code>  根据自身文件修改了才会变hash</p>
+<p>3.分组hash: <code>chunkHash</code>  根据多入口文件分组 不同组之间hash值不相影响， 组内文件修改，该组hash改变</p>
+<h4 id="Webpack-配置"><a href="#Webpack-配置" class="headerlink" title="Webpack 配置"></a>Webpack 配置</h4><pre><code class="js">    module.exports = &#123;
+        entry: &#123;
+            main: &#39;./js/main.js&#39;,
+            other: &#39;./js/other.js&#39;
+        &#125;,
+        output: &#123;
+            filename: &#39;[name].[hash/contentHash/chunkHash].js&#39;,
+            path: path.resolve(__dirname, &#39;dist&#39;)
+        &#125;,
+        plugins: [
+            new HtmlWebpackPlugin(&#123;
+                filename: &#39;index.html&#39;,
+                template: &#39;./src/index.html&#39;,
+                chunks: [&#39;main&#39;]
+            &#125;),
+            new HtmlWebpackPlugin(&#123;
+                filename: &#39;other.html&#39;,
+                template: &#39;./src/other.html&#39;,
+                chunks: [&#39;other&#39;]
+            &#125;),
+        ]
+        // ...
+    &#125;
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2022/09/30/webpack-multiInput/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2022/09/30/webpack-optimization/">
         <h2>
             Webpack之抽离压缩css
@@ -1590,120 +1666,6 @@ export default &#123;
     </div>
 
     <a href="/2022/09/29/php-dealImage/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/09/29/axios-axiosInterceptor/">
-        <h2>
-            axios拦截器配置
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Axios">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Axios
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/9/29
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="axios拦截器配置"><a href="#axios拦截器配置" class="headerlink" title="axios拦截器配置"></a>axios拦截器配置</h3><p><strong>ps:</strong> <em>http请求很多都喜欢配置拦截器，生成专属request方法，通过设置请求拦截器注入token，设置响应拦截器对响应作出响应的处理，比如报错信息，这样就不需要每次在catch里去提示错误信息了</em></p>
-<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    import axios from &quot;axios&quot;;
-    import router from &#39;@/router/index.js&#39;;
-    import &#123; Message &#125; from &quot;element-ui&quot;;
-    import &#123; getToken, removeToken &#125; from &#39;@/utils/auth&#39;
-    const service = axios.create(&#123;
-    timeout: 20000 // 请求超时时间
-    &#125;);
-
-    // request拦截器，
-    service.interceptors.request.use(
-    config =&gt; &#123;
-        // 权限校验
-        var sysToken = getToken();
-        if (sysToken &amp;&amp; sysToken.length &gt; 0) &#123;
-        config.headers[&#39;Authorization&#39;] = sysToken
-        &#125;
-        return config;
-    &#125;,
-    error =&gt; &#123;
-        return Promise.reject(error);
-    &#125;
-    );
-    // response拦截器，
-    service.interceptors.response.use(
-    response =&gt; &#123;
-        if (response.config.responseType === &#39;blob&#39;) &#123;
-
-        if (response.status != 200) &#123;
-
-            Message.error(&#39;请求失败&#39; + response.status);
-            return Promise.reject()
-        &#125; else if (!response.headers[&quot;content-disposition&quot;]) &#123;
-
-            Message.error(&#39;暂无接口访问权限&#39;);
-            return Promise.reject()
-        &#125;
-        return response
-
-        &#125; else &#123;
-
-        if (response.data.code !== 0) &#123;
-            let errMsg = response.data.msg;
-            if (response.data.code == 401) &#123; // token失效
-            if (getToken()) &#123;
-                Message.error(errMsg);
-                removeToken()
-                router.replace(&#39;/Login&#39;)
-            &#125;
-            &#125; else &#123;
-            Message.error(errMsg);
-            &#125;
-            return Promise.reject(errMsg)
-        &#125;
-        return response.data;
-        &#125;
-
-    &#125;,
-    error =&gt; &#123;
-        Message.error(&#39;请求服务器失败&#39;);
-        return Promise.reject(error);
-    &#125;
-    );
-
-    export default service
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/09/29/axios-axiosInterceptor/ " class="go-post">
         阅读全文
     </a>
 </div>

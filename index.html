@@ -166,6 +166,81 @@
 
 <div class="post">
 
+    <a href="/2023/06/06/js-getIPaddr/">
+        <h2>
+            JS获取用户IP及所在省市区
+        </h2>
+    </a>
+
+    <div class="category-and-date">
+
+        
+        <span class="category">
+            <a href="/categories/Js">
+                <span class="icon">
+                    <a-icon type="book" theme="filled" /></span>
+                Js
+            </a>
+        </span>
+        
+
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2023/6/6
+        </span>
+
+    </div>
+
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            
+            <h3 id="获取用户IP及所在省市区"><a href="#获取用户IP及所在省市区" class="headerlink" title="获取用户IP及所在省市区"></a>获取用户IP及所在省市区</h3><p><strong>ps:</strong> <em>1.通过<code>https://api.ipify.org?format=json</code>来获取当前用户<code>ip</code>（format可以为其他方式，如js&#x2F;jsonp拼接个callback）；2.通过百度查询ip地址的api查询省市区</em></p>
+<h4 id="js-Code"><a href="#js-Code" class="headerlink" title="js Code"></a>js Code</h4><pre><code class="js">    ; (function () &#123;
+        const ajax = function (url, cb = function () &#123; &#125;) &#123;
+            let xhr;
+            if (window.XMLHttpRequest) &#123;
+                xhr = new XMLHttpRequest();
+            &#125; else if (window.ActiveObject) &#123;//兼容IE6以下版本
+                xhr = new ActiveXobject(&#39;Microsoft.XMLHTTP&#39;);
+            &#125;
+            xhr.open(&quot;GET&quot;, url, true);
+            xhr.send(null);
+            xhr.onreadystatechange = function () &#123;
+                if (xhr.readyState == 4) &#123;
+                    typeof cb === &#39;function&#39; &amp;&amp; cb(JSON.parse(xhr.responseText))
+                &#125;
+            &#125;
+        &#125;
+
+        ajax(&#39;https://api.ipify.org?format=json&#39;, function (d1) &#123;
+            let ip = d1.ip;
+            ajax(&#39;https://qifu-api.baidubce.com/ip/geo/v1/district?ip=&#39; + ip, function (d2) &#123;
+                d2.data.ip = ip;
+                window.syf_ip_addr = d2.data;
+            &#125;)
+        &#125;)
+    &#125;)();
+</code></pre>
+
+            
+        </div>
+    </div>
+
+    <div class="post-tags">
+        
+        
+    </div>
+
+    <a href="/2023/06/06/js-getIPaddr/ " class="go-post">
+        阅读全文
+    </a>
+</div>
+
+<div class="post">
+
     <a href="/2023/02/28/babel-兼容性方案/">
         <h2>
             前端工程化：你所需要知道的最新的babel兼容性实现方案
@@ -1872,222 +1947,6 @@ obj.c = 44 // print =&gt; &quot;触发视图更新--修改了属性:c;&quot;
     </div>
 
     <a href="/2022/10/20/bom-router/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2022/10/20/node-spider/">
-        <h2>
-            Node：爬取某网图片
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-        <span class="category">
-            <a href="/categories/Node">
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Node
-            </a>
-        </span>
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2022/10/20
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="Node：爬取某网图片"><a href="#Node：爬取某网图片" class="headerlink" title="Node：爬取某网图片"></a>Node：爬取某网图片</h3><h4 id="一些依赖"><a href="#一些依赖" class="headerlink" title="一些依赖"></a>一些依赖</h4><pre><code class="bash"> npm install cheerio download async superagent superagent-charset mkdirp
-</code></pre>
-<p><code>superagent</code> ajax请求库</p>
-<p><code>cheerio</code> node版的jquery，获取dom节点</p>
-<p><code>download</code> 下载文件库</p>
-<p><code>superagent-charset</code> 设置字符集，不然获取到的htmlDoc会有中文乱码</p>
-<p><code>async</code> mapLimit控制请求并发数，第一个回调是linkArr每个item项都执行的函数，处理完想要的数据后并return，第二个回调是linkArr每项都执行完后执行，返回一个err，和results，results就是包裹着第一个函数return值的数组（有点像promise.all）</p>
-<p>码云地址：<a target="_blank" rel="noopener" href="https://gitee.com/shaoyunfeng793/nodespider">https://gitee.com/shaoyunfeng793/nodespider</a></p>
-<h4 id="爬取结果"><a href="#爬取结果" class="headerlink" title="爬取结果"></a>爬取结果</h4><p><a target="_blank" rel="noopener" href="https://postimg.cc/2V2YCVLy"><img src="https://i.postimg.cc/13Z3cF9G/spider-mulu.png" alt="spider-mulu.png"></a><br><a target="_blank" rel="noopener" href="https://postimg.cc/GHsPCs5J"><img src="https://i.postimg.cc/pXssKfQ7/spider-imgs.png" alt="spider-imgs.png"></a></p>
-<h4 id="Nodejs-Code"><a href="#Nodejs-Code" class="headerlink" title="Nodejs Code"></a>Nodejs Code</h4><pre><code class="js">const request = require(&#39;superagent&#39;)
-require(&#39;superagent-charset&#39;)(request)
-const cheerio = require(&#39;cheerio&#39;)
-const download = require(&#39;download&#39;)
-const mkdirp = require(&#39;mkdirp&#39;)
-const async = require(&#39;async&#39;)
-const URL = require(&quot;url&quot;)
-
-// 保存地址
-var savePath = &#39;./img/&#39;;
-// 匹配URL
-var UrlReg = new RegExp(/^https?:\/\/(([a-zA-Z0-9_-])+(\.)?)*(:\d+)?(\/((\.)?(\?)?=?&amp;?[a-zA-Z0-9_-](\?)?)*)*$/i);
-// link收集器
-var globalLinkQueue = [];
-// 爬取次数
-var spiderCount = 0;
-// 爬取次数限制
-var spiderCountLimit = 2;
-
-spider(&#39;https://www.tupianzj.com/meinv/xiezhen/&#39;)
-
-// 校验是否是合法的href
-function isValidHref(href) &#123;
-    return /\S+\.html/.test(href)
-&#125;
-
-// 检索a标签的href
-function fetchLinks(&#123; $, selector, linksAry, title, link &#125;) &#123;
-    let aTags = $(selector), $aTag, aHref, aTitle;
-    let &#123; domain, hrefPrev &#125; = getHrefInfo(link)
-
-    for (let i = 0; i &lt; aTags.length; i++) &#123;
-        $aTag = $(aTags[i]);
-        aHref = $aTag.attr(&#39;href&#39;);
-        aTitle = title || $aTag.attr(&#39;title&#39;);
-
-        if (String(aHref).startsWith(&#39;/&#39;)) &#123;
-            aHref = domain + aHref
-        &#125; else &#123;
-            aHref = hrefPrev + aHref
-        &#125;
-
-        // 过滤：重复链接
-        if (!isValidHref(aHref) || linksAry.some(d =&gt; d.href == aHref)) &#123;
-            continue;
-        &#125;
-
-        linksAry.push(&#123;
-            title: aTitle,
-            href: aHref
-        &#125;)
-    &#125;
-&#125;
-
-// 获取当前链接的域名信息和拼接前缀
-function getHrefInfo(href) &#123;
-    let &#123; protocol, hostname &#125; = URL.parse(href);
-    let domain = protocol + &#39;//&#39; + hostname;
-    return &#123;
-        hrefPrev: href.split(&#39;/&#39;).slice(0, -1).join(&#39;/&#39;) + &#39;/&#39;,
-        domain: domain
-    &#125;
-&#125;
-// 请求url
-function req(url) &#123;
-    return new Promise((rev, rej) =&gt; &#123;
-        request(&#39;GET&#39;, url)
-            .charset(&#39;gbk&#39;)
-            .buffer(true)
-            .set(&#39;Cookie&#39;, &#39;t=cdd3345174aba64147a802b43a0999e6; r=8221; Hm_lvt_f5329ae3e00629a7bb8ad78d0efb7273=1667359683,1667462127,1667525488; Hm_lpvt_f5329ae3e00629a7bb8ad78d0efb7273=1667538578&#39;)
-            .set(&#39;User-Agent&#39;, &#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36&#39;)
-            .end(function (err, res) &#123;
-                if (err) &#123;
-                    rej(err)
-                    return
-                &#125;
-
-                rev(res)
-            &#125;)
-    &#125;)
-&#125;
-
-// 爬虫
-function spider(fetch_link) &#123;
-    console.log(`开始第$&#123;++spiderCount&#125;次入口爬虫...`)
-    req(fetch_link).then(res =&gt; &#123;
-        let linksAry = [];
-        fetchLinks(&#123;
-            $: cheerio.load(res.text),
-            selector: &#39;.list_con_box ul&gt;li&gt;a[href]&#39;,
-            linksAry: linksAry,
-            link: fetch_link
-        &#125;);
-        console.log(&#39;第一次抓取到的链接：\n&#39;, linksAry)
-
-
-        async.mapLimit(linksAry, 1, async function (&#123; href, title &#125;) &#123;
-            // 存在title：代表是抓取图片的目标地址
-            if (title) &#123;
-                // 创建目录
-                mkdirp(savePath + title);
-                let linksAry = [];
-                let &#123; text &#125; = await req(href);
-                let $$ = cheerio.load(text);
-                fetchLinks(&#123;
-                    $: $$,
-                    selector: &#39;.pages li&gt;a&#39;,
-                    linksAry: linksAry,
-                    link: href,
-                    title: title, //因为当前抓的页面里可能存在额外的图片链接地址，是属于同一分类， 防止收集链接的时候title为undefined
-                &#125;);
-
-                linksAry.unshift(&#123;
-                    title: title,
-                    href: href
-                &#125;);
-
-                return linksAry;
-
-            &#125; else &#123;
-                // 加入集合
-                if (!globalLinkQueue.some(d =&gt; d == href)) &#123;
-                    globalLinkQueue.push(href)
-                &#125;
-            &#125;
-
-        &#125;, (err, linksAry) =&gt; &#123;
-            let links = linksAry.filter(d =&gt; d != undefined).flat();
-            let count = 0;
-            let allCount = links.length;
-            console.log(&#39;第二次抓取到的链接：\n&#39;, links);
-
-            async.mapLimit(links, 1, async function (&#123; href, title &#125;) &#123;
-                let &#123; text &#125; = await req(href);
-                let $ = cheerio.load(text);
-                let imgSrc = $(&#39;.pic_tupian img&#39;).attr(&#39;src&#39;);
-                let &#123; domain, hrefPrev &#125; = getHrefInfo(href);
-                if (!UrlReg.test(imgSrc)) &#123;
-                    if (String(imgSrc).startsWith(&#39;/&#39;)) &#123;
-                        imgSrc = domain + imgSrc
-                    &#125; else &#123;
-                        imgSrc = hrefPrev + imgSrc
-                    &#125;
-                &#125;
-                await download(imgSrc, savePath + title);
-                console.log(`当前图片下载进度:$&#123;++count&#125;/$&#123;allCount&#125;\n`)
-            &#125;, () =&gt; &#123;
-                let href = globalLinkQueue.shift()
-                if (href &amp;&amp; spiderCount &lt;= spiderCountLimit) &#123;
-                    spider(href)
-                &#125;
-            &#125;)
-        &#125;)
-    &#125;).catch(err =&gt; &#123;
-        console.log(&#39;错误信息=》&#39;, err)
-    &#125;)
-&#125;
-
-</code></pre>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2022/10/20/node-spider/ " class="go-post">
         阅读全文
     </a>
 </div>

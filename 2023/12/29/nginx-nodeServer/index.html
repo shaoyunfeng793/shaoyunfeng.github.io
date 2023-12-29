@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杨红蓝 | categories</title>
+    <title>杨红蓝 | Linux:Nginx配置nodejs服务器</title>
     <meta name="author" content="Yanghonglan">
     <meta name="description" content="一名酷爱小猴紫的前端小猿的Blog ">
     <meta name="keywords" content=" ">
@@ -135,179 +135,155 @@
 
                 <div id="main">
                      
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/categories/Axios/" style=background:#03a9f4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Axios
-            </a>
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="articlebg"></div>
+<div class="article">
+    <div>
+        <h1>Linux:Nginx配置nodejs服务器 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <a-icon type="calendar" theme="filled" />
+            </span>
+            2023/12/29
         </span>
+
         
-        
-        
-        <span>
-            <a href="/categories/前端工程化/" style=background:#00a596>
+        <span class="category">
+            <a href="/categories/Nginx">
                 <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                前端工程化
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/BOM/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                BOM
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Canvas/" style=background:#ffa2c4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Canvas
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/CSS/" style=background:#ffa2c4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                CSS
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/HTML/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                HTML
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Js/" style=background:#03a9f4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Js
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Node/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Node
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/PHP/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                PHP
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Nginx/" style=background:#ffa2c4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
+                    <a-icon type="book" theme="filled" />
+                </span>
                 Nginx
             </a>
         </span>
         
-        
-        
-        <span>
-            <a href="/categories/小乔/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                小乔
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Svga/" style=background:#ffa2c4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Svga
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Vue/" style=background:#ff7d73>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Vue
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Utils/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Utils
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/Webpack/" style=background:#00bcd4>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                Webpack
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/categories/个人项目/" style=background:#00a596>
-                <span class="icon">
-                    <a-icon type="book" theme="filled" /></span>
-                个人项目
-            </a>
-        </span>
-        
+
         
     </div>
-    <div id="archives">
-        
+
+    <div class="content" v-pre>
+        <h3 id="Nginx配置nodejs服务器"><a href="#Nginx配置nodejs服务器" class="headerlink" title="Nginx配置nodejs服务器"></a>Nginx配置nodejs服务器</h3><h4 id="1-安装nodejs"><a href="#1-安装nodejs" class="headerlink" title="1. 安装nodejs"></a>1. 安装nodejs</h4><p><em>通过wget安装nodejs，安装路径为<code>/user/local/src</code>下新建的<code>node</code>目录</em></p>
+<pre><code class="bash">cd  /usr/local/src 
+mkdir node
+wget https://npm.taobao.org/mirrors/node/v12.18.2/node-v12.18.2-linux-x64.tar.xz
+tar -xvf node-v12.18.2-linux-x64.tar.xz #解压node安装包
+mv node-v12.18.2-linux-x64 nodejs #把解压后文件名改成nodejs，不然名字太长了
+cd nodejs/bin
+# 接下来就是配置环境path
+ln -s /usr/local/src/node/nodejs/bin/node /usr/local/bin/node
+ln -s /usr/local/src/node/nodejs/bin/npm /usr/local/bin/npm
+# 执行上面2个指令，可以全局使用node、npm
+node -v #输出版本号
+npm -v #输出版本号
+
+#安装pm2：node进程管理工具
+npm i -g pm2
+# 接下来还是是配置环境path
+ln -s /usr/local/src/node/nodejs/bin/pm2  /usr/local/bin/pm2
+# 执行上面指令，可以全局使用pm2
+pm2 -v #输出版本号
+pm2 start app.js #运行app.js程序：即服务器程序
+</code></pre>
+<h6 id="Node服务器Code"><a href="#Node服务器Code" class="headerlink" title="Node服务器Code"></a>Node服务器Code</h6><p><em>这里就简单使用<code>express</code>搭建node服务器</em></p>
+<pre><code class="js">// app.js
+const express = require(&quot;express&quot;);
+const router = express.Router();
+const https = require(&quot;https&quot;);
+const url = require(&quot;url&quot;);
+
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded(&#123; extended: false &#125;));
+
+app.all(&quot;*&quot;, function (req, res, next) &#123;
+  //设置允许跨域的域名，*代表允许任意域名跨域
+  res.header(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);
+  //允许的header类型
+  res.header(
+    &quot;Access-Control-Allow-Headers&quot;,
+    &quot;Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild&quot;
+  );
+  //跨域允许的请求方式
+  res.header(&quot;Access-Control-Allow-Methods&quot;, &quot;DELETE,PUT,POST,GET,OPTIONS&quot;);
+  if (req.method.toLowerCase() == &quot;options&quot;)
+    res.send(200); //让options尝试请求快速结束
+  else next();
+&#125;);
+
+app.use(router);
+router.get(&quot;/&quot;, (req, res) =&gt; &#123;
+  res.send(&quot;Wellcome Express&quot;);
+&#125;);
+router.post(&quot;/api/returnData&quot;, (req, res) =&gt; &#123;
+  console.log(req.body);
+  const endpoint = &quot;https://xxx.com&quot;;  // 别人服务器API地址
+  const parsedEndpoint = url.parse(endpoint); 
+
+  const postData = JSON.stringify(req.body);
+
+  const options = &#123;
+    hostname: parsedEndpoint.hostname,
+    port: parsedEndpoint.port,
+    path: parsedEndpoint.path,
+    method: &quot;POST&quot;,
+    headers: &#123;
+      &quot;Content-Type&quot;: &quot;application/json&quot;,
+      &quot;Content-Length&quot;: postData.length,
+    &#125;,
+  &#125;;
+
+  const request = https.request(options, (res1) =&gt; &#123;
+    //检验状态码，如果成功接收数据
+    if (res1.statusCode === 200) &#123;
+      res1.setEncoding(&quot;utf8&quot;);
+      res1.on(&quot;data&quot;, (chunk) =&gt; &#123;
+        res.send(JSON.parse(chunk));
+      &#125;);
+    &#125;
+  &#125;);
+
+  request.on(&quot;error&quot;, (e) =&gt; &#123;
+    res.send(&#123;
+      code: -1,
+      data: e.message,
+      message: &quot;请求错误&quot;,
+    &#125;);
+    console.error(`problem with request: $&#123;e.message&#125;`);
+  &#125;);
+
+  request.write(postData);
+  request.end();
+&#125;);
+
+app.listen(8080, () =&gt; &#123;
+  console.log(&quot;Server Running...&quot;);
+&#125;);
+</code></pre>
+<h4 id="2-配置Nginx"><a href="#2-配置Nginx" class="headerlink" title="2. 配置Nginx"></a>2. 配置Nginx</h4><p><em>进入到你的nginx&#x2F;conf&#x2F;，<code>vim nginx.conf</code>，只展示对应配置（其余不变）</em></p>
+<pre><code>
+server &#123;
+    listen 80;
+    server_name 服务器域名;
+
+    # 这个是配置前端项目
+    location / &#123;
+        root html/你的项目;
+        index index.html;
+    &#125;
+
+    # 这个是接口代理，把你前端项目的/api请求都反向代理到8080端口的node服务器
+    location /api/ &#123;
+        proxy_pass http://127.0.0.1:8080/; 
+    &#125;
+&#125;
+</code></pre>
+
     </div>
-    <script>
-        new Vue({
-            el: '#archives'
-        })
-    </script>
+
+    
 </div>
                      
 <footer id="footer">
